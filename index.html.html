@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>NOC ITS - Alertas de Link/Ping</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root { --its-blue: #002D5B; --its-red: #DC2626; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
+        .container { display: flex; gap: 30px; max-width: 1450px; width: 100%; align-items: flex-start; }
+        
+        .form-side { flex: 1; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; transition: all 0.3s; position: relative; }
+        .form-side h2 { color: var(--its-blue); margin: 0 0 25px 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; }
+        
+        .fogo-no-parquinho { border-top: 8px solid var(--its-red) !important; box-shadow: 0 0 25px rgba(220, 38, 38, 0.25) !important; }
+        .fogo-no-parquinho h2 { color: var(--its-red) !important; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 25px; }
+        .full-width { grid-column: span 2; }
+        
+        .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+        .label-flex { display: flex; justify-content: space-between; align-items: center; }
+        label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        .actions-flex { display: flex; gap: 12px; }
+        .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
+        .btn-action:hover { text-decoration: underline; color: #005a9e; }
+        .btn-template { color: #166534; } 
+        .btn-template:hover { color: #14532d; }
+
+        input, select, textarea { padding: 12px; border: 1.5px solid var(--its-border); border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff; color: var(--its-text); }
+        input:focus, select:focus, textarea:focus { border-color: var(--its-blue); box-shadow: 0 0 0 4px rgba(0,45,91,0.1); outline: none; }
+        
+        .erro-validacao { border-color: #991B1B !important; box-shadow: 0 0 0 4px rgba(153,27,27,0.1) !important; }
+        textarea { height: 120px; resize: none; line-height: 1.5; }
+
+        .button-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        
+        .btn-copy { flex: 1.5; background-color: #0ea5e9; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
+        .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
+        
+        .btn-copy-img { flex: 2; background-color: #059669; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+        .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
+        
+        .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
+        .btn-copy-subject:hover { background-color: #E0F2FE; }
+
+        .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
+        .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
+
+        .btn-theme { position: absolute; top: 30px; right: 30px; background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
+        .log-time { font-size: 11px; color: #64748B; font-weight: bold; }
+        .log-subject { font-size: 13px; color: #1E293B; font-family: monospace; }
+        .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
+
+        body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
+        body.dark-mode .form-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
+        body.dark-mode .form-side h2 { color: #38bdf8; }
+        body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
+        body.dark-mode label { color: #94A3B8; }
+        body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
+        body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
+        body.dark-mode .btn-copy-subject:hover { background-color: #0F172A; }
+        body.dark-mode .preview-side { background: #1E293B; border-color: #334155; }
+        body.dark-mode .modal-content { background: #1E293B; border: 1px solid #334155; }
+        body.dark-mode .log-item { background: #0F172A; border-color: #334155; }
+        body.dark-mode .log-subject { color: #F8FAFC; }
+        body.dark-mode .modal-content h3 { color: #38bdf8; }
+        
+        .preview-side { flex: 1.4; background: #CBD5E1; padding: 40px; border-radius: 16px; position: sticky; top: 20px; border: 1px solid #94A3B8; overflow-y: auto; max-height: 92vh; display: flex; justify-content: center; transition: background-color 0.3s; }
+    </style>
+</head>
+<body>
+
+<datalist id="lista-clientes">
+    <option value="838 Soluções"></option>
+    <option value="AgroStahl (STAHL)"></option>
+    <option value="Atmosphere"></option>
+    <option value="Autopass"></option>
+    <option value="B-Simple"></option>
+    <option value="Banco BS2"></option>
+    <option value="Banco Carrefour"></option>
+    <option value="Banco Sofisa"></option>
+    <option value="Banco Tricury"></option>
+    <option value="Base Telco"></option>
+    <option value="BrasilAgro (AGRO3)"></option>
+    <option value="Carbon"></option>
+    <option value="Cogna"></option>
+    <option value="Conab"></option>
+    <option value="CSD (Grupo Amigão)"></option>
+    <option value="Easy-Way"></option>
+    <option value="FIDI"></option>
+    <option value="Focus Têxtil"></option>
+    <option value="Furacão"></option>
+    <option value="Galderma Brasil"></option>
+    <option value="Grupo Agis"></option>
+    <option value="Hotelaria Alba"></option>
+    <option value="HidroMares by SGS"></option>
+    <option value="Hospital Personal"></option>
+    <option value="Saint Matthews"></option>
+    <option value="Igua Holding"></option>
+    <option value="ITS"></option>
+    <option value="ITS-Compliance"></option>
+    <option value="Itseg"></option>
+    <option value="JMC"></option>
+    <option value="Libbs Farmacêutica"></option>
+    <option value="Linha Uni"></option>
+    <option value="Lush"></option>
+    <option value="Makro"></option>
+    <option value="Makro Food Service"></option>
+    <option value="Master"></option>
+    <option value="MB Health"></option>
+    <option value="MeuCurso"></option>
+    <option value="Mindbe"></option>
+    <option value="Nava"></option>
+    <option value="Netpartners"></option>
+    <option value="Opt-Driven"></option>
+    <option value="Pizzamigos"></option>
+    <option value="Pryor Global"></option>
+    <option value="RNP"></option>
+    <option value="Saudescolha Benefícios"></option>
+    <option value="SGS"></option>
+    <option value="Shure"></option>
+    <option value="Soluarq"></option>
+    <option value="Solver"></option>
+    <option value="Strattner"></option>
+    <option value="Supper Certo"></option>
+    <option value="T4S Tecnologia"></option>
+    <option value="Tecnogera (TNG)"></option>
+    <option value="Teresa Perez"></option>
+    <option value="Visus Engenharia"></option>
+    <option value="Viveo"></option>
+</datalist>
+
+<datalist id="lista-operadoras">
+    <option value="Embratel"></option><option value="Algar"></option><option value="Vivo"></option>
+    <option value="Mundivox"></option><option value="Ascenty"></option><option value="ProntoFibra"></option>
+    <option value="Claro"></option><option value="AmericaNet"></option><option value="Texnet"></option>
+    <option value="Ultracom"></option><option value="HostFiber"></option><option value="Net"></option>
+    <option value="Apex Net"></option><option value="GIGA+"></option><option value="Mega Telecom"></option>
+    <option value="Vero"></option>
+</datalist>
+
+<div id="modal-historico" class="modal-overlay">
+    <div class="modal-content">
+        <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
+        <h3 style="margin-top: 0;">📜 Histórico do Plantão</h3>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Relatórios gerados e copiados nesta máquina.</p>
+        <div id="lista-historico"></div>
+        <button onclick="limparHistorico()" style="margin-top: 20px; padding: 12px; background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.2s;">🗑️ Apagar Histórico</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="form-side" id="form-container">
+        <h2 id="titulo-form">Gestão de Link/Ping</h2>
+        <button class="btn-theme" onclick="toggleTheme()">🌙 Modo Escuro</button>
+        <div class="form-grid">
+            
+            <div class="input-group"><label>Cliente</label><input type="text" id="cliente" list="lista-clientes" placeholder="Ex: CSD (Grupo Amigão)" oninput="update()"></div>
+            <div class="input-group"><label>Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
+            
+            <div class="input-group"><label>Item Monitorado (Serviço)</label><input type="text" id="item" placeholder="Ex: LINK_ALGAR_10MB" oninput="update()"></div>
+            <div class="input-group"><label>Severidade</label><select id="severidade" onchange="update()"><option value="WARNING">🟡 WARNING</option><option value="CRITICAL">🔴 CRITICAL</option><option value="UNKNOWN">🟣 UNKNOWN</option></select></div>
+
+            <div class="input-group full-width"><label>Dados Técnicos (Status Information do Centreon)</label><input type="text" id="statusinfo" placeholder="Cole o log do Centreon aqui. Ex: lost 100%" oninput="update()"></div>
+
+            <div class="input-group"><label>Status Atual</label><select id="status" onchange="update()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
+            <div class="input-group"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
+            
+            <div class="input-group">
+                <div class="label-flex">
+                    <label>Início da Ocorrência</label>
+                    <div class="actions-flex">
+                        <input type="datetime-local" id="inicio-cal" style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;" onchange="inserirDataPicker('inicio', this.value)">
+                        <button type="button" class="btn-action" onclick="abrirPicker('inicio-cal')">📅</button>
+                        <button type="button" class="btn-action" onclick="preencherAgoraText('inicio')">🕒</button>
+                    </div>
+                </div>
+                <input type="text" id="inicio" oninput="update()">
+            </div>
+
+            <div class="input-group">
+                <div class="label-flex">
+                    <label>Follow-Up</label>
+                    <div class="actions-flex">
+                        <input type="datetime-local" id="fgrid-cal" style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;" onchange="inserirDataPicker('f-grid', this.value)">
+                        <button type="button" class="btn-action" onclick="abrirPicker('fgrid-cal')">📅</button>
+                        <button type="button" class="btn-action" onclick="preencherAgoraText('f-grid')">🕒</button>
+                    </div>
+                </div>
+                <input type="text" id="f-grid" placeholder="Ex: Em contato com..." oninput="update()">
+            </div>
+            
+            <div class="input-group full-width">
+                <div class="label-flex">
+                    <label id="label-termino">Previsão de Normalização (SLA)</label>
+                    <div class="actions-flex">
+                        <input type="datetime-local" id="termino-cal" style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;" onchange="inserirDataPicker('termino', this.value)">
+                        <button type="button" class="btn-action" onclick="abrirPicker('termino-cal')">📅 Calendário</button>
+                        <button type="button" class="btn-action" onclick="preencherAgoraText('termino')">🕒 Atual</button>
+                    </div>
+                </div>
+                <input type="text" id="termino" placeholder="Ex: 20/03/2026 às 21:00..." oninput="update()">
+            </div>
+            
+            <div class="input-group full-width">
+                <div class="label-flex">
+                    <label>Ações / Diagnóstico</label>
+                    <button type="button" class="btn-action btn-template" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
+                </div>
+                <textarea id="desc" oninput="update()"></textarea>
+            </div>
+            
+            <div class="input-group"><label>Solucionador (Operadora)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()"></div>
+            <div class="input-group"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
+        </div>
+        
+        <div class="button-row">
+            <button class="btn-secondary" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
+            <button class="btn-secondary" onclick="abrirHistorico()" style="background-color: #E0E7FF; color: #3730A3;">📜 VER HISTÓRICO</button>
+        </div>
+        <div class="button-row" style="margin-bottom: 0;">
+            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+            <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
+            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM (P/ OUTLOOK)</button>
+        </div>
+    </div>
+
+    <div class="preview-side">
+        <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto;">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
+                
+                <tr>
+                    <td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;">
+                        </td>
+                </tr>
+                <tr>
+                    <td align="center" bgcolor="#002D5B" style="padding: 16px 20px;">
+                        <h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding: 35px 35px;">
+                        
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                            <tr>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div>
+                                    <div id="v-item" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
+                                </td>
+                                <td width="4%"></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Host</div>
+                                    <div id="v-host" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
+                                </td>
+                            </tr>
+                            <tr height="12"><td></td></tr>
+                            <tr>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Início Ocorrência</div>
+                                    <div id="v-inicio" style="font-size: 12px; color: #334155;">---</div>
+                                </td>
+                                <td></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Follow-Up</div>
+                                    <div id="v-f-grid" style="font-size: 12px; color: #334155;">-</div>
+                                </td>
+                            </tr>
+                            <tr height="12"><td></td></tr>
+                            <tr>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div>
+                                    <div id="v-protocolo" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
+                                </td>
+                                <td></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;" id="v-badge-container">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>
+                                    <table cellpadding="0" cellspacing="0" border="0" bgcolor="#FEE2E2" style="border-radius: 6px;">
+                                        <tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #991B1B;">EM ABERTO</td></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr height="12"><td></td></tr>
+                            <tr>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div>
+                                    <div id="v-solucionador" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
+                                </td>
+                                <td></td>
+                                <td width="48%"></td>
+                            </tr>
+                        </table>
+
+                        <div id="statusinfo-container" style="display: none; margin-top: 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #002D5B;">
+                                        <div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div>
+                                        <div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all;">---</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;">
+                            <tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr>
+                            <tr height="8"><td></td></tr>
+                            <tr>
+                                <td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 13px; color: #334155; font-weight: 500; border-radius: 0 8px 8px 0;">
+                                    <span id="v-termino">-</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;">
+                            <tr>
+                                <td style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 13px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;">
+                                    <div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div id="obs-container" style="display: none; margin-top: 25px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td bgcolor="#FFFBEB" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 12px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;">
+                                        <strong>Nota Adicional:</strong> <span id="v-obs"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" bgcolor="#F8FAFC" style="padding: 20px; border-top: 1px solid #E2E8F0; color: #94A3B8; font-size: 11px; letter-spacing: 0.05em;">
+                        SISTEMA DE GESTÃO NOC • <strong>ITS SOLUÇÕES</strong>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const templates = {
+        "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
+        "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
+        "RESOLVIDO": "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."
+    };
+
+    window.onload = function() {
+        document.getElementById('severidade').value = 'WARNING'; 
+        carregarRascunho();
+        update();
+    };
+
+    function inserirTemplate() {
+        const statusAtual = document.getElementById('status').value;
+        const textoDesc = document.getElementById('desc');
+        if (textoDesc.value.trim() !== "" && !confirm("Isso vai substituir o texto atual. Deseja continuar?")) return;
+        textoDesc.value = templates[statusAtual];
+        update();
+    }
+
+    function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
+
+    function inserirDataPicker(idTexto, valor) {
+        if (!valor) return;
+        const partes = valor.split('T');
+        const data = partes[0].split('-');
+        const dataFormatada = `${data[2]}/${data[1]}/${data[0]} às ${partes[1]}`;
+        const inputTexto = document.getElementById(idTexto);
+        inputTexto.value = inputTexto.value && !inputTexto.value.startsWith(dataFormatada) ? dataFormatada + ' - ' + inputTexto.value : dataFormatada;
+        update();
+    }
+
+    function preencherAgoraText(idTexto) {
+        const agora = new Date();
+        const dataFinal = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        const inputTexto = document.getElementById(idTexto);
+        inputTexto.value = inputTexto.value && !inputTexto.value.startsWith(dataFinal) ? dataFinal + ' - ' + inputTexto.value : dataFinal;
+        update();
+    }
+
+    function formatarColchetes(texto) {
+        return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>');
+    }
+
+    function obterAssuntoGerado() {
+        const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
+        const host = document.getElementById('host').value.toUpperCase() || 'HOST';
+        const item = document.getElementById('item').value.toUpperCase() || 'SERVIÇO';
+        const severidade = document.getElementById('severidade').value;
+        const statusSelect = document.getElementById('status').value;
+        
+        let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+        return `${cliente} | ${host} | ${item} | ${severidade} | ${acao}`;
+    }
+
+    function update() {
+        const severidade = document.getElementById('severidade').value;
+        const formContainer = document.getElementById('form-container');
+        const tituloForm = document.getElementById('titulo-form');
+        
+        if (severidade === 'CRITICAL') {
+            formContainer.classList.add('fogo-no-parquinho');
+            tituloForm.innerText = "🚨 Gestão de Link/Ping (CRITICAL)";
+        } else {
+            formContainer.classList.remove('fogo-no-parquinho');
+            tituloForm.innerText = "Gestão de Link/Ping";
+        }
+
+        const clienteInput = document.getElementById('cliente').value.toUpperCase().trim();
+        const headerCell = document.getElementById('render-header-cell');
+
+        if (logosClientes[clienteInput]) {
+            const clientLogoUrl = logosClientes[clienteInput];
+            headerCell.innerHTML = `
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed;">
+                    <tr>
+                        <td width="50%" align="center" valign="middle">
+                            <img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;">
+                        </td>
+                        <td width="50%" align="center" valign="middle">
+                            <img src="${clientLogoUrl}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;">
+                        </td>
+                    </tr>
+                </table>
+            `;
+        } else {
+            headerCell.innerHTML = `
+                <img src="${itsLogoUrl}" alt="ITS" width="160" style="display: block; margin: 0 auto;">
+            `;
+        }
+
+        document.getElementById('v-host').innerText = document.getElementById('host').value || '---';
+        document.getElementById('v-item').innerText = document.getElementById('item').value || '---';
+        document.getElementById('v-inicio').innerText = document.getElementById('inicio').value || '---';
+        document.getElementById('v-solucionador').innerText = document.getElementById('solucionador').value || '---';
+        document.getElementById('v-protocolo').innerText = document.getElementById('protocolo').value || '---';
+        
+        if (document.getElementById('protocolo').value.trim() !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
+        
+        let fgridText = document.getElementById('f-grid').value || '-';
+        document.getElementById('v-f-grid').innerHTML = formatarColchetes(fgridText);
+
+        let terminoText = document.getElementById('termino').value || '-';
+        document.getElementById('v-termino').innerHTML = formatarColchetes(terminoText);
+
+        const statusInfoText = document.getElementById('statusinfo').value.trim(); 
+        if (statusInfoText) {
+            document.getElementById('statusinfo-container').style.display = 'block';
+            document.getElementById('v-statusinfo').innerHTML = formatarColchetes(statusInfoText);
+        } else {
+            document.getElementById('statusinfo-container').style.display = 'none';
+        }
+
+        const descText = document.getElementById('desc').value;
+        let descFormatado = descText.trim() ? descText.replace(/\n/g, '<br>') : 'Aguardando atualização técnica...';
+        document.getElementById('v-desc').innerHTML = formatarColchetes(descFormatado);
+        
+        const obsText = document.getElementById('obs').value;
+        const obsContainer = document.getElementById('obs-container');
+        if (obsText.trim()) {
+            obsContainer.style.display = 'block';
+            document.getElementById('v-obs').innerHTML = formatarColchetes(obsText.replace(/\n/g, '<br>'));
+        } else {
+            obsContainer.style.display = 'none';
+        }
+
+        const status = document.getElementById('status').value;
+        const tituloV = document.getElementById('v-titulo');
+        const badgeContainer = document.getElementById('v-badge-container');
+        const labelTermino = document.getElementById('label-termino');
+        const vTituloTermino = document.getElementById('v-titulo-termino');
+        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
+
+        if (status === 'RESOLVIDO') { 
+            bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO';
+            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Encerramento de Incidente';
+            labelTermino.innerText = 'Fim da Ocorrência';
+            vTituloTermino.innerText = 'FIM DA OCORRÊNCIA';
+        } else if (status === 'EM ABERTO') { 
+            bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO';
+            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente';
+            labelTermino.innerText = 'Previsão de Normalização (SLA)';
+            vTituloTermino.innerText = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
+        } else { 
+            bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP';
+            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Follow-up de Incidente';
+            labelTermino.innerText = 'Previsão de Normalização (SLA)';
+            vTituloTermino.innerText = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
+        }
+
+        tituloV.innerText = tituloTexto;
+        badgeContainer.innerHTML = `
+            <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>
+            <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; border-radius: 6px; border: 1px solid ${fadeColor};">
+                <tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr>
+            </table>
+        `;
+        salvarRascunho();
+    }
+
+    function copiarAssuntoAcao() {
+        const assunto = obterAssuntoGerado();
+        const tempInput = document.createElement("input");
+        tempInput.value = assunto;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+
+        const btn = document.getElementById('btn-assunto');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ COPIADO!';
+        btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
+        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
+    }
+
+    function registrarHistoricoLocal() {
+        const assunto = obterAssuntoGerado();
+        const agora = new Date();
+        const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        let historico = JSON.parse(localStorage.getItem('noc_log_its') || '[]');
+        historico.unshift({ hora: hora, assunto: assunto }); 
+        if(historico.length > 40) historico.pop();
+        
+        localStorage.setItem('noc_log_its', JSON.stringify(historico));
+    }
+
+    function abrirHistorico() {
+        const listaHtml = document.getElementById('lista-historico');
+        const historico = JSON.parse(localStorage.getItem('noc_log_its') || '[]');
+        
+        if (historico.length === 0) {
+            listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum informe gerado neste plantão ainda.</div>';
+        } else {
+            listaHtml.innerHTML = historico.map(item => `
+                <div class="log-item">
+                    <span class="log-time">🕒 Enviado às ${item.hora}</span>
+                    <span class="log-subject">${item.assunto}</span>
+                </div>
+            `).join('');
+        }
+        document.getElementById('modal-historico').style.display = 'flex';
+    }
+
+    function fecharHistorico() {
+        document.getElementById('modal-historico').style.display = 'none';
+    }
+
+    function limparHistorico() {
+        if(confirm("Tem certeza que deseja apagar todo o histórico de informes de hoje?")) {
+            localStorage.removeItem('noc_log_its');
+            abrirHistorico(); 
+        }
+    }
+
+    function copyHTML() {
+        const status = document.getElementById('status').value;
+        const protocolo = document.getElementById('protocolo');
+        
+        if ((status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento.');
+            protocolo.classList.add('erro-validacao');
+            protocolo.focus();
+            setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
+            return; 
+        }
+
+        const node = document.getElementById('render');
+        const range = document.createRange();
+        range.selectNode(node);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+
+        registrarHistoricoLocal();
+
+        const btn = document.getElementById('btn-copiar-html');
+        const txtOriginal = btn.innerHTML;
+        btn.innerHTML = '✅ COPIADO!';
+        setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
+    }
+
+    function copyAsImage() {
+        const status = document.getElementById('status').value;
+        const protocolo = document.getElementById('protocolo');
+        
+        if ((status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora.');
+            protocolo.classList.add('erro-validacao');
+            protocolo.focus();
+            setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
+            return; 
+        }
+
+        const btn = document.getElementById('btn-copiar-img');
+        const originalText = btn.innerHTML;
+        
+        btn.innerHTML = '⏳ GERANDO...';
+
+        const node = document.getElementById('render');
+        const clone = node.cloneNode(true);
+        clone.style.position = 'absolute';
+        clone.style.top = '-9999px';
+        clone.style.left = '-9999px';
+        clone.style.width = '650px'; 
+        clone.style.height = 'auto';
+        document.body.appendChild(clone);
+
+        html2canvas(clone, {
+            scale: 0.9, 
+            useCORS: true,
+            backgroundColor: '#ffffff'
+        }).then(canvas => {
+            document.body.removeChild(clone);
+            canvas.toBlob(blob => {
+                try {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    navigator.clipboard.write([item]).then(() => {
+                        registrarHistoricoLocal();
+                        btn.innerHTML = '✅ IMAGEM COPIADA!';
+                        setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+                    });
+                } catch (err) {
+                    alert("A cópia automática de imagem não é suportada por este navegador. Tente usar o Google Chrome ou Edge.");
+                    btn.innerHTML = originalText;
+                }
+            });
+        }).catch(err => {
+            document.body.removeChild(clone);
+            console.error(err);
+            alert("Erro ao gerar a imagem.");
+            btn.innerHTML = originalText;
+        });
+    }
+
+    function limparFormulario() {
+        if(confirm("Deseja limpar todos os campos?")) {
+            document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+            document.getElementById('status').value = 'EM ABERTO';
+            document.getElementById('severidade').value = 'WARNING';
+            document.getElementById('protocolo').classList.remove('erro-validacao');
+            localStorage.removeItem('noc_rascunho_its'); 
+            update();
+        }
+    }
+
+    function salvarRascunho() {
+        const rascunho = {
+            cliente: document.getElementById('cliente').value,
+            severidade: document.getElementById('severidade').value,
+            host: document.getElementById('host').value,
+            status: document.getElementById('status').value,
+            item: document.getElementById('item').value,
+            protocolo: document.getElementById('protocolo').value,
+            solucionador: document.getElementById('solucionador').value,
+            inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value,
+            termino: document.getElementById('termino').value,
+            desc: document.getElementById('desc').value,
+            obs: document.getElementById('obs').value,
+            statusinfo: document.getElementById('statusinfo').value
+        };
+        localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho));
+    }
+
+    function carregarRascunho() {
+        const salvo = localStorage.getItem('noc_rascunho_its');
+        if (salvo) {
+            const rascunho = JSON.parse(salvo);
+            document.getElementById('cliente').value = rascunho.cliente || '';
+            document.getElementById('severidade').value = rascunho.severidade || 'WARNING';
+            document.getElementById('host').value = rascunho.host || '';
+            document.getElementById('status').value = rascunho.status || 'EM ABERTO';
+            document.getElementById('item').value = rascunho.item || '';
+            document.getElementById('protocolo').value = rascunho.protocolo || '';
+            document.getElementById('solucionador').value = rascunho.solucionador || '';
+            document.getElementById('inicio').value = rascunho.inicio || '';
+            document.getElementById('f-grid').value = rascunho.fgrid || '';
+            document.getElementById('termino').value = rascunho.termino || '';
+            document.getElementById('desc').value = rascunho.desc || '';
+            document.getElementById('obs').value = rascunho.obs || '';
+            document.getElementById('statusinfo').value = rascunho.statusinfo || '';
+        }
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        document.querySelector('.btn-theme').innerText = document.body.classList.contains('dark-mode') ? '☀️ Modo Claro' : '🌙 Modo Escuro';
+    }
+
+
+    // ====================================================================================
+    // --- DICIONÁRIO DE LOGOS (REFATORADO PARA ARQUIVOS LOCAIS) ---
+    // Coloque as logos na mesma pasta que este arquivo HTML e insira o nome do arquivo aqui
+    // ====================================================================================
+    const itsLogoUrl = "logo-its.png"; 
+
+    const logosClientes = {
+        "838 SOLUÇÕES": "logo-838-solucoes.png",
+        "AGROSTAHL (STAHL)": "logo-agrostahl.png",
+        "ATMOSPHERE": "logo-atmosphere.png",
+        "AUTOPASS": "logo-autopass.png",
+        "B-SIMPLE": "logo-b-simple.png",
+        "BANCO BS2": "logo-banco-bs2.png",
+        "BANCO CARREFOUR": "logo-banco-carrefour.png",
+        "BANCO SOFISA": "logo-banco-sofisa.png",
+        "BANCO TRICURY": "logo-banco-tricury.png",
+        "BASE TELCO": "logo-base-telco.png",
+        "BRASILAGRO (AGRO3)": "logo-brasilagro.png",
+        "CARBON": "logo-carbon.png",
+        "COGNA": "logo-cogna.png",
+        "CONAB": "logo-conab.png",
+        "CSD (GRUPO AMIGÃO)": "logo-csd.png",
+        "EASY-WAY": "logo-easy-way.png",
+        "FIDI": "logo-fidi.png",
+        "FOCUS TÊXTIL": "logo-focus-textil.png",
+        "FURACÃO": "logo-furacao.png",
+        "GALDERMA BRASIL": "logo-galderma.png",
+        "GRUPO AGIS": "logo-grupo-agis.png",
+        "HOTELARIA ALBA": "logo-hotelaria-alba.png",
+        "HIDROMARES BY SGS": "logo-hidromares.png",
+        "HOSPITAL PERSONAL": "logo-hospital-personal.png",
+        "SAINT MATTHEWS": "logo-saint-matthews.png",
+        "IGUA HOLDING": "logo-igua-holding.png",
+        "ITS": "logo-its-cliente.png",
+        "ITS-COMPLIANCE": "logo-its-compliance.png",
+        "ITSEG": "logo-itseg.png",
+        "JMC": "logo-jmc.png",
+        "LIBBS FARMACÊUTICA": "logo-libbs.png",
+        "LINHA UNI": "logo-linha-uni.png",
+        "LUSH": "logo-lush.png",
+        "MAKRO": "logo-makro.png",
+        "MAKRO FOOD SERVICE": "logo-makro-food.png",
+        "MASTER": "logo-master.png",
+        "MB HEALTH": "logo-mb-health.png",
+        "MEUCURSO": "logo-meucurso.png",
+        "MINDBE": "logo-mindbe.png",
+        "NAVA": "logo-nava.png",
+        "NETPARTNERS": "logo-netpartners.png",
+        "OPT-DRIVEN": "logo-optdriven.png",
+        "PIZZAMIGOS": "logo-pizzamigos.png",
+        "PRYOR GLOBAL": "logo-pryor-global.png",
+        "RNP": "logo-rnp.png",
+        "SAUDESCOLHA BENEFÍCIOS": "logo-saudescolha.png",
+        "SGS": "logo-sgs.png",
+        "SHURE": "logo-shure.png",
+        "SOLUARQ": "logo-soluarq.png",
+        "SOLVER": "logo-solver.png",
+        "STRATTNER": "logo-strattner.png",
+        "SUPPER CERTO": "logo-supper-certo.png",
+        "T4S TECNOLOGIA": "logo-t4s.png",
+        "TECNOGERA (TNG)": "logo-tecnogera.png",
+        "TERESA PEREZ": "logo-teresa-perez.png",
+        "VISUS ENGENHARIA": "logo-visus.png",
+        "VIVEO": "logo-viveo.png"
+    };
+
+</script>
+</body>
+</html>
