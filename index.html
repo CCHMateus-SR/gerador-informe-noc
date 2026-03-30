@@ -3,17 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <title>NOC ITS - Alertas de Link/Ping</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --its-blue: #002D5B; --its-red: #DC2626; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
+        :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         .container { display: flex; gap: 30px; max-width: 1450px; width: 100%; align-items: flex-start; }
         
         .form-side { flex: 1; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; transition: all 0.3s; position: relative; }
-        .form-side h2 { color: var(--its-blue); margin: 0 0 25px 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; }
+        
+        .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; gap: 15px; }
+        .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
+        .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
         
         .fogo-no-parquinho { border-top: 8px solid var(--its-red) !important; box-shadow: 0 0 25px rgba(220, 38, 38, 0.25) !important; }
         .fogo-no-parquinho h2 { color: var(--its-red) !important; }
+
+        .alerta-laranja { border-top: 8px solid var(--its-orange) !important; box-shadow: 0 0 25px rgba(234, 88, 12, 0.25) !important; }
+        .alerta-laranja h2 { color: var(--its-orange) !important; }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 25px; }
         .full-width { grid-column: span 2; }
@@ -33,6 +41,7 @@
         
         .erro-validacao { border-color: #991B1B !important; box-shadow: 0 0 0 4px rgba(153,27,27,0.1) !important; }
         textarea { height: 120px; resize: none; line-height: 1.5; }
+        .textarea-sm { height: 50px !important; }
 
         .button-row { display: flex; gap: 10px; margin-bottom: 10px; }
         
@@ -48,13 +57,21 @@
         .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
 
-        .btn-theme { position: absolute; top: 30px; right: 30px; background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; }
+        .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
+        
+        .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
+        .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
 
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(3px); }
+        .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
+        .btn-theme:hover { background: #F1F5F9; }
+
+        /* Modais */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 30px; border-radius: 16px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
-        .log-time { font-size: 11px; color: #64748B; font-weight: bold; }
-        .log-subject { font-size: 13px; color: #1E293B; font-family: monospace; }
+        .modal-login-content { width: 400px; text-align: center; }
+        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid #0EA5E9;}
+        .log-time { font-size: 11px; color: #64748B; font-weight: bold; display: flex; justify-content: space-between;}
+        .log-subject { font-size: 13px; color: #1E293B; font-family: monospace; font-weight: bold;}
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
 
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
@@ -63,111 +80,149 @@
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
         body.dark-mode label { color: #94A3B8; }
         body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
+        body.dark-mode .btn-theme:hover { background: #334155; }
+        body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
+        body.dark-mode .btn-sair { background: #450a0a; border-color: #7f1d1d; color: #f87171; }
+        body.dark-mode .btn-sair:hover { background: #7f1d1d; color: white; }
         body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
         body.dark-mode .btn-copy-subject:hover { background-color: #0F172A; }
         body.dark-mode .preview-side { background: #1E293B; border-color: #334155; }
         body.dark-mode .modal-content { background: #1E293B; border: 1px solid #334155; }
-        body.dark-mode .log-item { background: #0F172A; border-color: #334155; }
+        body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #38bdf8;}
         body.dark-mode .log-subject { color: #F8FAFC; }
         body.dark-mode .modal-content h3 { color: #38bdf8; }
+        body.dark-mode #texto-alerta { color: #F8FAFC !important; }
         
+        /* Ajuste visual para os optgroups no dark mode */
+        body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
+        body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
+
+        /* NEW ITS THEME CLASSES */
+        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
+        .btn-danger-its:hover { background-color: #991B1B; transform: translateY(-2px); }
+
+        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
+        .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
+
+        .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
+        .btn-login-its:hover { background-color: #991B1B; transform: translateY(-2px); }
+
+        /* Dark mode variant for history button */
+        body.dark-mode .btn-its-history { background-color: #92400E; color: #FFEDD5; }
+        body.dark-mode .btn-its-history:hover { background-color: var(--its-orange); color: white; }
+
         .preview-side { flex: 1.4; background: #CBD5E1; padding: 40px; border-radius: 16px; position: sticky; top: 20px; border: 1px solid #94A3B8; overflow-y: auto; max-height: 92vh; display: flex; justify-content: center; transition: background-color 0.3s; }
     </style>
 </head>
 <body>
 
 <datalist id="lista-clientes">
-    <option value="838 Soluções"></option>
-    <option value="AgroStahl (STAHL)"></option>
-    <option value="Atmosphere"></option>
-    <option value="Autopass"></option>
-    <option value="B-Simple"></option>
-    <option value="Banco BS2"></option>
-    <option value="Banco Carrefour"></option>
-    <option value="Banco Sofisa"></option>
-    <option value="Banco Tricury"></option>
-    <option value="Base Telco"></option>
-    <option value="BrasilAgro (AGRO3)"></option>
-    <option value="Carbon"></option>
-    <option value="Cogna"></option>
-    <option value="Conab"></option>
-    <option value="CSD (Grupo Amigão)"></option>
-    <option value="Easy-Way"></option>
-    <option value="FIDI"></option>
-    <option value="Focus Têxtil"></option>
-    <option value="Furacão"></option>
-    <option value="Galderma Brasil"></option>
-    <option value="Grupo Agis"></option>
-    <option value="Hotelaria Alba"></option>
-    <option value="HidroMares by SGS"></option>
-    <option value="Hospital Personal"></option>
-    <option value="Saint Matthews"></option>
-    <option value="Igua Holding"></option>
-    <option value="ITS"></option>
-    <option value="ITS-Compliance"></option>
-    <option value="Itseg"></option>
-    <option value="JMC"></option>
-    <option value="Libbs Farmacêutica"></option>
-    <option value="Linha Uni"></option>
-    <option value="Lush"></option>
-    <option value="Makro"></option>
-    <option value="Makro Food Service"></option>
-    <option value="Master"></option>
-    <option value="MB Health"></option>
-    <option value="MeuCurso"></option>
-    <option value="Mindbe"></option>
-    <option value="Nava"></option>
-    <option value="Netpartners"></option>
-    <option value="Opt-Driven"></option>
-    <option value="Pizzamigos"></option>
-    <option value="Pryor Global"></option>
-    <option value="RNP"></option>
-    <option value="Saudescolha Benefícios"></option>
-    <option value="SGS"></option>
-    <option value="Shure"></option>
-    <option value="Soluarq"></option>
-    <option value="Solver"></option>
-    <option value="Strattner"></option>
-    <option value="Supper Certo"></option>
-    <option value="T4S Tecnologia"></option>
-    <option value="Tecnogera (TNG)"></option>
-    <option value="Teresa Perez"></option>
-    <option value="Visus Engenharia"></option>
-    <option value="Viveo"></option>
+    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs Farmacêutica"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S Tecnologia"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
 </datalist>
 
 <datalist id="lista-operadoras">
-    <option value="Embratel"></option><option value="Algar"></option><option value="Vivo"></option>
-    <option value="Mundivox"></option><option value="Ascenty"></option><option value="ProntoFibra"></option>
-    <option value="Claro"></option><option value="AmericaNet"></option><option value="Texnet"></option>
-    <option value="Ultracom"></option><option value="HostFiber"></option><option value="Net"></option>
-    <option value="Apex Net"></option><option value="GIGA+"></option><option value="Mega Telecom"></option>
-    <option value="Vero"></option>
+    <option value="Embratel"></option><option value="Algar"></option><option value="Vivo"></option><option value="Mundivox"></option><option value="Ascenty"></option><option value="ProntoFibra"></option><option value="Claro"></option><option value="AmericaNet"></option><option value="Texnet"></option><option value="Ultracom"></option><option value="HostFiber"></option><option value="Net"></option><option value="Apex Net"></option><option value="GIGA+"></option><option value="Mega Telecom"></option><option value="Vero"></option>
 </datalist>
+
+<div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
+    <div class="modal-content" style="width: 450px; text-align: center; border-top: 8px solid #EA580C;">
+        <h3 style="margin-top: 0; color: #EA580C; font-size: 22px;">🚨 Atualização no Radar!</h3>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Um colega da equipe acabou de registrar uma ação:</p>
+        <div id="texto-alerta" style="font-size: 15px; color: #1E293B; margin-bottom: 30px; line-height: 1.6; font-weight: 500; background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #0EA5E9;">
+        </div>
+        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">CIENTE 👍</button>
+    </div>
+</div>
+
+<div id="modal-login" class="modal-overlay">
+    <div class="modal-content modal-login-content">
+        <img src="Logos/logo-its.png" alt="ITS" width="120" style="margin-bottom: 20px;">
+        <h3 style="margin-top: 0; color: #002D5B;">Bem Vindo!</h3>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 25px;">Identifique-se para utilizar o painel de operações.</p>
+        
+        <div style="text-align: left; margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px;">Seu Nome Oficial</label>
+            <select id="login-nome" style="width: 90%; box-sizing: border-box; padding: 12px; border-radius: 8px; border: 1px solid var(--its-border); font-size: 14px;">
+                <option value="" disabled selected>Selecione na lista...</option>
+                <optgroup label="Turno da Manhã">
+                    <option value="Guilherme Ribeiro">Guilherme Ribeiro</option>
+                    <option value="Lucas Ferreira">Lucas Ferreira</option>
+                    <option value="Maria Lenira">Maria Lenira</option>
+                    <option value="Matheus Cavalcante">Matheus Cavalcante</option>
+                </optgroup>
+                <optgroup label="Turno da Tarde">
+                    <option value="Deleon Lima">Deleon Lima</option>
+                    <option value="Gabriel Stanzione">Gabriel Stanzione</option>
+                    <option value="Leonardo Marinello">Leonardo Marinello</option>
+                    <option value="Luis Mateus">Luis Mateus</option>
+                    <option value="Mark Leal">Mark Leal</option>
+                </optgroup>
+                <optgroup label="Turno da Noite">
+                    <option value="Guilherme Pizi">Guilherme Pizi</option>
+                    <option value="Heitor Andre">Heitor Andre</option>
+                    <option value="Luciano Francisqueti">Luciano Francisqueti</option>
+                    <option value="Rodolfo Ferreira">Rodolfo Ferreira</option>
+                </optgroup>
+            </select>
+        </div>
+        <div style="text-align: left; margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 5px;">Turno</label>
+            <select id="login-turno" style="width: 90%; box-sizing: border-box; padding: 12px; border-radius: 8px; border: 1px solid var(--its-border); font-size: 14px;">
+                <option value="Manhã">Manhã (07h às 16h)</option>
+                <option value="Tarde">Tarde (13h às 22h)</option>
+                <option value="Noite">Noite (22h às 07h)</option>
+            </select>
+        </div>
+        <button onclick="salvarLogin()" class="btn-login-its">ENTRAR NO SISTEMA ITS 🚀</button>
+    </div>
+</div>
 
 <div id="modal-historico" class="modal-overlay">
     <div class="modal-content">
         <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
-        <h3 style="margin-top: 0;">📜 Histórico do Plantão</h3>
-        <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Relatórios gerados e copiados nesta máquina.</p>
-        <div id="lista-historico"></div>
-        <button onclick="limparHistorico()" style="margin-top: 20px; padding: 12px; background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.2s;">🗑️ Apagar Histórico</button>
+        <h3 style="margin-top: 0; color: #002D5B;">📡 Radar do Plantão</h3>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Relatórios despachados a partir das 07h00 de hoje.</p>
+        <div id="lista-historico" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;">
+        </div>
     </div>
 </div>
 
 <div class="container">
     <div class="form-side" id="form-container">
-        <h2 id="titulo-form">Gestão de Link/Ping</h2>
-        <button class="btn-theme" onclick="toggleTheme()">🌙 Modo Escuro</button>
+        
+        <div class="header-row">
+            <h2 id="titulo-form">Gestão de Link/Ping</h2>
+            <div class="top-controls">
+                <div id="user-display" class="user-badge">👤 Entrando...</div>
+                <button class="btn-sair" onclick="fazerLogout()">Sair</button>
+                <button class="btn-theme" onclick="toggleTheme()">🌙 Escuro</button>
+            </div>
+        </div>
+
         <div class="form-grid">
             
             <div class="input-group"><label>Cliente</label><input type="text" id="cliente" list="lista-clientes" placeholder="Ex: CSD (Grupo Amigão)" oninput="update()"></div>
             <div class="input-group"><label>Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
             
-            <div class="input-group"><label>Item Monitorado (Serviço)</label><input type="text" id="item" placeholder="Ex: LINK_ALGAR_10MB" oninput="update()"></div>
-            <div class="input-group"><label>Severidade</label><select id="severidade" onchange="update()"><option value="WARNING">🟡 WARNING</option><option value="CRITICAL">🔴 CRITICAL</option><option value="UNKNOWN">🟣 UNKNOWN</option></select></div>
+            <div class="input-group">
+                <label>Item Monitorado (Serviço)</label>
+                <textarea id="item" class="textarea-sm" placeholder="Ex: Ping&#10;LINK APEX NET 50MB" oninput="update()"></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label>Severidade / Comportamento</label>
+                <select id="severidade" onchange="update()">
+                    <option value="WARNING">🟡 WARNING</option>
+                    <option value="CRITICAL">🔴 CRITICAL</option>
+                    <option value="INTERMITENTE">🟠 INTERMITENTE</option>
+                    <option value="UNKNOWN">🟣 UNKNOWN</option>
+                </select>
+            </div>
 
-            <div class="input-group full-width"><label>Dados Técnicos (Status Information do Centreon)</label><input type="text" id="statusinfo" placeholder="Cole o log do Centreon aqui. Ex: lost 100%" oninput="update()"></div>
+            <div class="input-group full-width">
+                <label>Dados Técnicos (Status Information do Centreon)</label>
+                <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui...&#10;Pode colar várias linhas." oninput="update()"></textarea>
+            </div>
 
             <div class="input-group"><label>Status Atual</label><select id="status" onchange="update()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
             <div class="input-group"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
@@ -221,8 +276,8 @@
         </div>
         
         <div class="button-row">
-            <button class="btn-secondary" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-            <button class="btn-secondary" onclick="abrirHistorico()" style="background-color: #E0E7FF; color: #3730A3;">📜 VER HISTÓRICO</button>
+            <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
+            <button class="btn-its-history" onclick="abrirHistorico()">📡 HISTÓRICO DA EQUIPE</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
             <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
@@ -237,7 +292,7 @@
                 
                 <tr>
                     <td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;">
-                        </td>
+                    </td>
                 </tr>
                 <tr>
                     <td align="center" bgcolor="#002D5B" style="padding: 16px 20px;">
@@ -252,7 +307,7 @@
                             <tr>
                                 <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
                                     <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div>
-                                    <div id="v-item" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
+                                    <div id="v-item" style="font-size: 13px; color: #0F172A; font-weight: 700; line-height: 1.4;">---</div>
                                 </td>
                                 <td width="4%"></td>
                                 <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
@@ -302,7 +357,7 @@
                                 <tr>
                                     <td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #002D5B;">
                                         <div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div>
-                                        <div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all;">---</div>
+                                        <div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all; line-height: 1.5;">---</div>
                                     </td>
                                 </tr>
                             </table>
@@ -351,23 +406,227 @@
 </div>
 
 <script>
+    // ==========================================
+    // CONFIGURAÇÃO DO FIREBASE (BANCO DE DADOS)
+    // ==========================================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDfs3d6GS9pmVmaRJgMaKNViaGoXErCQgo",
+        authDomain: "noc-its-logs.firebaseapp.com",
+        databaseURL: "https://noc-its-logs-default-rtdb.firebaseio.com",
+        projectId: "noc-its-logs",
+        storageBucket: "noc-its-logs.firebasestorage.app",
+        messagingSenderId: "872743555303",
+        appId: "1:872743555303:web:61be8c8f9fe0ae8ccf1242"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function getInicioDoPlantaoTimestamp() {
+        const agora = new Date();
+        const inicioPlantao = new Date(agora);
+        inicioPlantao.setHours(7, 0, 0, 0); 
+        if (agora.getHours() < 7) {
+            inicioPlantao.setDate(inicioPlantao.getDate() - 1);
+        }
+        return inicioPlantao.getTime();
+    }
+
+    // ==========================================
+    // SISTEMA DE LOGIN DO ANALISTA
+    // ==========================================
+    let currentUser = JSON.parse(localStorage.getItem('noc_user_info'));
+
+    window.onload = function() {
+        document.getElementById('severidade').value = 'WARNING'; 
+        carregarRascunho();
+        update();
+        
+        if (!currentUser) {
+            document.getElementById('modal-login').style.display = 'flex';
+        } else {
+            document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
+        }
+    };
+
+    function salvarLogin() {
+        const nomeEl = document.getElementById('login-nome');
+        const nome = nomeEl.value;
+        const turno = document.getElementById('login-turno').value;
+        
+        if(!nome || nome === "") { 
+            alert("Por favor, selecione seu nome na lista oficial!"); 
+            return; 
+        }
+        
+        currentUser = { nome, turno };
+        localStorage.setItem('noc_user_info', JSON.stringify(currentUser));
+        
+        document.getElementById('modal-login').style.display = 'none';
+        document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
+    }
+
+    function fazerLogout() {
+        if(confirm("Deseja sair do seu usuário atual?")) {
+            localStorage.removeItem('noc_user_info');
+            currentUser = null;
+            document.getElementById('modal-login').style.display = 'flex';
+            document.getElementById('user-display').innerText = `👤 Entrando...`;
+            document.getElementById('login-nome').value = ''; 
+        }
+    }
+
+    // ==========================================
+    // SISTEMA DE ALERTAS INVASIVOS (COM FILA)
+    // ==========================================
+    let filaDeAlertas = [];
+    let modalAberto = false;
+
+    function mostrarAlertaBloqueante(mensagemObj) {
+        const htmlMensagem = `
+            <strong>👤 ${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe às ${mensagemObj.hora}:<br><br>
+            <span style="font-family: monospace; font-size: 16px;">${mensagemObj.assunto}</span>
+        `;
+        filaDeAlertas.push(htmlMensagem);
+        if (!modalAberto) exibirProximoAlerta();
+    }
+
+    function exibirProximoAlerta() {
+        if (filaDeAlertas.length === 0) {
+            document.getElementById('modal-alerta').style.display = 'none';
+            modalAberto = false;
+            return;
+        }
+        modalAberto = true;
+        const mensagemAtual = filaDeAlertas[0];
+        document.getElementById('texto-alerta').innerHTML = mensagemAtual;
+        document.getElementById('modal-alerta').style.display = 'flex';
+    }
+
+    function fecharAlertaBloqueante() {
+        filaDeAlertas.shift(); 
+        exibirProximoAlerta(); 
+    }
+
+    let isInitialLoad = true;
+    db.ref('historico_noc').orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
+        if (isInitialLoad) { isInitialLoad = false; return; }
+        const data = snapshot.val();
+        if(currentUser && data.nome !== currentUser.nome) {
+            mostrarAlertaBloqueante(data);
+        }
+    });
+
+    // ==========================================
+    // SISTEMA DE PREVENÇÃO DE COLISÃO (DUPLICIDADE)
+    // ==========================================
+    let ultimosLogsFirebase = [];
+    db.ref('historico_noc').orderByChild('timestamp').limitToLast(150).on('value', (snapshot) => {
+        ultimosLogsFirebase = [];
+        snapshot.forEach(child => { ultimosLogsFirebase.push(child.val()); });
+    });
+
+    function verificarDuplicidade() {
+        const cliente = document.getElementById('cliente').value.toUpperCase().trim();
+        const host = document.getElementById('host').value.toUpperCase().trim();
+        const statusSelect = document.getElementById('status').value;
+        
+        if (!cliente || !host) return true;
+        
+        let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+        const buscaStr = `${cliente} | ${host}`;
+        const inicioTurno = getInicioDoPlantaoTimestamp(); 
+        
+        for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
+            let log = ultimosLogsFirebase[i];
+            if (log.timestamp < inicioTurno) continue; 
+            
+            if(log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
+                if(currentUser && log.nome !== currentUser.nome) {
+                    const mensagem = `⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este cliente/host às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`;
+                    return confirm(mensagem); 
+                }
+                return true; 
+            }
+        }
+        return true; 
+    }
+
+    // ==========================================
+    // GRAVAÇÃO E LEITURA NO BANCO (NUVEM)
+    // ==========================================
+    function registrarHistoricoNuvem(assunto) {
+        if(!currentUser) return;
+        const logRef = db.ref('historico_noc');
+        const agora = new Date();
+        const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        
+        logRef.push({
+            nome: currentUser.nome,
+            turno: currentUser.turno,
+            assunto: assunto,
+            hora: horaStr,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+    }
+
+    function abrirHistorico() {
+        document.getElementById('modal-historico').style.display = 'flex';
+        const listaHtml = document.getElementById('lista-historico');
+        listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar do plantão...</div>';
+        
+        const inicioTurno = getInicioDoPlantaoTimestamp(); 
+        
+        db.ref('historico_noc').orderByChild('timestamp').startAt(inicioTurno).once('value', (snapshot) => {
+            if(!snapshot.exists()) {
+                listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum informe registrado desde as 07h00 de hoje.</div>';
+                return;
+            }
+            let html = '';
+            const logs = [];
+            snapshot.forEach(child => { logs.push(child.val()); });
+            logs.reverse(); 
+            
+            logs.forEach(item => {
+                html += `
+                <div class="log-item">
+                    <div class="log-time">
+                        <span>🕒 ${item.hora}</span>
+                        <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
+                    </div>
+                    <span class="log-subject">${item.assunto}</span>
+                </div>`;
+            });
+            listaHtml.innerHTML = html;
+        });
+    }
+
+    function fecharHistorico() {
+        document.getElementById('modal-historico').style.display = 'none';
+    }
+
+    // ==========================================
+    // LÓGICA DO PAINEL (CÓDIGO EXISTENTE)
+    // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
         "RESOLVIDO": "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."
     };
 
-    window.onload = function() {
-        document.getElementById('severidade').value = 'WARNING'; 
-        carregarRascunho();
-        update();
-    };
-
     function inserirTemplate() {
         const statusAtual = document.getElementById('status').value;
+        const severidade = document.getElementById('severidade').value;
         const textoDesc = document.getElementById('desc');
+        
         if (textoDesc.value.trim() !== "" && !confirm("Isso vai substituir o texto atual. Deseja continuar?")) return;
-        textoDesc.value = templates[statusAtual];
+        
+        let textoFinal = templates[statusAtual];
+        if (severidade === 'INTERMITENTE') {
+            textoFinal = textoFinal.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação");
+            textoFinal = textoFinal.replace("foi restabelecido", "foi estabilizado");
+        }
+        textoDesc.value = textoFinal;
         update();
     }
 
@@ -398,10 +657,10 @@
     function obterAssuntoGerado() {
         const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
         const host = document.getElementById('host').value.toUpperCase() || 'HOST';
-        const item = document.getElementById('item').value.toUpperCase() || 'SERVIÇO';
+        let itemRaw = document.getElementById('item').value.toUpperCase().trim();
+        const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
         const severidade = document.getElementById('severidade').value;
         const statusSelect = document.getElementById('status').value;
-        
         let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
         return `${cliente} | ${host} | ${item} | ${severidade} | ${acao}`;
     }
@@ -412,10 +671,15 @@
         const tituloForm = document.getElementById('titulo-form');
         
         if (severidade === 'CRITICAL') {
+            formContainer.classList.remove('alerta-laranja');
             formContainer.classList.add('fogo-no-parquinho');
             tituloForm.innerText = "🚨 Gestão de Link/Ping (CRITICAL)";
-        } else {
+        } else if (severidade === 'INTERMITENTE') {
             formContainer.classList.remove('fogo-no-parquinho');
+            formContainer.classList.add('alerta-laranja');
+            tituloForm.innerText = "⚠️ Gestão de Link/Ping (INTERMITENTE)";
+        } else {
+            formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja');
             tituloForm.innerText = "Gestão de Link/Ping";
         }
 
@@ -443,7 +707,9 @@
         }
 
         document.getElementById('v-host').innerText = document.getElementById('host').value || '---';
-        document.getElementById('v-item').innerText = document.getElementById('item').value || '---';
+        const itemText = document.getElementById('item').value.trim();
+        document.getElementById('v-item').innerHTML = itemText ? itemText.replace(/\n/g, '<br>') : '---';
+
         document.getElementById('v-inicio').innerText = document.getElementById('inicio').value || '---';
         document.getElementById('v-solucionador').innerText = document.getElementById('solucionador').value || '---';
         document.getElementById('v-protocolo').innerText = document.getElementById('protocolo').value || '---';
@@ -459,7 +725,7 @@
         const statusInfoText = document.getElementById('statusinfo').value.trim(); 
         if (statusInfoText) {
             document.getElementById('statusinfo-container').style.display = 'block';
-            document.getElementById('v-statusinfo').innerHTML = formatarColchetes(statusInfoText);
+            document.getElementById('v-statusinfo').innerHTML = formatarColchetes(statusInfoText.replace(/\n/g, '<br>'));
         } else {
             document.getElementById('statusinfo-container').style.display = 'none';
         }
@@ -512,6 +778,8 @@
     }
 
     function copiarAssuntoAcao() {
+        if (!verificarDuplicidade()) return; 
+        
         const assunto = obterAssuntoGerado();
         const tempInput = document.createElement("input");
         tempInput.value = assunto;
@@ -524,53 +792,17 @@
         const originalText = btn.innerHTML;
         btn.innerHTML = '✅ COPIADO!';
         btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
+        
+        registrarHistoricoNuvem(assunto); 
+        
         setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
     }
 
-    function registrarHistoricoLocal() {
-        const assunto = obterAssuntoGerado();
-        const agora = new Date();
-        const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        let historico = JSON.parse(localStorage.getItem('noc_log_its') || '[]');
-        historico.unshift({ hora: hora, assunto: assunto }); 
-        if(historico.length > 40) historico.pop();
-        
-        localStorage.setItem('noc_log_its', JSON.stringify(historico));
-    }
-
-    function abrirHistorico() {
-        const listaHtml = document.getElementById('lista-historico');
-        const historico = JSON.parse(localStorage.getItem('noc_log_its') || '[]');
-        
-        if (historico.length === 0) {
-            listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum informe gerado neste plantão ainda.</div>';
-        } else {
-            listaHtml.innerHTML = historico.map(item => `
-                <div class="log-item">
-                    <span class="log-time">🕒 Enviado às ${item.hora}</span>
-                    <span class="log-subject">${item.assunto}</span>
-                </div>
-            `).join('');
-        }
-        document.getElementById('modal-historico').style.display = 'flex';
-    }
-
-    function fecharHistorico() {
-        document.getElementById('modal-historico').style.display = 'none';
-    }
-
-    function limparHistorico() {
-        if(confirm("Tem certeza que deseja apagar todo o histórico de informes de hoje?")) {
-            localStorage.removeItem('noc_log_its');
-            abrirHistorico(); 
-        }
-    }
-
     function copyHTML() {
+        if (!verificarDuplicidade()) return; 
+        
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
-        
         if ((status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
             alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento.');
             protocolo.classList.add('erro-validacao');
@@ -587,7 +819,7 @@
         document.execCommand('copy');
         window.getSelection().removeAllRanges();
 
-        registrarHistoricoLocal();
+        registrarHistoricoNuvem(obterAssuntoGerado()); 
 
         const btn = document.getElementById('btn-copiar-html');
         const txtOriginal = btn.innerHTML;
@@ -596,9 +828,10 @@
     }
 
     function copyAsImage() {
+        if (!verificarDuplicidade()) return; 
+        
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
-        
         if ((status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
             alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora.');
             protocolo.classList.add('erro-validacao');
@@ -609,7 +842,6 @@
 
         const btn = document.getElementById('btn-copiar-img');
         const originalText = btn.innerHTML;
-        
         btn.innerHTML = '⏳ GERANDO...';
 
         const node = document.getElementById('render');
@@ -621,28 +853,25 @@
         clone.style.height = 'auto';
         document.body.appendChild(clone);
 
-        html2canvas(clone, {
-            scale: 0.9, 
-            useCORS: true,
-            backgroundColor: '#ffffff'
-        }).then(canvas => {
+        html2canvas(clone, { scale: 0.9, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             document.body.removeChild(clone);
             canvas.toBlob(blob => {
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     navigator.clipboard.write([item]).then(() => {
-                        registrarHistoricoLocal();
+                        
+                        registrarHistoricoNuvem(obterAssuntoGerado()); 
+                        
                         btn.innerHTML = '✅ IMAGEM COPIADA!';
                         setTimeout(() => { btn.innerHTML = originalText; }, 3000);
                     });
                 } catch (err) {
-                    alert("A cópia automática de imagem não é suportada por este navegador. Tente usar o Google Chrome ou Edge.");
+                    alert("A cópia automática de imagem não é suportada por este navegador.");
                     btn.innerHTML = originalText;
                 }
             });
         }).catch(err => {
             document.body.removeChild(clone);
-            console.error(err);
             alert("Erro ao gerar a imagem.");
             btn.innerHTML = originalText;
         });
@@ -703,71 +932,65 @@
         document.querySelector('.btn-theme').innerText = document.body.classList.contains('dark-mode') ? '☀️ Modo Claro' : '🌙 Modo Escuro';
     }
 
-
-    // ====================================================================================
-    // --- DICIONÁRIO DE LOGOS (REFATORADO PARA ARQUIVOS LOCAIS) ---
-    // Coloque as logos na mesma pasta que este arquivo HTML e insira o nome do arquivo aqui
-    // ====================================================================================
-    const itsLogoUrl = "logo-its.png"; 
-
+    const itsLogoUrl = "Logos/logo-its.png"; 
     const logosClientes = {
-        "838 SOLUÇÕES": "logo-838-solucoes.png",
-        "AGROSTAHL (STAHL)": "logo-agrostahl.png",
-        "ATMOSPHERE": "logo-atmosphere.png",
-        "AUTOPASS": "logo-autopass.png",
-        "B-SIMPLE": "logo-b-simple.png",
-        "BANCO BS2": "logo-banco-bs2.png",
-        "BANCO CARREFOUR": "logo-banco-carrefour.png",
-        "BANCO SOFISA": "logo-banco-sofisa.png",
-        "BANCO TRICURY": "logo-banco-tricury.png",
-        "BASE TELCO": "logo-base-telco.png",
-        "BRASILAGRO (AGRO3)": "logo-brasilagro.png",
-        "CARBON": "logo-carbon.png",
-        "COGNA": "logo-cogna.png",
-        "CONAB": "logo-conab.png",
-        "CSD (GRUPO AMIGÃO)": "logo-csd.png",
-        "EASY-WAY": "logo-easy-way.png",
-        "FIDI": "logo-fidi.png",
-        "FOCUS TÊXTIL": "logo-focus-textil.png",
-        "FURACÃO": "logo-furacao.png",
-        "GALDERMA BRASIL": "logo-galderma.png",
-        "GRUPO AGIS": "logo-grupo-agis.png",
-        "HOTELARIA ALBA": "logo-hotelaria-alba.png",
-        "HIDROMARES BY SGS": "logo-hidromares.png",
-        "HOSPITAL PERSONAL": "logo-hospital-personal.png",
-        "SAINT MATTHEWS": "logo-saint-matthews.png",
-        "IGUA HOLDING": "logo-igua-holding.png",
-        "ITS": "logo-its-cliente.png",
-        "ITS-COMPLIANCE": "logo-its-compliance.png",
-        "ITSEG": "logo-itseg.png",
-        "JMC": "logo-jmc.png",
-        "LIBBS FARMACÊUTICA": "logo-libbs.png",
-        "LINHA UNI": "logo-linha-uni.png",
-        "LUSH": "logo-lush.png",
-        "MAKRO": "logo-makro.png",
-        "MAKRO FOOD SERVICE": "logo-makro-food.png",
-        "MASTER": "logo-master.png",
-        "MB HEALTH": "logo-mb-health.png",
-        "MEUCURSO": "logo-meucurso.png",
-        "MINDBE": "logo-mindbe.png",
-        "NAVA": "logo-nava.png",
-        "NETPARTNERS": "logo-netpartners.png",
-        "OPT-DRIVEN": "logo-optdriven.png",
-        "PIZZAMIGOS": "logo-pizzamigos.png",
-        "PRYOR GLOBAL": "logo-pryor-global.png",
-        "RNP": "logo-rnp.png",
-        "SAUDESCOLHA BENEFÍCIOS": "logo-saudescolha.png",
-        "SGS": "logo-sgs.png",
-        "SHURE": "logo-shure.png",
-        "SOLUARQ": "logo-soluarq.png",
-        "SOLVER": "logo-solver.png",
-        "STRATTNER": "logo-strattner.png",
-        "SUPPER CERTO": "logo-supper-certo.png",
-        "T4S TECNOLOGIA": "logo-t4s.png",
-        "TECNOGERA (TNG)": "logo-tecnogera.png",
-        "TERESA PEREZ": "logo-teresa-perez.png",
-        "VISUS ENGENHARIA": "logo-visus.png",
-        "VIVEO": "logo-viveo.png"
+        "838 SOLUÇÕES": "Logos/logo-838-solucoes.png",
+        "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png",
+        "ATMOSPHERE": "Logos/logo-atmosphere.png",
+        "AUTOPASS": "Logos/logo-autopass.png",
+        "B-SIMPLE": "Logos/logo-b-simple.png",
+        "BANCO BS2": "Logos/logo-banco-bs2.png",
+        "BANCO CARREFOUR": "Logos/logo-banco-carrefour.png",
+        "BANCO SOFISA": "Logos/logo-banco-sofisa.png",
+        "BANCO TRICURY": "Logos/logo-banco-tricury.png",
+        "BASE TELCO": "Logos/logo-base-telco.png",
+        "BRASILAGRO (AGRO3)": "Logos/logo-brasilagro.png",
+        "CARBON": "Logos/logo-carbon.png",
+        "COGNA": "Logos/logo-cogna.png",
+        "CONAB": "Logos/logo-conab.png",
+        "CSD (GRUPO AMIGÃO)": "Logos/logo-csd.png",
+        "EASY-WAY": "Logos/logo-easy-way.png",
+        "FIDI": "Logos/logo-fidi.png",
+        "FOCUS TÊXTIL": "Logos/logo-focus-textil.png",
+        "FURACÃO": "Logos/logo-furacao.png",
+        "GALDERMA BRASIL": "Logos/logo-galderma.png",
+        "GRUPO AGIS": "Logos/logo-grupo-agis.png",
+        "HOTELARIA ALBA": "Logos/logo-hotelaria-alba.png",
+        "HIDROMARES BY SGS": "Logos/logo-hidromares.png",
+        "HOSPITAL PERSONAL": "Logos/logo-hospital-personal.png",
+        "SAINT MATTHEWS": "Logos/logo-saint-matthews.png",
+        "IGUA HOLDING": "Logos/logo-igua-holding.png",
+        "ITS": "Logos/logo-its-cliente.png",
+        "ITS-COMPLIANCE": "Logos/logo-its-compliance.png",
+        "ITSEG": "Logos/logo-itseg.png",
+        "JMC": "Logos/logo-jmc.png",
+        "LIBBS FARMACÊUTICA": "Logos/logo-libbs.png",
+        "LINHA UNI": "Logos/logo-linha-uni.png",
+        "LUSH": "Logos/logo-lush.png",
+        "MAKRO": "Logos/logo-makro.png",
+        "MAKRO FOOD SERVICE": "Logos/logo-makro-food.png",
+        "MASTER": "Logos/logo-master.png",
+        "MB HEALTH": "Logos/logo-mb-health.png",
+        "MEUCURSO": "Logos/logo-meucurso.png",
+        "MINDBE": "Logos/logo-mindbe.png",
+        "NAVA": "Logos/logo-nava.png",
+        "NETPARTNERS": "Logos/logo-netpartners.png",
+        "OPT-DRIVEN": "Logos/optdriven.png",
+        "PIZZAMIGOS": "Logos/logo-pizzamigos.png",
+        "PRYOR GLOBAL": "Logos/logo-pryor-global.png",
+        "RNP": "Logos/logo-rnp.png",
+        "SAUDESCOLHA BENEFÍCIOS": "Logos/logo-saudescolha.png",
+        "SGS": "Logos/logo-sgs.png",
+        "SHURE": "Logos/logo-shure.png",
+        "SOLUARQ": "Logos/logo-soluarq.png",
+        "SOLVER": "Logos/logo-solver.png",
+        "STRATTNER": "Logos/logo-strattner.png",
+        "SUPPER CERTO": "Logos/logo-supper-certo.png",
+        "T4S TECNOLOGIA": "Logos/logo-t4s.png",
+        "TECNOGERA (TNG)": "Logos/logo-tecnogera.png",
+        "TERESA PEREZ": "Logos/logo-teresa-perez.png",
+        "VISUS ENGENHARIA": "Logos/logo-visus.png",
+        "VIVEO": "Logos/logo-viveo.png"
     };
 
 </script>
