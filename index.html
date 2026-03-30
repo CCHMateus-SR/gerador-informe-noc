@@ -7,7 +7,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
+        :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-green: #166534; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         .container { display: flex; gap: 30px; max-width: 1450px; width: 100%; align-items: flex-start; }
         
@@ -22,6 +22,9 @@
 
         .alerta-laranja { border-top: 8px solid var(--its-orange) !important; box-shadow: 0 0 25px rgba(234, 88, 12, 0.25) !important; }
         .alerta-laranja h2 { color: var(--its-orange) !important; }
+        
+        .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
+        .alerta-verde h2 { color: var(--its-green) !important; }
 
         .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; border-bottom: 2px solid var(--its-border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 
@@ -254,6 +257,7 @@
                     <option value="CRITICAL">🔴 CRITICAL</option>
                     <option value="INTERMITENTE">🟠 INTERMITENTE</option>
                     <option value="UNKNOWN">🟣 UNKNOWN</option>
+                    <option value="OK">🟢 OK (NORMALIZADO)</option>
                 </select>
             </div>
 
@@ -264,7 +268,7 @@
 
             <div class="section-title">⏱️ 2. SLA e Acompanhamento</div>
 
-            <div class="input-group"><label>Status Atual</label><select id="status" onchange="update()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
+            <div class="input-group"><label>Status Atual</label><select id="status" onchange="mudarStatus()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
             <div class="input-group"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
             
             <div class="input-group">
@@ -602,7 +606,6 @@
         `;
         filaDeAlertas.push(htmlMensagem);
         
-        // Sempre que um alerta novo chega na fila, toca o Gongo do NOC!
         tocarAlertaSonoro();
 
         if (!modalAberto) exibirProximoAlerta();
@@ -695,7 +698,6 @@
         const txtOriginal = btn.innerHTML;
         btn.innerHTML = '⏳ Baixando...';
         
-        // Puxa todos os chamados da base de dados do Firebase
         db.ref('historico_noc').once('value', (snapshot) => {
             if(!snapshot.exists()) {
                 alert("Nenhum dado encontrado no banco de dados para exportar.");
@@ -703,12 +705,10 @@
                 return;
             }
             
-            // Monta o cabeçalho do arquivo Excel
             let csvContent = "Data,Hora,Analista,Turno,Cliente,Host,Servico,Severidade,Acao\n";
             const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             
-            // Organiza os dados e preenche linha por linha
             logs.forEach(log => {
                 const partes = log.assunto.split(' | ');
                 const cliente = partes[0] ? partes[0].trim() : '-';
@@ -725,7 +725,6 @@
                 csvContent += row + "\n";
             });
             
-            // Cria o arquivo e força o download no computador do analista
             const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
@@ -776,7 +775,7 @@
     }
 
     // ==========================================
-    // LÓGICA DO PAINEL (CÓDIGO EXISTENTE)
+    // LÓGICA DO PAINEL
     // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
@@ -797,6 +796,18 @@
             textoFinal = textoFinal.replace("foi restabelecido", "foi estabilizado");
         }
         textoDesc.value = textoFinal;
+        update();
+    }
+
+    // FUNÇÃO MÁGICA: QUANDO MUDA PARA RESOLVIDO, MUDA SEVERIDADE PARA "OK"
+    function mudarStatus() {
+        const statusVal = document.getElementById('status').value;
+        const sevEl = document.getElementById('severidade');
+        
+        if (statusVal === 'RESOLVIDO') {
+            sevEl.value = 'OK';
+        }
+        
         update();
     }
 
@@ -841,15 +852,19 @@
         const tituloForm = document.getElementById('titulo-form');
         
         if (severidade === 'CRITICAL') {
-            formContainer.classList.remove('alerta-laranja');
+            formContainer.classList.remove('alerta-laranja', 'alerta-verde');
             formContainer.classList.add('fogo-no-parquinho');
             tituloForm.innerText = "🚨 Gestão de Link/Ping (CRITICAL)";
         } else if (severidade === 'INTERMITENTE') {
-            formContainer.classList.remove('fogo-no-parquinho');
+            formContainer.classList.remove('fogo-no-parquinho', 'alerta-verde');
             formContainer.classList.add('alerta-laranja');
             tituloForm.innerText = "⚠️ Gestão de Link/Ping (INTERMITENTE)";
-        } else {
+        } else if (severidade === 'OK') {
             formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja');
+            formContainer.classList.add('alerta-verde');
+            tituloForm.innerText = "✅ Gestão de Link/Ping (NORMALIZADO)";
+        } else {
+            formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
             tituloForm.innerText = "Gestão de Link/Ping";
         }
 
@@ -888,7 +903,10 @@
         if(severidade === 'CRITICAL') corSeveridade = '#DC2626';
         if(severidade === 'WARNING') corSeveridade = '#D97706';
         if(severidade === 'INTERMITENTE') corSeveridade = '#EA580C';
-        document.getElementById('v-severidade').innerHTML = `<span style="color: ${corSeveridade}; font-weight: 800;">${severidade}</span>`;
+        if(severidade === 'OK') corSeveridade = '#166534'; // Verde
+        
+        let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
+        document.getElementById('v-severidade').innerHTML = `<span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span>`;
 
         if (document.getElementById('protocolo').value.trim() !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
         
