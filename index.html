@@ -13,7 +13,7 @@
         
         .form-side { flex: 1; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; transition: all 0.3s; position: relative; }
         
-        .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; gap: 15px; }
+        .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px; }
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
         
@@ -22,6 +22,9 @@
 
         .alerta-laranja { border-top: 8px solid var(--its-orange) !important; box-shadow: 0 0 25px rgba(234, 88, 12, 0.25) !important; }
         .alerta-laranja h2 { color: var(--its-orange) !important; }
+
+        /* NOVA CLASSE PARA AS DIVISÓRIAS DO FORMULÁRIO */
+        .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; border-bottom: 2px solid var(--its-border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 25px; }
         .full-width { grid-column: span 2; }
@@ -92,11 +95,11 @@
         body.dark-mode .log-subject { color: #F8FAFC; }
         body.dark-mode .modal-content h3 { color: #38bdf8; }
         body.dark-mode #texto-alerta { color: #F8FAFC !important; }
+        body.dark-mode .section-title { color: #38bdf8; border-color: #334155; }
         
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
 
-        /* THEME CLASSES ITS */
         .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
         .btn-danger-its:hover { background-color: #991B1B; transform: translateY(-2px); }
 
@@ -199,6 +202,8 @@
 
         <div class="form-grid">
             
+            <div class="section-title">📍 1. Identificação do Alarme</div>
+
             <div class="input-group"><label>Cliente</label><input type="text" id="cliente" list="lista-clientes" placeholder="Ex: CSD (Grupo Amigão)" oninput="update()"></div>
             <div class="input-group"><label>Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
             
@@ -221,6 +226,8 @@
                 <label>Dados Técnicos (Status Information do Centreon)</label>
                 <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui...&#10;Pode colar várias linhas." oninput="update()"></textarea>
             </div>
+
+            <div class="section-title">⏱️ 2. SLA e Acompanhamento</div>
 
             <div class="input-group"><label>Status Atual</label><select id="status" onchange="update()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
             <div class="input-group"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
@@ -261,6 +268,8 @@
                 <input type="text" id="termino" placeholder="Ex: 20/03/2026 às 21:00..." oninput="update()">
             </div>
             
+            <div class="section-title">🛠️ 3. Tratativa e Diagnóstico</div>
+
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label>Ações / Diagnóstico</label>
@@ -346,7 +355,10 @@
                                     <div id="v-solucionador" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
                                 </td>
                                 <td></td>
-                                <td width="48%"></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div>
+                                    <div id="v-severidade" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
+                                </td>
                             </tr>
                         </table>
 
@@ -754,6 +766,13 @@
         document.getElementById('v-solucionador').innerText = document.getElementById('solucionador').value || '---';
         document.getElementById('v-protocolo').innerText = document.getElementById('protocolo').value || '---';
         
+        // NOVO: Adicionando a severidade na caixa do preview
+        let corSeveridade = '#64748B'; // Default/Unknown
+        if(severidade === 'CRITICAL') corSeveridade = '#DC2626';
+        if(severidade === 'WARNING') corSeveridade = '#D97706';
+        if(severidade === 'INTERMITENTE') corSeveridade = '#EA580C';
+        document.getElementById('v-severidade').innerHTML = `<span style="color: ${corSeveridade}; font-weight: 800;">${severidade}</span>`;
+
         if (document.getElementById('protocolo').value.trim() !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
         
         let fgridText = document.getElementById('f-grid').value || '-';
