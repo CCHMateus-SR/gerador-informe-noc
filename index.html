@@ -93,11 +93,10 @@
         body.dark-mode .modal-content h3 { color: #38bdf8; }
         body.dark-mode #texto-alerta { color: #F8FAFC !important; }
         
-        /* Ajuste visual para os optgroups no dark mode */
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
 
-        /* NEW ITS THEME CLASSES */
+        /* THEME CLASSES ITS */
         .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
         .btn-danger-its:hover { background-color: #991B1B; transform: translateY(-2px); }
 
@@ -107,7 +106,6 @@
         .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
         .btn-login-its:hover { background-color: #991B1B; transform: translateY(-2px); }
 
-        /* Dark mode variant for history button */
         body.dark-mode .btn-its-history { background-color: #92400E; color: #FFEDD5; }
         body.dark-mode .btn-its-history:hover { background-color: var(--its-orange); color: white; }
 
@@ -393,6 +391,52 @@
                                 </tr>
                             </table>
                         </div>
+
+                        <div id="assinatura-container" style="display: none; margin-top: 40px;">
+                            <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; color: #1E293B; margin-bottom: 12px;">Atenciosamente;</div>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: Arial, sans-serif; background-color: #2D2D2D;">
+                                <tr>
+                                    <td width="45%" valign="middle" style="padding: 25px;">
+                                        <div id="sig-nome" style="color: #FFFFFF; font-size: 17px; font-weight: bold; margin-bottom: 4px;">Nome do Analista</div>
+                                        <div style="color: #A0A0A0; font-size: 13px; margin-bottom: 15px;">Analista de Monitoramento</div>
+                                        
+                                        <div style="color: #D4D4D4; font-size: 12px; line-height: 1.6; margin-bottom: 15px;">
+                                            11 2202-0950<br>
+                                            operacoes@itssolucoes.com.br<br>
+                                            <a href="http://www.itssolucoes.com.br" style="color: #E3000F; text-decoration: none;">www.itssolucoes.com.br</a>
+                                        </div>
+                                        
+                                        <table cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td bgcolor="#E3000F" width="24" height="24" align="center" style="border-radius: 4px; color: white; font-size: 12px; font-weight: bold; font-family: Arial;">in</td>
+                                                <td width="6"></td>
+                                                <td bgcolor="#E3000F" width="24" height="24" align="center" style="border-radius: 4px; color: white; font-size: 12px; font-weight: bold; font-family: Arial;">📷</td>
+                                                <td width="6"></td>
+                                                <td bgcolor="#E3000F" width="24" height="24" align="center" style="border-radius: 4px; color: white; font-size: 12px; font-weight: bold; font-family: Arial;">f</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td width="55%" valign="middle" style="background-color: #E3000F; border-radius: 60px 0 0 0; padding: 20px;">
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                            <tr>
+                                                <td align="right" width="55%" style="color: white; font-size: 55px; font-weight: 900; letter-spacing: -2px; padding-right: 10px; font-family: Arial, sans-serif;">its</td>
+                                                <td align="left" width="45%" style="color: white; font-size: 12px; line-height: 1.2; font-family: Arial, sans-serif; padding-top: 5px;">The IT<br>Solution<br>Center</td>
+                                            </tr>
+                                        </table>
+                                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 15px;">
+                                            <tr>
+                                                <td align="center">
+                                                    <span style="background: white; color: #059669; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">▶ PressPlay</span>
+                                                    &nbsp;
+                                                    <span style="background: white; color: #002D5B; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block;">❖ Radar Cloud</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
                     </td>
                 </tr>
                 <tr>
@@ -446,6 +490,8 @@
             document.getElementById('modal-login').style.display = 'flex';
         } else {
             document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
+            document.getElementById('sig-nome').innerText = currentUser.nome;
+            document.getElementById('assinatura-container').style.display = 'block';
         }
     };
 
@@ -464,6 +510,10 @@
         
         document.getElementById('modal-login').style.display = 'none';
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
+        
+        // Ativa a assinatura com o nome
+        document.getElementById('sig-nome').innerText = currentUser.nome;
+        document.getElementById('assinatura-container').style.display = 'block';
     }
 
     function fazerLogout() {
@@ -473,6 +523,7 @@
             document.getElementById('modal-login').style.display = 'flex';
             document.getElementById('user-display').innerText = `👤 Entrando...`;
             document.getElementById('login-nome').value = ''; 
+            document.getElementById('assinatura-container').style.display = 'none';
         }
     }
 
