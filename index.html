@@ -400,21 +400,11 @@
                                         <div id="sig-nome" style="color: #FFFFFF; font-size: 17px; font-weight: bold; margin-bottom: 4px;">Nome do Analista</div>
                                         <div style="color: #A0A0A0; font-size: 13px; margin-bottom: 15px;">Analista de Monitoramento</div>
                                         
-                                        <div style="color: #D4D4D4; font-size: 12px; line-height: 1.6; margin-bottom: 15px;">
+                                        <div style="color: #D4D4D4; font-size: 12px; line-height: 1.6;">
                                             11 2202-0950<br>
-                                            operacoes@itssolucoes.com.br<br>
-                                            <a href="http://www.itssolucoes.com.br" style="color: #E3000F; text-decoration: none;">www.itssolucoes.com.br</a>
+                                            <span style="color: #D4D4D4;">operacoes@itssolucoes.com.br</span><br>
+                                            <span style="color: #E3000F;">www.itssolucoes.com.br</span>
                                         </div>
-                                        
-                                        <table cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td bgcolor="#E3000F" width="24" height="24" align="center" style="border-radius: 4px; color: white; font-size: 12px; font-weight: bold; font-family: Arial;">in</td>
-                                                <td width="6"></td>
-                                                <td bgcolor="#E3000F" width="24" height="24" align="center" style="border-radius: 4px; color: white; font-size: 12px; font-weight: bold; font-family: Arial;">📷</td>
-                                                <td width="6"></td>
-                                                <td bgcolor="#E3000F" width="24" height="24" align="center" style="border-radius: 4px; color: white; font-size: 12px; font-weight: bold; font-family: Arial;">f</td>
-                                            </tr>
-                                        </table>
                                     </td>
                                     <td width="55%" valign="middle" style="background-color: #E3000F; border-radius: 60px 0 0 0; padding: 20px;">
                                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -511,7 +501,6 @@
         document.getElementById('modal-login').style.display = 'none';
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
         
-        // Ativa a assinatura com o nome
         document.getElementById('sig-nome').innerText = currentUser.nome;
         document.getElementById('assinatura-container').style.display = 'block';
     }
