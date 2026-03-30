@@ -13,7 +13,7 @@
         /* NOVO CONTAINER MAIS LARGO PARA 3 COLUNAS */
         .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center;}
         
-        /* COLUNA 1: MEUS CHAMADOS (NOVIDADE) */
+        /* COLUNA 1: MEUS CHAMADOS */
         .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
         .history-side h3 { color: var(--its-blue); margin: 0 0 5px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         .history-side p { font-size: 11px; color: #64748B; margin-bottom: 20px; text-transform: uppercase; font-weight: bold;}
@@ -28,6 +28,10 @@
         .badge-follow { background: #FEF3C7; color: #92400E; }
         .badge-ok { background: #DCFCE7; color: #166534; }
         .my-card-host { font-size: 12px; font-weight: bold; color: var(--its-text); word-break: break-all; line-height: 1.3;}
+        
+        /* NOVA CLASSE PARA O SERVIÇO NO CARD */
+        .my-card-service { font-size: 10px; color: #64748B; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+        
         .my-card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 4px;}
         .my-card-time { font-size: 10px; color: #64748B; font-weight: bold;}
         .btn-pull { background: #E0F2FE; color: #0284C7; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; text-transform: uppercase;}
@@ -109,7 +113,7 @@
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* DARK MODE - ATUALIZADO PARA NOVA COLUNA */
+        /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
         body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
         body.dark-mode .form-side h2, body.dark-mode .history-side h3 { color: #38bdf8; }
@@ -133,6 +137,7 @@
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
         body.dark-mode .my-card-client { color: #38bdf8; }
         body.dark-mode .my-card-host { color: #F8FAFC; }
+        body.dark-mode .my-card-service { color: #94A3B8; }
         body.dark-mode .btn-pull { background: #0c4a6e; color: #38bdf8; }
         body.dark-mode .btn-pull:hover { background: #075985; }
 
@@ -519,7 +524,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Variavel global para segurar os dados dos chamados do usuario na tela
     window.meusChamadosCarregados = [];
 
     function getInicioDoPlantaoTimestamp() {
@@ -567,7 +571,6 @@
         document.getElementById('modal-login').style.display = 'none';
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
         
-        // Exibe a coluna esquerda e puxa os chamados da pessoa
         document.getElementById('history-container').style.display = 'block';
         carregarMeuHistorico();
     }
@@ -615,7 +618,6 @@
                 return;
             }
             
-            // Filtra os chamados que pertencem a quem está logado e que possuem dados completos salvos
             snapshot.forEach(child => { 
                 const val = child.val();
                 if(val.nome === currentUser.nome && val.form) {
@@ -623,7 +625,7 @@
                 }
             });
             
-            window.meusChamadosCarregados.reverse(); // Os mais recentes ficam no topo da coluna
+            window.meusChamadosCarregados.reverse();
 
             if(window.meusChamadosCarregados.length === 0) {
                 lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado salvo com dados de preenchimento.</div>';
@@ -632,7 +634,6 @@
 
             let html = '';
             window.meusChamadosCarregados.forEach((log, index) => {
-                // Pegando a ação direto do assunto gerado (a parte 5)
                 const partesAssunto = log.assunto.split(' | ');
                 const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
                 
@@ -642,6 +643,8 @@
 
                 const clienteNome = log.form.cliente || 'CLIENTE NÃO INFORMADO';
                 const hostNome = log.form.host || 'Host/Circuito Não Informado';
+                // Captura o serviço e troca as quebras de linha por um espaço para caber no card
+                const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
 
                 html += `
                 <div class="my-card">
@@ -650,6 +653,7 @@
                         <span class="my-card-badge ${classeBadge}">${acao}</span>
                     </div>
                     <div class="my-card-host">${hostNome}</div>
+                    <div class="my-card-service">🔖 ${servicoNome}</div>
                     <div class="my-card-bottom">
                         <span class="my-card-time">🕒 ${log.hora}</span>
                         <button class="btn-pull" onclick="carregarChamadoParaFormulario(${index})">🔄 Puxar Dados</button>
@@ -660,7 +664,6 @@
         });
     }
 
-    // O BOTÃO MÁGICO: Joga tudo da nuvem pro formulário do analista instantaneamente!
     function carregarChamadoParaFormulario(index) {
         const dados = window.meusChamadosCarregados[index].form;
         if(!dados) return;
@@ -672,8 +675,6 @@
         document.getElementById('item').value = dados.item || '';
         document.getElementById('severidade').value = dados.severidade || 'WARNING';
         document.getElementById('statusinfo').value = dados.statusinfo || '';
-        
-        // Puxamos exatamente o status em que ele estava quando foi gerado. O analista altera manualmente para o novo status.
         document.getElementById('status').value = dados.status || 'EM ABERTO'; 
         document.getElementById('protocolo').value = dados.protocolo || '';
         document.getElementById('inicio').value = dados.inicio || '';
@@ -794,7 +795,6 @@
         const agora = new Date();
         const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         
-        // Empacotando todos os campos da tela para salvar no banco
         const formData = {
             cliente: document.getElementById('cliente').value,
             host: document.getElementById('host').value,
@@ -817,7 +817,7 @@
             assunto: assunto,
             hora: horaStr,
             timestamp: firebase.database.ServerValue.TIMESTAMP,
-            form: formData // <--- O tesouro escondido!
+            form: formData 
         });
     }
 
