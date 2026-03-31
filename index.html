@@ -91,7 +91,6 @@
         .btn-copy-img { flex: 1.2; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
         .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
 
-        /* NOVO BOTÃO DO ITSSM */
         .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
         .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
@@ -378,8 +377,11 @@
     <div class="preview-side" style="display: flex;">
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
+                
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
+                
                 <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -449,6 +451,7 @@
     let chamadosDoTurno = []; 
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
+    let ultimaAssinaturaGerada = ''; // VARIÁVEL ANTI-SPAM
 
     function getInicioDoPlantaoTimestamp() {
         const agora = new Date();
@@ -504,6 +507,7 @@
             document.getElementById('meus-chamados-lista').innerHTML = '';
             chamadosDoTurno = [];
             window.chamadosExibidos = [];
+            ultimaAssinaturaGerada = '';
         }
     }
 
@@ -542,6 +546,7 @@
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
         localStorage.removeItem('noc_rascunho_its');
+        ultimaAssinaturaGerada = ''; // Limpa o anti-spam ao trocar de modo
 
         setModo(novoModo);
     }
@@ -585,7 +590,7 @@
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL
+    // HISTÓRICO LATERAL COM FILTRO DE MODO E CORES
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
@@ -637,6 +642,8 @@
             const partesAssunto = log.assunto.split(' | ');
             const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
             const modoIcon = log.form.modo === 'infra' ? '🖥️' : '🌐';
+            
+            // COR DA BORDA DO CARD
             const classeCardModo = log.form.modo === 'infra' ? 'card-infra' : 'card-link';
 
             let classeBadge = 'badge-aberto';
@@ -693,6 +700,8 @@
         document.getElementById('solucionador').value = dados.solucionador || '';
         document.getElementById('obs').value = dados.obs || '';
         document.getElementById('evidencias').checked = dados.evidencias || false; 
+        
+        ultimaAssinaturaGerada = ''; // Limpa o anti-spam para permitir novo salvamento com os dados puxados
         
         update();
         mostrarToast("✅ Formulário preenchido com sucesso!");
@@ -770,6 +779,15 @@
         return true; 
     }
 
+    // NOVO: Assinatura para evitar o "Anti-Spam" de botões locais
+    function obterAssinaturaFormulario() {
+        const cliente = document.getElementById('cliente').value.toUpperCase().trim();
+        const host = document.getElementById('host').value.toUpperCase().trim();
+        const status = document.getElementById('status').value;
+        const fgrid = document.getElementById('f-grid').value.trim(); // Se ele mudar a hora do FU, salva um novo.
+        return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
+    }
+
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
@@ -824,7 +842,7 @@
             
             logs.reverse().forEach(item => {
                 const isInfra = item.form && item.form.modo === 'infra';
-                const corBorda = isInfra ? '#0284C7' : 'var(--its-red)';
+                const corBorda = isInfra ? '#0284C7' : '#DC2626'; // Azul Tech pra infra, Vermelho ITS pra Link
                 const modoLabel = isInfra ? '🖥️' : '🌐';
                 
                 html += `
@@ -1073,10 +1091,17 @@
     }
 
     // ==========================================
-    // NOVO: GERADOR DE TEXTO PARA O ITSSM
+    // CÓPIAS, TEXTO ITSSM E EXPORTAÇÃO (COM ANTI-SPAM)
     // ==========================================
+
     function copyITSSM() {
-        if (!verificarDuplicidade()) return;
+        const assinaturaAtual = obterAssinaturaFormulario();
+        
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return;
+            registrarHistoricoNuvem(obterAssuntoGerado());
+            ultimaAssinaturaGerada = assinaturaAtual;
+        }
 
         const vHost = document.getElementById('host').value || '---';
         const vInicio = document.getElementById('inicio').value || '---';
@@ -1092,10 +1117,9 @@
         textoITSSM += `Cliente: ${vCliente}\n`;
         
         if (vStatusInfo) {
-            textoITSSM += `Dados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`;
+            textoITSSM += `\nDados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`;
         }
 
-        // Condicionais
         const vPressplay = document.getElementById('pressplay').value.trim();
         if (modoAtual === 'infra' && vPressplay) {
             textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`;
@@ -1131,19 +1155,18 @@
         btn.style.backgroundColor = '#10B981'; 
         btn.style.color = '#fff';
         
-        registrarHistoricoNuvem(obterAssuntoGerado()); 
-        setTimeout(() => { 
-            btn.innerHTML = originalText; 
-            btn.style.backgroundColor = ''; 
-            btn.style.color = ''; 
-        }, 3000);
+        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.color = ''; }, 3000);
     }
 
-    // ==========================================
-    // CÓPIA E EXPORTAÇÃO
-    // ==========================================
     function copiarAssuntoAcao() {
-        if (!verificarDuplicidade()) return; 
+        const assinaturaAtual = obterAssinaturaFormulario();
+        
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return; 
+            registrarHistoricoNuvem(obterAssuntoGerado()); 
+            ultimaAssinaturaGerada = assinaturaAtual;
+        }
+
         const assunto = obterAssuntoGerado();
         const tempInput = document.createElement("input");
         tempInput.value = assunto; document.body.appendChild(tempInput);
@@ -1153,12 +1176,10 @@
         const originalText = btn.innerHTML;
         btn.innerHTML = '✅ COPIADO!'; btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
         
-        registrarHistoricoNuvem(assunto); 
         setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
     }
 
     function copyHTML() {
-        if (!verificarDuplicidade()) return; 
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
         
@@ -1169,19 +1190,24 @@
             return; 
         }
 
+        const assinaturaAtual = obterAssinaturaFormulario();
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return; 
+            registrarHistoricoNuvem(obterAssuntoGerado()); 
+            ultimaAssinaturaGerada = assinaturaAtual;
+        }
+
         const node = document.getElementById('render');
         const range = document.createRange(); range.selectNode(node);
         window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
         document.execCommand('copy'); window.getSelection().removeAllRanges();
 
-        registrarHistoricoNuvem(obterAssuntoGerado()); 
         const btn = document.getElementById('btn-copiar-html');
         const txtOriginal = btn.innerHTML; btn.innerHTML = '✅ COPIADO!';
         setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
     }
 
     function copyAsImage() {
-        if (!verificarDuplicidade()) return; 
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
         
@@ -1190,6 +1216,13 @@
             protocolo.classList.add('erro-validacao'); protocolo.focus();
             setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
             return; 
+        }
+
+        const assinaturaAtual = obterAssinaturaFormulario();
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return; 
+            registrarHistoricoNuvem(obterAssuntoGerado()); 
+            ultimaAssinaturaGerada = assinaturaAtual;
         }
 
         const btn = document.getElementById('btn-copiar-img');
@@ -1206,7 +1239,6 @@
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     navigator.clipboard.write([item]).then(() => {
-                        registrarHistoricoNuvem(obterAssuntoGerado()); 
                         btn.innerHTML = '✅ IMAGEM COPIADA!';
                         setTimeout(() => { btn.innerHTML = originalText; }, 3000);
                     });
@@ -1226,6 +1258,7 @@
             document.getElementById('evidencias').checked = false; 
             document.getElementById('protocolo').classList.remove('erro-validacao');
             localStorage.removeItem('noc_rascunho_its'); 
+            ultimaAssinaturaGerada = ''; // Limpa a proteção
             update();
         }
     }
