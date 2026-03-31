@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>NOC ITS - Alertas de Link/Ping</title>
+    <title>NOC ITS - Central de Despacho</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -12,16 +12,14 @@
         
         .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center;}
         
-        /* COLUNA 1: MEUS CHAMADOS / EQUIPE */
+        /* COLUNA 1: MEUS CHAMADOS */
         .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
         .history-side h3 { color: var(--its-blue); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         
-        /* ABAS DE HISTÓRICO */
         .tabs-container { display: flex; gap: 5px; margin-bottom: 15px; background: #F1F5F9; padding: 4px; border-radius: 8px; border: 1px solid #E2E8F0;}
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
         .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        /* ESTILO DOS CARDS DE HISTÓRICO */
         .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; border-left: 4px solid var(--its-blue); transition: 0.2s; display: flex; flex-direction: column; gap: 6px;}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
         .my-card-header { display: flex; justify-content: space-between; align-items: center; }
@@ -53,6 +51,11 @@
         .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
         .alerta-verde h2 { color: var(--its-green) !important; }
 
+        /* CHAVEADOR DE MODOS */
+        .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; }
+        .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
         .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; border-bottom: 2px solid var(--its-border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 25px; }
@@ -72,17 +75,14 @@
         input:focus, select:focus, textarea:focus { border-color: var(--its-blue); box-shadow: 0 0 0 4px rgba(0,45,91,0.1); outline: none; }
         
         .erro-validacao { border-color: #991B1B !important; box-shadow: 0 0 0 4px rgba(153,27,27,0.1) !important; }
-        textarea { height: 120px; resize: none; line-height: 1.5; }
+        textarea { height: 120px; resize: none; line-height: 1.5; font-family: inherit; }
         .textarea-sm { height: 50px !important; }
 
         .button-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        
         .btn-copy { flex: 1.5; background-color: #0ea5e9; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
         .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
-        
         .btn-copy-img { flex: 2; background-color: #059669; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
         .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
-        
         .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
         .btn-copy-subject:hover { background-color: #E0F2FE; }
 
@@ -90,10 +90,8 @@
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
 
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
-        
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
-
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
         .btn-theme:hover { background: #F1F5F9; }
 
@@ -137,6 +135,9 @@
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
         body.dark-mode .tab-btn { color: #94A3B8; }
         body.dark-mode .tab-btn.active { background: #1E293B; color: #38bdf8; }
+        body.dark-mode .mode-switch-container { background: #0F172A; }
+        body.dark-mode .mode-btn { color: #94A3B8; }
+        body.dark-mode .mode-btn.active { background: #1E293B; color: #38bdf8; }
 
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
         body.dark-mode .my-card-client { color: #38bdf8; }
@@ -148,21 +149,18 @@
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
 
-        /* THEME CLASSES ITS */
         .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
         .btn-danger-its:hover { background-color: #991B1B; transform: translateY(-2px); }
-
         .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
-
         .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
         .btn-login-its:hover { background-color: #991B1B; transform: translateY(-2px); }
-
         .btn-export { background-color: #10B981; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .btn-export:hover { background-color: #059669; }
 
-        body.dark-mode .btn-its-history { background-color: #92400E; color: #FFEDD5; }
-        body.dark-mode .btn-its-history:hover { background-color: var(--its-orange); color: white; }
+        /* Nova caixa PressPlay do DarkMode */
+        body.dark-mode #pressplay-container td { background-color: #052e16 !important; border-color: #166534 !important; border-left-color: #22c55e !important; }
+        body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
     </style>
 </head>
 <body>
@@ -172,29 +170,7 @@
 </datalist>
 
 <datalist id="lista-operadoras">
-    <option value="Algar"></option>
-    <option value="AmericaNet"></option>
-    <option value="American Tower"></option>
-    <option value="Apex Net"></option>
-    <option value="Ascenty"></option>
-    <option value="Claro"></option>
-    <option value="Embratel"></option>
-    <option value="GIGA+"></option>
-    <option value="HostFiber"></option>
-    <option value="JacomeliNET"></option>
-    <option value="Ligga Telecom"></option>
-    <option value="MAXCOMM"></option>
-    <option value="Mega Telecom"></option>
-    <option value="Mundivox"></option>
-    <option value="Net"></option>
-    <option value="Noroeste Net"></option>
-    <option value="ProntoFibra"></option>
-    <option value="Texnet"></option>
-    <option value="Ultracom"></option>
-    <option value="UP Telecom"></option>
-    <option value="Vero"></option>
-    <option value="Vivo"></option>
-    <option value="VSX Networks"></option>
+    <option value="Algar"></option><option value="AmericaNet"></option><option value="American Tower"></option><option value="Apex Net"></option><option value="Ascenty"></option><option value="Claro"></option><option value="Embratel"></option><option value="GIGA+"></option><option value="HostFiber"></option><option value="JacomeliNET"></option><option value="Ligga Telecom"></option><option value="MAXCOMM"></option><option value="Mega Telecom"></option><option value="Mundivox"></option><option value="Net"></option><option value="Noroeste Net"></option><option value="ProntoFibra"></option><option value="Texnet"></option><option value="Ultracom"></option><option value="UP Telecom"></option><option value="Vero"></option><option value="Vivo"></option><option value="VSX Networks"></option>
 </datalist>
 
 <div id="toast-container"></div>
@@ -205,7 +181,7 @@
         <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Um colega da equipe acabou de registrar uma ação:</p>
         <div id="texto-alerta" style="font-size: 15px; color: #1E293B; margin-bottom: 30px; line-height: 1.6; font-weight: 500; background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #0EA5E9;">
         </div>
-        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">CIENTE 👍</button>
+        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s;">CIENTE 👍</button>
     </div>
 </div>
 
@@ -213,34 +189,16 @@
     <div class="modal-content modal-login-content">
         <img src="Logos/logo-its.png" alt="ITS" width="120" style="margin-bottom: 20px;">
         <h3 style="margin-top: 0; color: #002D5B;">Bem Vindo!</h3>
-        <p style="font-size: 13px; color: #64748B; margin-bottom: 25px;">Identifique-se para utilizar o painel de operações.</p>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 25px;">Identifique-se para utilizar a Central de Despacho.</p>
         
         <div style="text-align: left; margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 5px;">Seu Nome Oficial</label>
             <select id="login-nome" style="width: 90%; box-sizing: border-box; padding: 12px; border-radius: 8px; border: 1px solid var(--its-border); font-size: 14px;">
                 <option value="" disabled selected>Selecione na lista...</option>
-                <optgroup label="Gestão">
-                    <option value="Geberson Costa">Geberson Costa</option>
-                </optgroup>
-                <optgroup label="Turno da Manhã">
-                    <option value="Guilherme Ribeiro">Guilherme Ribeiro</option>
-                    <option value="Lucas Ferreira">Lucas Ferreira</option>
-                    <option value="Maria Lenira">Maria Lenira</option>
-                    <option value="Matheus Cavalcante">Matheus Cavalcante</option>
-                </optgroup>
-                <optgroup label="Turno da Tarde">
-                    <option value="Deleon Lima">Deleon Lima</option>
-                    <option value="Gabriel Stanzione">Gabriel Stanzione</option>
-                    <option value="Leonardo Marinello">Leonardo Marinello</option>
-                    <option value="Luis Mateus">Luis Mateus</option>
-                    <option value="Mark Leal">Mark Leal</option>
-                </optgroup>
-                <optgroup label="Turno da Noite">
-                    <option value="Guilherme Pizi">Guilherme Pizi</option>
-                    <option value="Heitor Andre">Heitor Andre</option>
-                    <option value="Luciano Francisqueti">Luciano Francisqueti</option>
-                    <option value="Rodolfo Ferreira">Rodolfo Ferreira</option>
-                </optgroup>
+                <optgroup label="Gestão"><option value="Geberson Costa">Geberson Costa</option></optgroup>
+                <optgroup label="Turno da Manhã"><option value="Guilherme Ribeiro">Guilherme Ribeiro</option><option value="Lucas Ferreira">Lucas Ferreira</option><option value="Maria Lenira">Maria Lenira</option><option value="Matheus Cavalcante">Matheus Cavalcante</option></optgroup>
+                <optgroup label="Turno da Tarde"><option value="Deleon Lima">Deleon Lima</option><option value="Gabriel Stanzione">Gabriel Stanzione</option><option value="Leonardo Marinello">Leonardo Marinello</option><option value="Luis Mateus">Luis Mateus</option><option value="Mark Leal">Mark Leal</option></optgroup>
+                <optgroup label="Turno da Noite"><option value="Guilherme Pizi">Guilherme Pizi</option><option value="Heitor Andre">Heitor Andre</option><option value="Luciano Francisqueti">Luciano Francisqueti</option><option value="Rodolfo Ferreira">Rodolfo Ferreira</option></optgroup>
             </select>
         </div>
         <div style="text-align: left; margin-bottom: 25px;">
@@ -259,17 +217,11 @@
 <div id="modal-historico" class="modal-overlay">
     <div class="modal-content">
         <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
-        
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3>
-                <p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios despachados a partir das 07h00 de hoje pela equipe.</p>
-            </div>
+            <div><h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3><p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios despachados a partir das 07h00 de hoje pela equipe.</p></div>
             <button id="btn-exportar" class="btn-export" onclick="exportarParaExcel()">📊 EXPORTAR (CSV)</button>
         </div>
-
-        <div id="lista-historico" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;">
-        </div>
+        <div id="lista-historico" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;"></div>
     </div>
 </div>
 
@@ -277,12 +229,10 @@
     
     <div class="history-side" id="history-container">
         <h3>🕰️ Histórico</h3>
-        
         <div class="tabs-container">
             <button id="tab-meus" class="tab-btn active" onclick="setVisaoHistorico('meus')">👤 Meus</button>
             <button id="tab-equipe" class="tab-btn" onclick="setVisaoHistorico('equipe')">👥 Equipe</button>
         </div>
-
         <div id="meus-chamados-lista">
             <div style="text-align: center; color: #94A3B8; font-size: 12px; margin-top: 30px;">Carregando histórico...</div>
         </div>
@@ -291,7 +241,7 @@
     <div class="form-side" id="form-container">
         
         <div class="header-row">
-            <h2 id="titulo-form">Gestão de Link/Ping</h2>
+            <h2 id="titulo-form">Central de Despacho</h2>
             <div class="top-controls">
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
@@ -299,12 +249,17 @@
             </div>
         </div>
 
+        <div class="mode-switch-container">
+            <button id="btn-modo-link" class="mode-btn active" onclick="setModo('link')">🌐 Link / Ping</button>
+            <button id="btn-modo-infra" class="mode-btn" onclick="setModo('infra')">🖥️ Infra / Aplicações</button>
+        </div>
+
         <div class="form-grid">
             
-            <div class="section-title">📍 1. Identificação do Alarme</div>
+            <div class="section-title" id="label-secao-1">📍 1. Identificação do Alarme</div>
 
-            <div class="input-group"><label>Cliente</label><input type="text" id="cliente" list="lista-clientes" placeholder="Ex: CSD (Grupo Amigão)" oninput="update()"></div>
-            <div class="input-group"><label>Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
+            <div class="input-group"><label>Cliente</label><input type="text" id="cliente" list="lista-clientes" placeholder="Ex: Libbs" oninput="update()"></div>
+            <div class="input-group"><label id="label-host">Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
             
             <div class="input-group">
                 <label>Item Monitorado (Serviço)</label>
@@ -324,13 +279,19 @@
 
             <div class="input-group full-width">
                 <label>Dados Técnicos (Status Information do Centreon)</label>
-                <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui...&#10;Pode colar várias linhas." oninput="update()"></textarea>
+                <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui..." oninput="update()"></textarea>
+            </div>
+
+            <div class="input-group full-width" id="grupo-pressplay" style="display: none;">
+                <label>Retorno / Logs do PressPlay (Opcional)</label>
+                <textarea id="pressplay" class="textarea-sm" placeholder="Cole o retorno da execução do PressPlay aqui..." oninput="update()"></textarea>
             </div>
 
             <div class="section-title">⏱️ 2. SLA e Acompanhamento</div>
 
             <div class="input-group"><label>Status Atual</label><select id="status" onchange="mudarStatus()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
-            <div class="input-group"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
+            
+            <div class="input-group" id="grupo-protocolo"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
             
             <div class="input-group">
                 <div class="label-flex">
@@ -353,7 +314,7 @@
                         <button type="button" class="btn-action" onclick="preencherAgoraText('f-grid')">🕒</button>
                     </div>
                 </div>
-                <input type="text" id="f-grid" placeholder="Ex: Em contato com..." oninput="update()">
+                <input type="text" id="f-grid" placeholder="Ex: 30/03/2026 - 15:30" oninput="update()">
             </div>
             
             <div class="input-group full-width">
@@ -370,163 +331,83 @@
             
             <div class="section-title">🛠️ 3. Tratativa e Diagnóstico</div>
 
+            <div class="input-group"><label id="label-solucionador">Solucionador (Operadora / Analista)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()"></div>
+            <div class="input-group" id="grupo-obs"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
+
             <div class="input-group full-width">
                 <div class="label-flex">
-                    <label>Ações / Diagnóstico</label>
-                    <button type="button" class="btn-action btn-template" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
+                    <label id="label-desc">Ações / Diagnóstico</label>
+                    <button type="button" class="btn-action btn-template" id="btn-template-desc" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
             </div>
             
-            <div class="input-group"><label>Solucionador (Operadora)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()"></div>
-            <div class="input-group"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
-            
-            <div class="input-group full-width" style="display: flex; flex-direction: row; align-items: center; gap: 8px; background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px dashed #CBD5E1; margin-top: 5px;">
+            <div class="input-group full-width" id="grupo-evidencias" style="display: flex; flex-direction: row; align-items: center; gap: 8px; background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px dashed #CBD5E1; margin-top: 5px;">
                 <input type="checkbox" id="evidencias" onchange="update()" style="width: 18px; height: 18px; cursor: pointer; margin: 0; accent-color: var(--its-blue);">
-                <label for="evidencias" style="cursor: pointer; margin: 0; color: #0F172A; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong> (Gráficos / CMD)</label>
+                <label for="evidencias" style="cursor: pointer; margin: 0; color: #0F172A; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong></label>
             </div>
 
         </div>
         
         <div class="button-row">
             <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-            <button class="btn-its-history" onclick="abrirHistorico()">📡 HISTÓRICO EM TELA CHEIA</button>
+            <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
             <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM (P/ OUTLOOK)</button>
+            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
         </div>
     </div>
 
-    <div class="preview-side">
-        <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto;">
+    <div class="preview-side" style="display: flex;">
+        <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
-                
-                <tr>
-                    <td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;">
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" bgcolor="#002D5B" style="padding: 16px 20px;">
-                        <h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1>
-                    </td>
-                </tr>
-
+                <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
+                <tr><td align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
                 <tr>
                     <td style="padding: 35px 35px;">
                         
                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                             <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div>
-                                    <div id="v-item" style="font-size: 13px; color: #0F172A; font-weight: 700; line-height: 1.4;">---</div>
-                                </td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 13px; color: #0F172A; font-weight: 700; line-height: 1.4;">---</div></td>
                                 <td width="4%"></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Host</div>
-                                    <div id="v-host" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
-                                </td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div id="v-label-host" style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div></td>
                             </tr>
                             <tr height="12"><td></td></tr>
                             <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Início Ocorrência</div>
-                                    <div id="v-inicio" style="font-size: 12px; color: #334155;">---</div>
-                                </td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 12px; color: #334155;">---</div></td>
                                 <td></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Follow-Up</div>
-                                    <div id="v-f-grid" style="font-size: 12px; color: #334155;">-</div>
-                                </td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 12px; color: #334155;">-</div></td>
                             </tr>
                             <tr height="12"><td></td></tr>
-                            <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div>
-                                    <div id="v-protocolo" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
-                                </td>
-                                <td></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;" id="v-badge-container">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>
-                                    <table cellpadding="0" cellspacing="0" border="0" bgcolor="#FEE2E2" style="border-radius: 6px;">
-                                        <tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #991B1B;">EM ABERTO</td></tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr height="12"><td></td></tr>
-                            <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div>
-                                    <div id="v-solucionador" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
-                                </td>
-                                <td></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
-                                    <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div>
-                                    <div id="v-severidade" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div>
-                                </td>
-                            </tr>
+                            <tbody id="v-dynamic-grid"></tbody>
                         </table>
 
                         <div id="statusinfo-container" style="display: none; margin-top: 20px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #002D5B;">
-                                        <div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div>
-                                        <div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all; line-height: 1.5;">---</div>
-                                    </td>
-                                </tr>
-                            </table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #002D5B;"><div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div><div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
-                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;">
-                            <tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr>
-                            <tr height="8"><td></td></tr>
-                            <tr>
-                                <td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 13px; color: #334155; font-weight: 500; border-radius: 0 8px 8px 0;">
-                                    <span id="v-termino">-</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <div id="pressplay-container" style="display: none; margin-top: 20px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F0FDF4" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #BBF7D0; border-left: 4px solid #22C55E;"><div style="font-size: 10px; color: #166534; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">▶ Retorno PressPlay</div><div id="v-pressplay" style="font-family: Consolas, monospace; font-size: 12px; color: #14532D; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
+                        </div>
 
-                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;">
-                            <tr>
-                                <td style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td>
-                            </tr>
-                            <tr>
-                                <td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 13px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;">
-                                    <div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div>
-                                </td>
-                            </tr>
-                        </table>
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 13px; color: #334155; font-weight: 500; border-radius: 0 8px 8px 0;"><span id="v-termino">-</span></td></tr></table>
+                        
+                        <div id="detalhamento-container">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 13px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
+                        </div>
 
                         <div id="evidencias-container" style="display: none; margin-top: 25px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td bgcolor="#EFF6FF" style="padding: 15px; border: 1px dashed #38BDF8; border-radius: 8px; font-size: 12px; color: #0369A1; line-height: 1.5;">
-                                        <strong>📎 Evidências Técnicas:</strong> Gráficos e testes de conectividade foram anexados no corpo deste e-mail para análise.
-                                    </td>
-                                </tr>
-                            </table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#EFF6FF" style="padding: 15px; border: 1px dashed #38BDF8; border-radius: 8px; font-size: 12px; color: #0369A1; line-height: 1.5;"><strong>📎 Evidências Técnicas:</strong> Gráficos e testes de conectividade foram anexados no corpo deste e-mail para análise.</td></tr></table>
                         </div>
 
                         <div id="obs-container" style="display: none; margin-top: 25px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
-                                <tr>
-                                    <td bgcolor="#FFFBEB" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 12px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;">
-                                        <strong>Nota Adicional:</strong> <span id="v-obs"></span>
-                                    </td>
-                                </tr>
-                            </table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#FFFBEB" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 12px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;"><strong>Nota Adicional:</strong> <span id="v-obs"></span></td></tr></table>
                         </div>
-
                     </td>
                 </tr>
-                <tr>
-                    <td align="center" bgcolor="#F8FAFC" style="padding: 20px; border-top: 1px solid #E2E8F0; color: #94A3B8; font-size: 11px; letter-spacing: 0.05em;">
-                        SISTEMA DE GESTÃO NOC • <strong>ITS SOLUÇÕES</strong>
-                    </td>
-                </tr>
+                <tr><td align="center" bgcolor="#F8FAFC" style="padding: 20px; border-top: 1px solid #E2E8F0; color: #94A3B8; font-size: 11px; letter-spacing: 0.05em;">SISTEMA DE GESTÃO NOC • <strong>ITS SOLUÇÕES</strong></td></tr>
             </table>
         </div>
     </div>
@@ -549,10 +430,10 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Novas variáveis para gerenciar as abas de histórico
-    let visaoHistorico = 'meus'; // Pode ser 'meus' ou 'equipe'
+    let visaoHistorico = 'meus';
     let chamadosDoTurno = []; 
     window.chamadosExibidos = []; 
+    let modoAtual = 'link'; // Inicializa como 'link'
 
     function getInicioDoPlantaoTimestamp() {
         const agora = new Date();
@@ -565,14 +446,14 @@
     }
 
     // ==========================================
-    // SISTEMA DE LOGIN
+    // SISTEMA DE LOGIN E INICIALIZAÇÃO
     // ==========================================
     let currentUser = JSON.parse(localStorage.getItem('noc_user_info'));
 
     window.onload = function() {
         document.getElementById('severidade').value = 'WARNING'; 
         carregarRascunho();
-        update();
+        setModo(modoAtual); 
         
         if (!currentUser) {
             document.getElementById('modal-login').style.display = 'flex';
@@ -587,18 +468,12 @@
         const nomeEl = document.getElementById('login-nome');
         const nome = nomeEl.value;
         const turno = document.getElementById('login-turno').value;
-        
-        if(!nome || nome === "") { 
-            alert("Por favor, selecione seu nome na lista oficial!"); 
-            return; 
-        }
+        if(!nome || nome === "") { alert("Por favor, selecione seu nome na lista oficial!"); return; }
         
         currentUser = { nome, turno };
         localStorage.setItem('noc_user_info', JSON.stringify(currentUser));
-        
         document.getElementById('modal-login').style.display = 'none';
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
-        
         document.getElementById('history-container').style.display = 'block';
         iniciarListenerHistorico();
     }
@@ -610,7 +485,6 @@
             document.getElementById('modal-login').style.display = 'flex';
             document.getElementById('user-display').innerText = `👤 Entrando...`;
             document.getElementById('login-nome').value = ''; 
-            
             document.getElementById('history-container').style.display = 'none';
             document.getElementById('meus-chamados-lista').innerHTML = '';
             chamadosDoTurno = [];
@@ -632,10 +506,47 @@
     }
 
     // ==========================================
-    // COLUNA LATERAL DE HISTÓRICO COM ABAS
+    // SELETOR DE MODO (LINK vs INFRA) - COM AJUSTES DE PLACEHOLDER
     // ==========================================
-    
-    // Função que alterna entre "Meus" e "Equipe"
+    function setModo(modo) {
+        modoAtual = modo;
+        
+        document.getElementById('btn-modo-link').classList.toggle('active', modo === 'link');
+        document.getElementById('btn-modo-infra').classList.toggle('active', modo === 'infra');
+
+        if (modo === 'link') {
+            document.getElementById('titulo-form').innerText = "Gestão de Link/Ping";
+            document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Alarme";
+            document.getElementById('label-host').innerText = "Host / Circuito";
+            document.getElementById('v-label-host').innerText = "Host";
+            
+            // Placeholders de Link
+            document.getElementById('host').placeholder = "Ex: FURACAO_FGT_BELO_HORIZONTE";
+            document.getElementById('item').placeholder = "Ex: Ping\nLINK APEX NET 50MB";
+            
+            document.getElementById('grupo-protocolo').style.display = 'flex';
+            document.getElementById('btn-template-desc').style.display = 'flex';
+            document.getElementById('grupo-pressplay').style.display = 'none'; // Esconde PressPlay
+        } else {
+            document.getElementById('titulo-form').innerText = "Infra / Aplicações";
+            document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
+            document.getElementById('label-host').innerText = "Host / Servidor";
+            document.getElementById('v-label-host').innerText = "Host / Servidor";
+            
+            // Placeholders de Infra
+            document.getElementById('host').placeholder = "Ex: Libbs-CO-DC-PM-01";
+            document.getElementById('item').placeholder = "Ex: CPU\nMemory\nServices-Auto";
+
+            document.getElementById('grupo-protocolo').style.display = 'none';
+            document.getElementById('btn-template-desc').style.display = 'none';
+            document.getElementById('grupo-pressplay').style.display = 'flex'; // Mostra PressPlay
+        }
+        update();
+    }
+
+    // ==========================================
+    // HISTÓRICO LATERAL
+    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -643,14 +554,11 @@
         renderizarListaLateral();
     }
 
-    // Função que fica "escutando" a base de dados o tempo todo
     function iniciarListenerHistorico() {
         if (!currentUser) return;
         const inicioTurno = getInicioDoPlantaoTimestamp(); 
-        
         db.ref('historico_noc').orderByChild('timestamp').startAt(inicioTurno).on('value', (snapshot) => {
             chamadosDoTurno = [];
-            
             if(snapshot.exists()) {
                 snapshot.forEach(child => { 
                     const val = child.val();
@@ -661,24 +569,18 @@
         });
     }
 
-    // Função que desenha os cards na tela baseado na aba escolhida
     function renderizarListaLateral() {
         const lista = document.getElementById('meus-chamados-lista');
         window.chamadosExibidos = [];
-
         if (chamadosDoTurno.length === 0) {
             lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>';
             return;
         }
 
-        // Filtro de aba
-        if (visaoHistorico === 'meus') {
-            window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome);
-        } else {
-            window.chamadosExibidos = [...chamadosDoTurno]; // Puxa todo mundo
-        }
+        if (visaoHistorico === 'meus') { window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome); } 
+        else { window.chamadosExibidos = [...chamadosDoTurno]; }
 
-        window.chamadosExibidos.reverse(); // Mais novos no topo
+        window.chamadosExibidos.reverse(); 
 
         if(window.chamadosExibidos.length === 0) {
             lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado encontrado para esta visão.</div>';
@@ -689,6 +591,7 @@
         window.chamadosExibidos.forEach((log, index) => {
             const partesAssunto = log.assunto.split(' | ');
             const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
+            const modoIcon = log.form.modo === 'infra' ? '🖥️' : '🌐';
             
             let classeBadge = 'badge-aberto';
             if(acao.includes('FOLLOW')) classeBadge = 'badge-follow';
@@ -698,7 +601,6 @@
             const hostNome = log.form.host || 'Host/Circuito Não Informado';
             const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
 
-            // TAG DE AUTORIA (Aparece na aba equipe se não for você)
             let infoAnalista = '';
             if (visaoHistorico === 'equipe' && log.nome !== currentUser.nome) {
                 infoAnalista = `<div style="font-size: 9px; color: var(--its-orange); margin-top: 4px; font-weight: bold; background: #FFF7ED; padding: 3px 6px; border-radius: 4px; display: inline-block;">👤 Criado por: ${log.nome}</div>`;
@@ -707,7 +609,7 @@
             html += `
             <div class="my-card">
                 <div class="my-card-header">
-                    <span class="my-card-client">${clienteNome}</span>
+                    <span class="my-card-client">${modoIcon} ${clienteNome}</span>
                     <span class="my-card-badge ${classeBadge}">${acao}</span>
                 </div>
                 <div class="my-card-host">${hostNome}</div>
@@ -728,11 +630,14 @@
 
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
+        if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
+
         document.getElementById('cliente').value = dados.cliente || '';
         document.getElementById('host').value = dados.host || '';
         document.getElementById('item').value = dados.item || '';
         document.getElementById('severidade').value = dados.severidade || 'WARNING';
         document.getElementById('statusinfo').value = dados.statusinfo || '';
+        document.getElementById('pressplay').value = dados.pressplay || ''; // NOVO: Puxa o PressPlay
         document.getElementById('status').value = dados.status || 'EM ABERTO'; 
         document.getElementById('protocolo').value = dados.protocolo || '';
         document.getElementById('inicio').value = dados.inicio || '';
@@ -748,36 +653,26 @@
     }
 
     // ==========================================
-    // GERADOR DO ALERTA SONORO
+    // ALERTAS, EXPORTAÇÃO E NUVEM
     // ==========================================
     function tocarAlertaSonoro() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); 
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.3);
-        } catch(e) {
-            console.log('Áudio não suportado.');
-        }
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {}
     }
 
-    // ==========================================
-    // SISTEMA DE ALERTAS INVASIVOS
-    // ==========================================
     let filaDeAlertas = [];
     let modalAberto = false;
 
     function mostrarAlertaBloqueante(mensagemObj) {
+        const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra' : '🌐 Link';
         const htmlMensagem = `
-            <strong>👤 ${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe às ${mensagemObj.hora}:<br><br>
+            <strong>👤 ${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de ${modoLabel} às ${mensagemObj.hora}:<br><br>
             <span style="font-family: monospace; font-size: 16px;">${mensagemObj.assunto}</span>
         `;
         filaDeAlertas.push(htmlMensagem);
@@ -786,34 +681,21 @@
     }
 
     function exibirProximoAlerta() {
-        if (filaDeAlertas.length === 0) {
-            document.getElementById('modal-alerta').style.display = 'none';
-            modalAberto = false;
-            return;
-        }
+        if (filaDeAlertas.length === 0) { document.getElementById('modal-alerta').style.display = 'none'; modalAberto = false; return; }
         modalAberto = true;
-        const mensagemAtual = filaDeAlertas[0];
-        document.getElementById('texto-alerta').innerHTML = mensagemAtual;
+        document.getElementById('texto-alerta').innerHTML = filaDeAlertas[0];
         document.getElementById('modal-alerta').style.display = 'flex';
     }
 
-    function fecharAlertaBloqueante() {
-        filaDeAlertas.shift(); 
-        exibirProximoAlerta(); 
-    }
+    function fecharAlertaBloqueante() { filaDeAlertas.shift(); exibirProximoAlerta(); }
 
     let isInitialLoad = true;
     db.ref('historico_noc').orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
         if (isInitialLoad) { isInitialLoad = false; return; }
         const data = snapshot.val();
-        if(currentUser && data.nome !== currentUser.nome) {
-            mostrarAlertaBloqueante(data);
-        }
+        if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
     });
 
-    // ==========================================
-    // SISTEMA DE PREVENÇÃO DE COLISÃO
-    // ==========================================
     let ultimosLogsFirebase = [];
     db.ref('historico_noc').orderByChild('timestamp').limitToLast(150).on('value', (snapshot) => {
         ultimosLogsFirebase = [];
@@ -832,11 +714,9 @@
         for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
             let log = ultimosLogsFirebase[i];
             if (log.timestamp < inicioTurno) continue; 
-            
             if(log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
                 if(currentUser && log.nome !== currentUser.nome) {
-                    const mensagem = `⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este cliente/host às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`;
-                    return confirm(mensagem); 
+                    return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este cliente/host às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`);
                 }
                 return true; 
             }
@@ -844,88 +724,46 @@
         return true; 
     }
 
-    // ==========================================
-    // GRAVAÇÃO NA NUVEM
-    // ==========================================
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
-        const logRef = db.ref('historico_noc');
-        const agora = new Date();
-        const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        
         const formData = {
-            cliente: document.getElementById('cliente').value,
-            host: document.getElementById('host').value,
-            item: document.getElementById('item').value,
-            severidade: document.getElementById('severidade').value,
-            statusinfo: document.getElementById('statusinfo').value,
-            status: document.getElementById('status').value,
-            protocolo: document.getElementById('protocolo').value,
-            inicio: document.getElementById('inicio').value,
-            fgrid: document.getElementById('f-grid').value,
-            termino: document.getElementById('termino').value,
-            desc: document.getElementById('desc').value,
-            solucionador: document.getElementById('solucionador').value,
-            obs: document.getElementById('obs').value,
-            evidencias: document.getElementById('evidencias').checked
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, host: document.getElementById('host').value,
+            item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, // NOVO
+            status: document.getElementById('status').value, protocolo: document.getElementById('protocolo').value, 
+            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, 
+            termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
+            solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, 
+            evidencias: document.getElementById('evidencias').checked 
         };
-
-        logRef.push({
-            nome: currentUser.nome,
-            turno: currentUser.turno,
-            assunto: assunto,
-            hora: horaStr,
-            timestamp: firebase.database.ServerValue.TIMESTAMP,
-            form: formData 
+        db.ref('historico_noc').push({
+            nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
+            hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
         });
     }
 
-    // ==========================================
-    // EXPORTAÇÃO PARA EXCEL
-    // ==========================================
     function exportarParaExcel() {
         const btn = document.getElementById('btn-exportar');
         const txtOriginal = btn.innerHTML;
         btn.innerHTML = '⏳ Baixando...';
-        
         db.ref('historico_noc').once('value', (snapshot) => {
-            if(!snapshot.exists()) {
-                alert("Nenhum dado encontrado no banco de dados para exportar.");
-                btn.innerHTML = txtOriginal;
-                return;
-            }
-            
-            let csvContent = "Data,Hora,Analista,Turno,Cliente,Host,Servico,Severidade,Acao\n";
+            if(!snapshot.exists()) { alert("Nenhum dado encontrado."); btn.innerHTML = txtOriginal; return; }
+            let csvContent = "Data,Hora,Analista,Turno,Modo,Cliente,Host,Servico,Severidade,Acao\n";
             const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
-            
             logs.forEach(log => {
-                const partes = log.assunto.split(' | ');
-                const cliente = partes[0] ? partes[0].trim() : '-';
-                const host = partes[1] ? partes[1].trim() : '-';
-                const servico = partes[2] ? partes[2].replace(/\n/g, ' ').trim() : '-';
-                const severidade = partes[3] ? partes[3].trim() : '-';
-                const acao = partes[5] ? partes[5].trim() : '-'; 
-                
-                const dataObj = new Date(log.timestamp);
-                const dataFormatada = dataObj.toLocaleDateString('pt-BR');
-                const horaFormatada = dataObj.toLocaleTimeString('pt-BR');
-                
-                const row = `"${dataFormatada}","${horaFormatada}","${log.nome}","${log.turno}","${cliente}","${host}","${servico}","${severidade}","${acao}"`;
-                csvContent += row + "\n";
+                const p = log.assunto.split(' | ');
+                const dObj = new Date(log.timestamp);
+                csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${log.nome}","${log.turno}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? p[0].trim() : '-'}","${p[1] ? p[1].trim() : '-'}","${p[2] ? p[2].replace(/\n/g, ' ').trim() : '-'}","${p[3] ? p[3].trim() : '-'}","${p[5] ? p[5].trim() : '-'}"\n`;
             });
-            
             const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
             const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            btn.innerHTML = '✅ Concluído!';
-            setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
+            link.href = URL.createObjectURL(blob);
+            link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            btn.innerHTML = '✅ Concluído!'; setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
         });
     }
 
@@ -933,38 +771,21 @@
         document.getElementById('modal-historico').style.display = 'flex';
         const listaHtml = document.getElementById('lista-historico');
         listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar do plantão...</div>';
-        const inicioTurno = getInicioDoPlantaoTimestamp(); 
-        
-        db.ref('historico_noc').orderByChild('timestamp').startAt(inicioTurno).once('value', (snapshot) => {
-            if(!snapshot.exists()) {
-                listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum informe registrado desde as 07h00 de hoje.</div>';
-                return;
-            }
-            let html = '';
-            const logs = [];
+        db.ref('historico_noc').orderByChild('timestamp').startAt(getInicioDoPlantaoTimestamp()).once('value', (snapshot) => {
+            if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum informe registrado desde as 07h00 de hoje.</div>'; return; }
+            let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
-            logs.reverse(); 
-            
-            logs.forEach(item => {
-                html += `
-                <div class="log-item">
-                    <div class="log-time">
-                        <span>🕒 ${item.hora}</span>
-                        <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
-                    </div>
-                    <span class="log-subject">${item.assunto}</span>
-                </div>`;
+            logs.reverse().forEach(item => {
+                html += `<div class="log-item"><div class="log-time"><span>🕒 ${item.hora}</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject">${item.assunto}</span></div>`;
             });
             listaHtml.innerHTML = html;
         });
     }
 
-    function fecharHistorico() {
-        document.getElementById('modal-historico').style.display = 'none';
-    }
+    function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
     // ==========================================
-    // LÓGICA DO PAINEL
+    // PREENCHIMENTO E LÓGICA DO CARD
     // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
@@ -973,50 +794,36 @@
     };
 
     function inserirTemplate() {
-        const statusAtual = document.getElementById('status').value;
-        const severidade = document.getElementById('severidade').value;
-        const textoDesc = document.getElementById('desc');
-        if (textoDesc.value.trim() !== "" && !confirm("Isso vai substituir o texto atual. Deseja continuar?")) return;
-        
-        let textoFinal = templates[statusAtual];
-        if (severidade === 'INTERMITENTE') {
-            textoFinal = textoFinal.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação");
-            textoFinal = textoFinal.replace("foi restabelecido", "foi estabilizado");
-        }
-        textoDesc.value = textoFinal;
-        update();
+        const s = document.getElementById('status').value;
+        const sev = document.getElementById('severidade').value;
+        const desc = document.getElementById('desc');
+        if (desc.value.trim() !== "" && !confirm("Substituir o texto atual?")) return;
+        let final = templates[s];
+        if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
+        desc.value = final; update();
     }
 
     function mudarStatus() {
-        const statusVal = document.getElementById('status').value;
-        const sevEl = document.getElementById('severidade');
-        if (statusVal === 'RESOLVIDO') { sevEl.value = 'OK'; }
+        if (document.getElementById('status').value === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; }
         update();
     }
 
     function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
-
     function inserirDataPicker(idTexto, valor) {
         if (!valor) return;
-        const partes = valor.split('T');
-        const data = partes[0].split('-');
-        const dataFormatada = `${data[2]}/${data[1]}/${data[0]} às ${partes[1]}`;
-        const inputTexto = document.getElementById(idTexto);
-        inputTexto.value = inputTexto.value && !inputTexto.value.startsWith(dataFormatada) ? dataFormatada + ' - ' + inputTexto.value : dataFormatada;
+        const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`;
+        const input = document.getElementById(idTexto);
+        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt;
         update();
     }
-
     function preencherAgoraText(idTexto) {
-        const agora = new Date();
-        const dataFinal = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-        const inputTexto = document.getElementById(idTexto);
-        inputTexto.value = inputTexto.value && !inputTexto.value.startsWith(dataFinal) ? dataFinal + ' - ' + inputTexto.value : dataFinal;
+        const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        const input = document.getElementById(idTexto);
+        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt;
         update();
     }
 
-    function formatarColchetes(texto) {
-        return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>');
-    }
+    function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
 
     function obterAssuntoGerado() {
         const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
@@ -1037,200 +844,210 @@
 
     function update() {
         const severidade = document.getElementById('severidade').value;
-        const formContainer = document.getElementById('form-container');
-        const tituloForm = document.getElementById('titulo-form');
+        const status = document.getElementById('status').value;
         
-        if (severidade === 'CRITICAL') {
-            formContainer.classList.remove('alerta-laranja', 'alerta-verde');
-            formContainer.classList.add('fogo-no-parquinho');
-            tituloForm.innerText = "🚨 Gestão de Link/Ping (CRITICAL)";
-        } else if (severidade === 'INTERMITENTE') {
-            formContainer.classList.remove('fogo-no-parquinho', 'alerta-verde');
-            formContainer.classList.add('alerta-laranja');
-            tituloForm.innerText = "⚠️ Gestão de Link/Ping (INTERMITENTE)";
-        } else if (severidade === 'OK') {
-            formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja');
-            formContainer.classList.add('alerta-verde');
-            tituloForm.innerText = "✅ Gestão de Link/Ping (NORMALIZADO)";
-        } else {
-            formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
-            tituloForm.innerText = "Gestão de Link/Ping";
-        }
+        const vCliente = document.getElementById('cliente').value.toUpperCase().trim();
+        const vHost = document.getElementById('host').value || '---';
+        const vItem = document.getElementById('item').value.trim() || '---';
+        const vInicio = document.getElementById('inicio').value || '---';
+        const vProtocolo = document.getElementById('protocolo').value || '---';
+        const vFgrid = document.getElementById('f-grid').value || '-';
+        const vTermino = document.getElementById('termino').value || '-';
+        const vSolucionador = document.getElementById('solucionador').value || '---';
+        const vStatusInfo = document.getElementById('statusinfo').value.trim();
+        const vPressplay = document.getElementById('pressplay').value.trim(); // NOVO
+        const vDesc = document.getElementById('desc').value.trim();
+        const vObs = document.getElementById('obs').value.trim();
+        const temEvidencias = document.getElementById('evidencias').checked;
 
-        const clienteInput = document.getElementById('cliente').value.toUpperCase().trim();
-        const headerCell = document.getElementById('render-header-cell');
+        if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
 
-        if (logosClientes[clienteInput]) {
-            const clientLogoUrl = logosClientes[clienteInput];
-            headerCell.innerHTML = `
-                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed;">
-                    <tr>
-                        <td width="50%" align="center" valign="middle">
-                            <img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;">
-                        </td>
-                        <td width="50%" align="center" valign="middle">
-                            <img src="${clientLogoUrl}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;">
-                        </td>
-                    </tr>
-                </table>
-            `;
-        } else {
-            headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" width="160" style="display: block; margin: 0 auto;">`;
-        }
-
-        document.getElementById('v-host').innerText = document.getElementById('host').value || '---';
-        const itemText = document.getElementById('item').value.trim();
-        document.getElementById('v-item').innerHTML = itemText ? itemText.replace(/\n/g, '<br>') : '---';
-        document.getElementById('v-inicio').innerText = document.getElementById('inicio').value || '---';
-        document.getElementById('v-solucionador').innerText = document.getElementById('solucionador').value || '---';
-        document.getElementById('v-protocolo').innerText = document.getElementById('protocolo').value || '---';
-        
+        // LÓGICA DE CORES
         let corSeveridade = '#64748B'; 
         if(severidade === 'CRITICAL') corSeveridade = '#DC2626';
         if(severidade === 'WARNING') corSeveridade = '#D97706';
         if(severidade === 'INTERMITENTE') corSeveridade = '#EA580C';
         if(severidade === 'OK') corSeveridade = '#166534'; 
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
-        document.getElementById('v-severidade').innerHTML = `<span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span>`;
 
-        if (document.getElementById('protocolo').value.trim() !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
+        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
+        if (status === 'RESOLVIDO') { 
+            bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO';
+            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Encerramento de Incidente';
+            document.getElementById('label-termino').innerText = 'Fim da Ocorrência';
+            document.getElementById('v-titulo-termino').innerText = 'FIM DA OCORRÊNCIA';
+        } else if (status === 'EM ABERTO') { 
+            bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO';
+            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente';
+            document.getElementById('label-termino').innerText = 'Previsão de Normalização (SLA)';
+            document.getElementById('v-titulo-termino').innerText = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
+        } else { 
+            bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP';
+            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Follow-up de Incidente';
+            document.getElementById('label-termino').innerText = 'Previsão de Normalização (SLA)';
+            document.getElementById('v-titulo-termino').innerText = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
+        }
+
+        // TÍTULO E BORDAS DO FORMULÁRIO
+        const formContainer = document.getElementById('form-container');
+        const tituloForm = document.getElementById('titulo-form');
+        formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
-        document.getElementById('v-f-grid').innerHTML = formatarColchetes(document.getElementById('f-grid').value || '-');
-        document.getElementById('v-termino').innerHTML = formatarColchetes(document.getElementById('termino').value || '-');
+        if (severidade === 'CRITICAL') {
+            formContainer.classList.add('fogo-no-parquinho');
+            tituloForm.innerText = modoAtual === 'link' ? "🚨 Gestão de Link/Ping (CRITICAL)" : "🚨 Infra / Aplicações (CRITICAL)";
+        } else if (severidade === 'INTERMITENTE') {
+            formContainer.classList.add('alerta-laranja');
+            tituloForm.innerText = modoAtual === 'link' ? "⚠️ Gestão de Link/Ping (INTERMITENTE)" : "⚠️ Infra / Aplicações (INTERMITENTE)";
+        } else if (severidade === 'OK') {
+            formContainer.classList.add('alerta-verde');
+            tituloForm.innerText = modoAtual === 'link' ? "✅ Gestão de Link/Ping (NORMALIZADO)" : "✅ Infra / Aplicações (NORMALIZADO)";
+        } else {
+            tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link/Ping" : "Infra / Aplicações";
+        }
 
-        const statusInfoText = document.getElementById('statusinfo').value.trim(); 
-        if (statusInfoText) {
+        // PREENCHENDO O CARD HTML
+        const headerCell = document.getElementById('render-header-cell');
+        if (logosClientes[vCliente]) {
+            headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;"></td></tr></table>`;
+        } else {
+            headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" width="160" style="display: block; margin: 0 auto;">`;
+        }
+
+        document.getElementById('v-titulo').innerText = tituloTexto;
+        document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
+        document.getElementById('v-host').innerText = vHost;
+        document.getElementById('v-inicio').innerText = vInicio;
+        document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid);
+        document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
+
+        // GRID DINÂMICO
+        const dynamicGrid = document.getElementById('v-dynamic-grid');
+        const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
+        
+        if (modoAtual === 'link') {
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vProtocolo}</div></td>
+                    <td width="4%"></td>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td>
+                </tr>
+                <tr height="12"><td></td></tr>
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vSolucionador}</div></td>
+                    <td></td>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td>
+                </tr>
+            `;
+        } else {
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vSolucionador}</div></td>
+                    <td width="4%"></td>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td>
+                </tr>
+                <tr height="12"><td></td></tr>
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td>
+                    <td></td>
+                    <td width="48%"></td>
+                </tr>
+            `;
+        }
+
+        // Blocos Opcionais
+        if (vStatusInfo) {
             document.getElementById('statusinfo-container').style.display = 'block';
-            document.getElementById('v-statusinfo').innerHTML = formatarColchetes(statusInfoText.replace(/\n/g, '<br>'));
+            document.getElementById('v-statusinfo').innerHTML = formatarColchetes(vStatusInfo.replace(/\n/g, '<br>'));
         } else {
             document.getElementById('statusinfo-container').style.display = 'none';
         }
 
-        const descText = document.getElementById('desc').value;
-        let descFormatado = descText.trim() ? descText.replace(/\n/g, '<br>') : 'Aguardando atualização técnica...';
-        document.getElementById('v-desc').innerHTML = formatarColchetes(descFormatado);
-        
-        const obsText = document.getElementById('obs').value;
-        const obsContainer = document.getElementById('obs-container');
-        if (obsText.trim()) {
-            obsContainer.style.display = 'block';
-            document.getElementById('v-obs').innerHTML = formatarColchetes(obsText.replace(/\n/g, '<br>'));
+        // NOVO: BLOCO PRESSPLAY (Aparece só na infra e se tiver texto)
+        if (vPressplay && modoAtual === 'infra') {
+            document.getElementById('pressplay-container').style.display = 'block';
+            document.getElementById('v-pressplay').innerHTML = formatarColchetes(vPressplay.replace(/\n/g, '<br>'));
         } else {
-            obsContainer.style.display = 'none';
+            document.getElementById('pressplay-container').style.display = 'none';
+        }
+
+        if (vDesc) {
+            document.getElementById('detalhamento-container').style.display = 'block';
+            document.getElementById('v-desc').innerHTML = formatarColchetes(vDesc.replace(/\n/g, '<br>'));
+        } else {
+            document.getElementById('detalhamento-container').style.display = modoAtual === 'link' ? 'block' : 'none';
+            document.getElementById('v-desc').innerHTML = 'Aguardando atualização técnica...';
         }
         
-        const temEvidencias = document.getElementById('evidencias').checked;
         document.getElementById('evidencias-container').style.display = temEvidencias ? 'block' : 'none';
-
-        const status = document.getElementById('status').value;
-        const tituloV = document.getElementById('v-titulo');
-        const badgeContainer = document.getElementById('v-badge-container');
-        const labelTermino = document.getElementById('label-termino');
-        const vTituloTermino = document.getElementById('v-titulo-termino');
-        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
-
-        if (status === 'RESOLVIDO') { 
-            bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO';
-            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Encerramento de Incidente';
-            labelTermino.innerText = 'Fim da Ocorrência';
-            vTituloTermino.innerText = 'FIM DA OCORRÊNCIA';
-        } else if (status === 'EM ABERTO') { 
-            bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO';
-            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente';
-            labelTermino.innerText = 'Previsão de Normalização (SLA)';
-            vTituloTermino.innerText = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
-        } else { 
-            bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP';
-            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Follow-up de Incidente';
-            labelTermino.innerText = 'Previsão de Normalização (SLA)';
-            vTituloTermino.innerText = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
+        
+        if (vObs) {
+            document.getElementById('obs-container').style.display = 'block';
+            document.getElementById('v-obs').innerHTML = formatarColchetes(vObs.replace(/\n/g, '<br>'));
+        } else {
+            document.getElementById('obs-container').style.display = 'none';
         }
 
-        tituloV.innerText = tituloTexto;
-        badgeContainer.innerHTML = `
-            <div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>
-            <table cellpadding="0" cellspacing="0" border="0" style="background-color: ${bgColor}; border-radius: 6px; border: 1px solid ${fadeColor};">
-                <tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr>
-            </table>
-        `;
         salvarRascunho();
     }
 
     function copiarAssuntoAcao() {
         if (!verificarDuplicidade()) return; 
-        
         const assunto = obterAssuntoGerado();
         const tempInput = document.createElement("input");
-        tempInput.value = assunto;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
+        tempInput.value = assunto; document.body.appendChild(tempInput);
+        tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
 
         const btn = document.getElementById('btn-assunto');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ COPIADO!';
-        btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
+        btn.innerHTML = '✅ COPIADO!'; btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
         
         registrarHistoricoNuvem(assunto); 
-        
         setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
     }
 
     function copyHTML() {
         if (!verificarDuplicidade()) return; 
-        
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
-        if ((status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
-            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento.');
-            protocolo.classList.add('erro-validacao');
-            protocolo.focus();
+        
+        if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento no modo Link/Ping.');
+            protocolo.classList.add('erro-validacao'); protocolo.focus();
             setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
             return; 
         }
 
         const node = document.getElementById('render');
-        const range = document.createRange();
-        range.selectNode(node);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-        document.execCommand('copy');
-        window.getSelection().removeAllRanges();
+        const range = document.createRange(); range.selectNode(node);
+        window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+        document.execCommand('copy'); window.getSelection().removeAllRanges();
 
         registrarHistoricoNuvem(obterAssuntoGerado()); 
-
         const btn = document.getElementById('btn-copiar-html');
-        const txtOriginal = btn.innerHTML;
-        btn.innerHTML = '✅ COPIADO!';
+        const txtOriginal = btn.innerHTML; btn.innerHTML = '✅ COPIADO!';
         setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
     }
 
     function copyAsImage() {
         if (!verificarDuplicidade()) return; 
-        
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
-        if ((status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+        
+        if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
             alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora.');
-            protocolo.classList.add('erro-validacao');
-            protocolo.focus();
+            protocolo.classList.add('erro-validacao'); protocolo.focus();
             setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
             return; 
         }
 
         const btn = document.getElementById('btn-copiar-img');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '⏳ GERANDO...';
+        const originalText = btn.innerHTML; btn.innerHTML = '⏳ GERANDO...';
 
         const node = document.getElementById('render');
         const clone = node.cloneNode(true);
-        clone.style.position = 'absolute';
-        clone.style.top = '-9999px';
-        clone.style.left = '-9999px';
-        clone.style.width = '650px'; 
-        clone.style.height = 'auto';
-        document.body.appendChild(clone);
+        clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px';
+        clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
         html2canvas(clone, { scale: 0.9, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             document.body.removeChild(clone);
@@ -1247,11 +1064,7 @@
                     btn.innerHTML = originalText;
                 }
             });
-        }).catch(err => {
-            document.body.removeChild(clone);
-            alert("Erro ao gerar a imagem.");
-            btn.innerHTML = originalText;
-        });
+        }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
     function limparFormulario() {
@@ -1268,19 +1081,14 @@
 
     function salvarRascunho() {
         const rascunho = {
-            cliente: document.getElementById('cliente').value,
-            severidade: document.getElementById('severidade').value,
-            host: document.getElementById('host').value,
-            status: document.getElementById('status').value,
-            item: document.getElementById('item').value,
-            protocolo: document.getElementById('protocolo').value,
-            solucionador: document.getElementById('solucionador').value,
-            inicio: document.getElementById('inicio').value,
-            fgrid: document.getElementById('f-grid').value,
-            termino: document.getElementById('termino').value,
-            desc: document.getElementById('desc').value,
-            obs: document.getElementById('obs').value,
-            statusinfo: document.getElementById('statusinfo').value,
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value,
+            host: document.getElementById('host').value, status: document.getElementById('status').value,
+            item: document.getElementById('item').value, protocolo: document.getElementById('protocolo').value,
+            solucionador: document.getElementById('solucionador').value, inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+            desc: document.getElementById('desc').value, obs: document.getElementById('obs').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, // NOVO
             evidencias: document.getElementById('evidencias').checked 
         };
         localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho));
@@ -1290,6 +1098,7 @@
         const salvo = localStorage.getItem('noc_rascunho_its');
         if (salvo) {
             const rascunho = JSON.parse(salvo);
+            if (rascunho.modo) modoAtual = rascunho.modo; 
             document.getElementById('cliente').value = rascunho.cliente || '';
             document.getElementById('severidade').value = rascunho.severidade || 'WARNING';
             document.getElementById('host').value = rascunho.host || '';
@@ -1303,6 +1112,7 @@
             document.getElementById('desc').value = rascunho.desc || '';
             document.getElementById('obs').value = rascunho.obs || '';
             document.getElementById('statusinfo').value = rascunho.statusinfo || '';
+            document.getElementById('pressplay').value = rascunho.pressplay || ''; // NOVO
             document.getElementById('evidencias').checked = rascunho.evidencias || false; 
         }
     }
@@ -1314,65 +1124,20 @@
 
     const itsLogoUrl = "Logos/logo-its.png"; 
     const logosClientes = {
-        "838 SOLUÇÕES": "Logos/logo-838-solucoes.png",
-        "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png",
-        "ATMOSPHERE": "Logos/logo-atmosphere.png",
-        "AUTOPASS": "Logos/logo-autopass.png",
-        "B-SIMPLE": "Logos/logo-b-simple.png",
-        "BANCO BS2": "Logos/logo-banco-bs2.png",
-        "BANCO CARREFOUR": "Logos/logo-banco-carrefour.png",
-        "BANCO SOFISA": "Logos/logo-banco-sofisa.png",
-        "BANCO TRICURY": "Logos/logo-banco-tricury.png",
-        "BASE TELCO": "Logos/logo-base-telco.png",
-        "BRASILAGRO (AGRO3)": "Logos/logo-brasilagro.png",
-        "CARBON": "Logos/logo-carbon.png",
-        "COGNA": "Logos/logo-cogna.png",
-        "CONAB": "Logos/logo-conab.png",
-        "CSD (GRUPO AMIGÃO)": "Logos/logo-csd.png",
-        "EASY-WAY": "Logos/logo-easy-way.png",
-        "FIDI": "Logos/logo-fidi.png",
-        "FOCUS TÊXTIL": "Logos/logo-focus-textil.png",
-        "FURACÃO": "Logos/logo-furacao.png",
-        "GALDERMA BRASIL": "Logos/logo-galderma.png",
-        "GRUPO AGIS": "Logos/logo-grupo-agis.png",
-        "HOTELARIA ALBA": "Logos/logo-hotelaria-alba.png",
-        "HIDROMARES BY SGS": "Logos/logo-hidromares.png",
-        "HOSPITAL PERSONAL": "Logos/logo-hospital-personal.png",
-        "SAINT MATTHEWS": "Logos/logo-saint-matthews.png",
-        "IGUA HOLDING": "Logos/logo-igua-holding.png",
-        "ITS": "Logos/logo-its-cliente.png",
-        "ITS-COMPLIANCE": "Logos/logo-its-compliance.png",
-        "ITSEG": "Logos/logo-itseg.png",
-        "JMC": "Logos/logo-jmc.png",
-        "LIBBS": "Logos/logo-libbs.png",
-        "LINHA UNI": "Logos/logo-linha-uni.png",
-        "LUSH": "Logos/logo-lush.png",
-        "MAKRO": "Logos/logo-makro.png",
-        "MAKRO FOOD SERVICE": "Logos/logo-makro-food.png",
-        "MASTER": "Logos/logo-master.png",
-        "MB HEALTH": "Logos/logo-mb-health.png",
-        "MEUCURSO": "Logos/logo-meucurso.png",
-        "MINDBE": "Logos/logo-mindbe.png",
-        "NAVA": "Logos/logo-nava.png",
-        "NETPARTNERS": "Logos/logo-netpartners.png",
-        "OPT-DRIVEN": "Logos/optdriven.png",
-        "PIZZAMIGOS": "Logos/logo-pizzamigos.png",
-        "PRYOR GLOBAL": "Logos/logo-pryor-global.png",
-        "RNP": "Logos/logo-rnp.png",
-        "SAUDESCOLHA BENEFÍCIOS": "Logos/logo-saudescolha.png",
-        "SGS": "Logos/logo-sgs.png",
-        "SHURE": "Logos/logo-shure.png",
-        "SOLUARQ": "Logos/logo-soluarq.png",
-        "SOLVER": "Logos/logo-solver.png",
-        "STRATTNER": "Logos/logo-strattner.png",
-        "SUPPER CERTO": "Logos/logo-supper-certo.png",
-        "T4S TECNOLOGIA": "Logos/logo-t4s.png",
-        "TECNOGERA (TNG)": "Logos/logo-tecnogera.png",
-        "TERESA PEREZ": "Logos/logo-teresa-perez.png",
-        "VISUS ENGENHARIA": "Logos/logo-visus.png",
-        "VIVEO": "Logos/logo-viveo.png"
+        "838 SOLUÇÕES": "Logos/logo-838-solucoes.png", "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png", "ATMOSPHERE": "Logos/logo-atmosphere.png",
+        "AUTOPASS": "Logos/logo-autopass.png", "B-SIMPLE": "Logos/logo-b-simple.png", "BANCO BS2": "Logos/logo-banco-bs2.png", "BANCO CARREFOUR": "Logos/logo-banco-carrefour.png",
+        "BANCO SOFISA": "Logos/logo-banco-sofisa.png", "BANCO TRICURY": "Logos/logo-banco-tricury.png", "BASE TELCO": "Logos/logo-base-telco.png", "BRASILAGRO (AGRO3)": "Logos/logo-brasilagro.png",
+        "CARBON": "Logos/logo-carbon.png", "COGNA": "Logos/logo-cogna.png", "CONAB": "Logos/logo-conab.png", "CSD (GRUPO AMIGÃO)": "Logos/logo-csd.png", "EASY-WAY": "Logos/logo-easy-way.png",
+        "FIDI": "Logos/logo-fidi.png", "FOCUS TÊXTIL": "Logos/logo-focus-textil.png", "FURACÃO": "Logos/logo-furacao.png", "GALDERMA BRASIL": "Logos/logo-galderma.png", "GRUPO AGIS": "Logos/logo-grupo-agis.png",
+        "HOTELARIA ALBA": "Logos/logo-hotelaria-alba.png", "HIDROMARES BY SGS": "Logos/logo-hidromares.png", "HOSPITAL PERSONAL": "Logos/logo-hospital-personal.png", "SAINT MATTHEWS": "Logos/logo-saint-matthews.png",
+        "IGUA HOLDING": "Logos/logo-igua-holding.png", "ITS": "Logos/logo-its-cliente.png", "ITS-COMPLIANCE": "Logos/logo-its-compliance.png", "ITSEG": "Logos/logo-itseg.png", "JMC": "Logos/logo-jmc.png",
+        "LIBBS": "Logos/logo-libbs.png", "LINHA UNI": "Logos/logo-linha-uni.png", "LUSH": "Logos/logo-lush.png", "MAKRO": "Logos/logo-makro.png", "MAKRO FOOD SERVICE": "Logos/logo-makro-food.png",
+        "MASTER": "Logos/logo-master.png", "MB HEALTH": "Logos/logo-mb-health.png", "MEUCURSO": "Logos/logo-meucurso.png", "MINDBE": "Logos/logo-mindbe.png", "NAVA": "Logos/logo-nava.png",
+        "NETPARTNERS": "Logos/logo-netpartners.png", "OPT-DRIVEN": "Logos/optdriven.png", "PIZZAMIGOS": "Logos/logo-pizzamigos.png", "PRYOR GLOBAL": "Logos/logo-pryor-global.png", "RNP": "Logos/logo-rnp.png",
+        "SAUDESCOLHA BENEFÍCIOS": "Logos/logo-saudescolha.png", "SGS": "Logos/logo-sgs.png", "SHURE": "Logos/logo-shure.png", "SOLUARQ": "Logos/logo-soluarq.png", "SOLVER": "Logos/logo-solver.png",
+        "STRATTNER": "Logos/logo-strattner.png", "SUPPER CERTO": "Logos/logo-supper-certo.png", "T4S TECNOLOGIA": "Logos/logo-t4s.png", "TECNOGERA (TNG)": "Logos/logo-tecnogera.png",
+        "TERESA PEREZ": "Logos/logo-teresa-perez.png", "VISUS ENGENHARIA": "Logos/logo-visus.png", "VIVEO": "Logos/logo-viveo.png"
     };
-
 </script>
 </body>
 </html>
