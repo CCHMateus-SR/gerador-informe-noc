@@ -22,8 +22,8 @@
 
         .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--its-blue);}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
-        .my-card.card-link { border-left-color: #002D5B; }
-        .my-card.card-infra { border-left-color: #475569; } /* Grafite para Infra */
+        .my-card.card-link { border-left-color: var(--its-red); }
+        .my-card.card-infra { border-left-color: #0284C7; } 
         
         .my-card-header { display: flex; justify-content: space-between; align-items: center; }
         .my-card-client { font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; }
@@ -81,13 +81,19 @@
         textarea { height: 120px; resize: none; line-height: 1.5; font-family: inherit; }
         .textarea-sm { height: 50px !important; }
 
-        .button-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-copy { flex: 1.5; background-color: #0ea5e9; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
-        .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
-        .btn-copy-img { flex: 2; background-color: #059669; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
-        .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
-        .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
+        .button-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
         .btn-copy-subject:hover { background-color: #E0F2FE; }
+        
+        .btn-copy { flex: 1.2; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
+        .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
+        
+        .btn-copy-img { flex: 1.2; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+        .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
+
+        /* NOVO BOTÃO DO ITSSM */
+        .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
+        .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
         .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
@@ -143,8 +149,8 @@
         body.dark-mode .mode-btn.active { background: #1E293B; color: #38bdf8; }
 
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
-        body.dark-mode .my-card.card-link { border-left-color: #38bdf8; }
-        body.dark-mode .my-card.card-infra { border-left-color: #94A3B8; }
+        body.dark-mode .my-card.card-link { border-left-color: #f87171; } 
+        body.dark-mode .my-card.card-infra { border-left-color: #38bdf8; } 
         body.dark-mode .my-card-client { color: #38bdf8; }
         body.dark-mode .my-card-host { color: #F8FAFC; }
         body.dark-mode .my-card-service { color: #94A3B8; }
@@ -165,6 +171,9 @@
 
         body.dark-mode #pressplay-container td { background-color: #052e16 !important; border-color: #166534 !important; border-left-color: #22c55e !important; }
         body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
+        
+        body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
+        body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
     </style>
 </head>
 <body>
@@ -362,17 +371,15 @@
             <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
             <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
+            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
 
     <div class="preview-side" style="display: flex;">
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
-                
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
-                
                 <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
-                
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -573,13 +580,12 @@
             document.getElementById('grupo-solucionador').style.display = 'none'; 
         }
         
-        // Atualiza e renderiza a lista lateral para filtrar o que não é do modo atual
         renderizarListaLateral();
         update();
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL COM FILTRO DE MODO
+    // HISTÓRICO LATERAL
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
@@ -603,7 +609,6 @@
         });
     }
 
-    // NOVIDADE: AGORA O HISTÓRICO FILTRA PELO MODO ATUAL (LINK vs INFRA)
     function renderizarListaLateral() {
         const lista = document.getElementById('meus-chamados-lista');
         window.chamadosExibidos = [];
@@ -613,7 +618,6 @@
             return;
         }
 
-        // Filtra pela ABA (Meus vs Equipe) E também pelo MODO ATUAL (Link vs Infra)
         if (visaoHistorico === 'meus') { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome && (c.form.modo || 'link') === modoAtual); 
         } else { 
@@ -633,8 +637,6 @@
             const partesAssunto = log.assunto.split(' | ');
             const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
             const modoIcon = log.form.modo === 'infra' ? '🖥️' : '🌐';
-            
-            // Define a cor da borda do card baseado no modo
             const classeCardModo = log.form.modo === 'infra' ? 'card-infra' : 'card-link';
 
             let classeBadge = 'badge-aberto';
@@ -674,7 +676,6 @@
 
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
-        // Como agora a lista já está filtrada pelo modo, isso é só por segurança
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
         document.getElementById('cliente').value = dados.cliente || '';
@@ -698,7 +699,7 @@
     }
 
     // ==========================================
-    // ALERTAS, EXPORTAÇÃO E NUVEM
+    // ALERTAS E NUVEM
     // ==========================================
     function tocarAlertaSonoro() {
         try {
@@ -820,10 +821,20 @@
             if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum informe registrado desde as 07h00 de hoje.</div>'; return; }
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
+            
             logs.reverse().forEach(item => {
-                // Aqui no global eu mostro o ícone do que se trata pra chefia saber
-                const modoLabel = item.form && item.form.modo === 'infra' ? '🖥️' : '🌐';
-                html += `<div class="log-item"><div class="log-time"><span>🕒 ${item.hora} ${modoLabel}</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject">${item.assunto}</span></div>`;
+                const isInfra = item.form && item.form.modo === 'infra';
+                const corBorda = isInfra ? '#0284C7' : 'var(--its-red)';
+                const modoLabel = isInfra ? '🖥️' : '🌐';
+                
+                html += `
+                <div class="log-item" style="border-left-color: ${corBorda};">
+                    <div class="log-time">
+                        <span>🕒 ${item.hora} ${modoLabel}</span>
+                        <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
+                    </div>
+                    <span class="log-subject">${item.assunto}</span>
+                </div>`;
             });
             listaHtml.innerHTML = html;
         });
@@ -916,9 +927,6 @@
         if(severidade === 'OK') corSeveridade = '#166534'; 
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
 
-        // ==========================================
-        // TEXTOS, TÍTULOS E CORES DINÂMICAS
-        // ==========================================
         let labelTerminoForm = '';
         let tituloTerminoBox = '';
         let tituloDescBox = 'DETALHAMENTO';
@@ -934,8 +942,8 @@
             document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
             document.getElementById('v-desc').style.fontSize = "12px";
             
-            headerBg.setAttribute('bgcolor', '#1E293B'); // Fundo Grafite
-            topBorder.style.borderTop = '8px solid #0284C7'; // Linha Azul Tech
+            headerBg.setAttribute('bgcolor', '#1E293B'); 
+            topBorder.style.borderTop = '8px solid #0284C7'; 
             
         } else {
             document.getElementById('label-desc').innerText = "Ações / Diagnóstico";
@@ -950,8 +958,8 @@
                 tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
             }
             
-            headerBg.setAttribute('bgcolor', '#002D5B'); // Fundo Azul ITS
-            topBorder.style.borderTop = '8px solid #DC2626'; // Linha Vermelha ITS
+            headerBg.setAttribute('bgcolor', '#002D5B'); 
+            topBorder.style.borderTop = '8px solid #DC2626'; 
         }
         
         document.getElementById('label-termino').innerText = labelTerminoForm;
@@ -1064,6 +1072,76 @@
         salvarRascunho();
     }
 
+    // ==========================================
+    // NOVO: GERADOR DE TEXTO PARA O ITSSM
+    // ==========================================
+    function copyITSSM() {
+        if (!verificarDuplicidade()) return;
+
+        const vHost = document.getElementById('host').value || '---';
+        const vInicio = document.getElementById('inicio').value || '---';
+        const vFgrid = document.getElementById('f-grid').value || '-';
+        const vTermino = document.getElementById('termino').value || '-';
+        const vCliente = document.getElementById('cliente').value || '---';
+        const vStatusInfo = document.getElementById('statusinfo').value.trim();
+
+        let textoITSSM = `Host: ${vHost}\n`;
+        textoITSSM += `Início da ocorrência: ${vInicio}\n`;
+        textoITSSM += `Follow-up da ocorrência: ${vFgrid}\n`;
+        textoITSSM += `Término da ocorrência: ${vTermino}\n`;
+        textoITSSM += `Cliente: ${vCliente}\n`;
+        
+        if (vStatusInfo) {
+            textoITSSM += `Dados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`;
+        }
+
+        // Condicionais
+        const vPressplay = document.getElementById('pressplay').value.trim();
+        if (modoAtual === 'infra' && vPressplay) {
+            textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`;
+        }
+
+        const vSolucionador = document.getElementById('solucionador').value.trim();
+        if (vSolucionador) {
+            const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)';
+            textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`;
+        }
+
+        const vDesc = document.getElementById('desc').value.trim();
+        if (vDesc) {
+            const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico';
+            textoITSSM += `\n${labelDesc}:\n${vDesc}\n`;
+        }
+
+        const vObs = document.getElementById('obs').value.trim();
+        if (vObs) {
+            textoITSSM += `\nObservação:\n${vObs}\n`;
+        }
+
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = textoITSSM;
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempTextarea);
+
+        const btn = document.getElementById('btn-copiar-itssm');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ COPIADO!';
+        btn.style.backgroundColor = '#10B981'; 
+        btn.style.color = '#fff';
+        
+        registrarHistoricoNuvem(obterAssuntoGerado()); 
+        setTimeout(() => { 
+            btn.innerHTML = originalText; 
+            btn.style.backgroundColor = ''; 
+            btn.style.color = ''; 
+        }, 3000);
+    }
+
+    // ==========================================
+    // CÓPIA E EXPORTAÇÃO
+    // ==========================================
     function copiarAssuntoAcao() {
         if (!verificarDuplicidade()) return; 
         const assunto = obterAssuntoGerado();
