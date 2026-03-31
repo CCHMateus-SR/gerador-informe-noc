@@ -180,7 +180,7 @@
         <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Um colega da equipe acabou de registrar uma ação:</p>
         <div id="texto-alerta" style="font-size: 15px; color: #1E293B; margin-bottom: 30px; line-height: 1.6; font-weight: 500; background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #0EA5E9;">
         </div>
-        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">CIENTE 👍</button>
+        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s;">CIENTE 👍</button>
     </div>
 </div>
 
@@ -363,8 +363,11 @@
     <div class="preview-side" style="display: flex;">
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
+                
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
-                <tr><td align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                
+                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -506,23 +509,21 @@
     }
 
     // ==========================================
-    // SELETOR DE MODO COM LIMPEZA INTELIGENTE
+    // SELETOR DE MODO
     // ==========================================
     function trocarModo(novoModo) {
-        if (modoAtual === novoModo) return; // Se clicou na mesma aba, não faz nada
+        if (modoAtual === novoModo) return; 
 
-        // Verifica se tem algo preenchido que o analista possa perder
         const temDado = document.getElementById('cliente').value.trim() !== '' ||
                         document.getElementById('host').value.trim() !== '' ||
                         document.getElementById('item').value.trim() !== '';
 
         if (temDado) {
             if(!confirm("Alternar de módulo irá limpar os dados atuais do formulário. Deseja continuar?")) {
-                return; // Analista cancelou a troca
+                return; 
             }
         }
 
-        // Limpa tudo silenciosamente
         document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
         document.getElementById('status').value = 'EM ABERTO';
         document.getElementById('severidade').value = 'WARNING';
@@ -655,7 +656,6 @@
 
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
-        // Ao puxar dados, NÃO passa pelo trocarModo (que limpa). Passa direto pelo setModo.
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
         document.getElementById('cliente').value = dados.cliente || '';
@@ -896,11 +896,15 @@
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
 
         // ==========================================
-        // TEXTOS E TÍTULOS DINÂMICOS
+        // TEXTOS, TÍTULOS E CORES DINÂMICAS
         // ==========================================
         let labelTerminoForm = '';
         let tituloTerminoBox = '';
         let tituloDescBox = 'DETALHAMENTO';
+        
+        // ELEMENTOS QUE MUDAM DE COR
+        const headerBg = document.getElementById('v-header-bg');
+        const topBorder = document.getElementById('render-header-cell');
 
         if (modoAtual === 'infra') {
             labelTerminoForm = 'Término da Ocorrência';
@@ -909,6 +913,10 @@
             document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais <strong>(Bloco Cinza)</strong>";
             document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
             document.getElementById('v-desc').style.fontSize = "12px";
+            
+            // CORES EFEITO CAMALEÃO (INFRA)
+            headerBg.setAttribute('bgcolor', '#1E293B'); // Fundo Grafite
+            topBorder.style.borderTop = '8px solid #0284C7'; // Linha Azul Tech
             
         } else {
             document.getElementById('label-desc').innerText = "Ações / Diagnóstico";
@@ -922,22 +930,29 @@
                 labelTerminoForm = 'Previsão de Normalização (SLA)';
                 tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
             }
+            
+            // CORES EFEITO CAMALEÃO (LINK/PING)
+            headerBg.setAttribute('bgcolor', '#002D5B'); // Fundo Azul ITS
+            topBorder.style.borderTop = '8px solid #DC2626'; // Linha Vermelha ITS
         }
         
         document.getElementById('label-termino').innerText = labelTerminoForm;
         document.getElementById('v-titulo-termino').innerText = tituloTerminoBox;
         document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
+        // TÍTULO COM ÍCONE
+        let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
         let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
+        
         if (status === 'RESOLVIDO') { 
             bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO';
-            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Encerramento de Incidente';
+            tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`;
         } else if (status === 'EM ABERTO') { 
             bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO';
-            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente';
+            tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`;
         } else { 
             bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP';
-            tituloTexto = 'INFORME GESTÃO OPERACIONAL | Follow-up de Incidente';
+            tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`;
         }
 
         const formContainer = document.getElementById('form-container');
