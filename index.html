@@ -20,8 +20,11 @@
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
         .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; border-left: 4px solid var(--its-blue); transition: 0.2s; display: flex; flex-direction: column; gap: 6px;}
+        .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--its-blue);}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
+        .my-card.card-link { border-left-color: #002D5B; }
+        .my-card.card-infra { border-left-color: #475569; } /* Grafite para Infra */
+        
         .my-card-header { display: flex; justify-content: space-between; align-items: center; }
         .my-card-client { font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; }
         .my-card-badge { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; }
@@ -140,6 +143,8 @@
         body.dark-mode .mode-btn.active { background: #1E293B; color: #38bdf8; }
 
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
+        body.dark-mode .my-card.card-link { border-left-color: #38bdf8; }
+        body.dark-mode .my-card.card-infra { border-left-color: #94A3B8; }
         body.dark-mode .my-card-client { color: #38bdf8; }
         body.dark-mode .my-card-host { color: #F8FAFC; }
         body.dark-mode .my-card-service { color: #94A3B8; }
@@ -567,11 +572,14 @@
             document.getElementById('grupo-pressplay').style.display = 'flex'; 
             document.getElementById('grupo-solucionador').style.display = 'none'; 
         }
+        
+        // Atualiza e renderiza a lista lateral para filtrar o que não é do modo atual
+        renderizarListaLateral();
         update();
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL
+    // HISTÓRICO LATERAL COM FILTRO DE MODO
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
@@ -595,21 +603,28 @@
         });
     }
 
+    // NOVIDADE: AGORA O HISTÓRICO FILTRA PELO MODO ATUAL (LINK vs INFRA)
     function renderizarListaLateral() {
         const lista = document.getElementById('meus-chamados-lista');
         window.chamadosExibidos = [];
+        
         if (chamadosDoTurno.length === 0) {
             lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>';
             return;
         }
 
-        if (visaoHistorico === 'meus') { window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome); } 
-        else { window.chamadosExibidos = [...chamadosDoTurno]; }
+        // Filtra pela ABA (Meus vs Equipe) E também pelo MODO ATUAL (Link vs Infra)
+        if (visaoHistorico === 'meus') { 
+            window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome && (c.form.modo || 'link') === modoAtual); 
+        } else { 
+            window.chamadosExibidos = chamadosDoTurno.filter(c => (c.form.modo || 'link') === modoAtual); 
+        }
 
         window.chamadosExibidos.reverse(); 
 
         if(window.chamadosExibidos.length === 0) {
-            lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado encontrado para esta visão.</div>';
+            const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura";
+            lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado ${textoAba} encontrado nesta visão.</div>`;
             return;
         }
 
@@ -619,6 +634,9 @@
             const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
             const modoIcon = log.form.modo === 'infra' ? '🖥️' : '🌐';
             
+            // Define a cor da borda do card baseado no modo
+            const classeCardModo = log.form.modo === 'infra' ? 'card-infra' : 'card-link';
+
             let classeBadge = 'badge-aberto';
             if(acao.includes('FOLLOW')) classeBadge = 'badge-follow';
             if(acao.includes('ENCERRAMENTO')) classeBadge = 'badge-ok';
@@ -633,7 +651,7 @@
             }
 
             html += `
-            <div class="my-card">
+            <div class="my-card ${classeCardModo}">
                 <div class="my-card-header">
                     <span class="my-card-client">${modoIcon} ${clienteNome}</span>
                     <span class="my-card-badge ${classeBadge}">${acao}</span>
@@ -656,6 +674,7 @@
 
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
+        // Como agora a lista já está filtrada pelo modo, isso é só por segurança
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
         document.getElementById('cliente').value = dados.cliente || '';
@@ -802,7 +821,9 @@
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             logs.reverse().forEach(item => {
-                html += `<div class="log-item"><div class="log-time"><span>🕒 ${item.hora}</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject">${item.assunto}</span></div>`;
+                // Aqui no global eu mostro o ícone do que se trata pra chefia saber
+                const modoLabel = item.form && item.form.modo === 'infra' ? '🖥️' : '🌐';
+                html += `<div class="log-item"><div class="log-time"><span>🕒 ${item.hora} ${modoLabel}</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject">${item.assunto}</span></div>`;
             });
             listaHtml.innerHTML = html;
         });
@@ -902,7 +923,6 @@
         let tituloTerminoBox = '';
         let tituloDescBox = 'DETALHAMENTO';
         
-        // ELEMENTOS QUE MUDAM DE COR
         const headerBg = document.getElementById('v-header-bg');
         const topBorder = document.getElementById('render-header-cell');
 
@@ -914,7 +934,6 @@
             document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
             document.getElementById('v-desc').style.fontSize = "12px";
             
-            // CORES EFEITO CAMALEÃO (INFRA)
             headerBg.setAttribute('bgcolor', '#1E293B'); // Fundo Grafite
             topBorder.style.borderTop = '8px solid #0284C7'; // Linha Azul Tech
             
@@ -931,7 +950,6 @@
                 tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
             }
             
-            // CORES EFEITO CAMALEÃO (LINK/PING)
             headerBg.setAttribute('bgcolor', '#002D5B'); // Fundo Azul ITS
             topBorder.style.borderTop = '8px solid #DC2626'; // Linha Vermelha ITS
         }
@@ -940,7 +958,6 @@
         document.getElementById('v-titulo-termino').innerText = tituloTerminoBox;
         document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
-        // TÍTULO COM ÍCONE
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
         let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
         
