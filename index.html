@@ -180,7 +180,7 @@
         <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Um colega da equipe acabou de registrar uma ação:</p>
         <div id="texto-alerta" style="font-size: 15px; color: #1E293B; margin-bottom: 30px; line-height: 1.6; font-weight: 500; background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #0EA5E9;">
         </div>
-        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s;">CIENTE 👍</button>
+        <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">CIENTE 👍</button>
     </div>
 </div>
 
@@ -249,8 +249,8 @@
         </div>
 
         <div class="mode-switch-container">
-            <button id="btn-modo-link" class="mode-btn active" onclick="setModo('link')">🌐 Link / Ping</button>
-            <button id="btn-modo-infra" class="mode-btn" onclick="setModo('infra')">🖥️ Infra / Aplicações</button>
+            <button id="btn-modo-link" class="mode-btn active" onclick="trocarModo('link')">🌐 Link / Ping</button>
+            <button id="btn-modo-infra" class="mode-btn" onclick="trocarModo('infra')">🖥️ Infra / Aplicações</button>
         </div>
 
         <div class="form-grid">
@@ -506,8 +506,33 @@
     }
 
     // ==========================================
-    // SELETOR DE MODO (LINK vs INFRA) - ATUALIZADO
+    // SELETOR DE MODO COM LIMPEZA INTELIGENTE
     // ==========================================
+    function trocarModo(novoModo) {
+        if (modoAtual === novoModo) return; // Se clicou na mesma aba, não faz nada
+
+        // Verifica se tem algo preenchido que o analista possa perder
+        const temDado = document.getElementById('cliente').value.trim() !== '' ||
+                        document.getElementById('host').value.trim() !== '' ||
+                        document.getElementById('item').value.trim() !== '';
+
+        if (temDado) {
+            if(!confirm("Alternar de módulo irá limpar os dados atuais do formulário. Deseja continuar?")) {
+                return; // Analista cancelou a troca
+            }
+        }
+
+        // Limpa tudo silenciosamente
+        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+        document.getElementById('status').value = 'EM ABERTO';
+        document.getElementById('severidade').value = 'WARNING';
+        document.getElementById('evidencias').checked = false;
+        document.getElementById('protocolo').classList.remove('erro-validacao');
+        localStorage.removeItem('noc_rascunho_its');
+
+        setModo(novoModo);
+    }
+
     function setModo(modo) {
         modoAtual = modo;
         
@@ -526,7 +551,7 @@
             document.getElementById('grupo-protocolo').style.display = 'flex';
             document.getElementById('btn-template-desc').style.display = 'flex';
             document.getElementById('grupo-pressplay').style.display = 'none'; 
-            document.getElementById('grupo-solucionador').style.display = 'flex'; // Volta o Solucionador
+            document.getElementById('grupo-solucionador').style.display = 'flex'; 
         } else {
             document.getElementById('titulo-form').innerText = "Infra / Aplicações";
             document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
@@ -539,7 +564,7 @@
             document.getElementById('grupo-protocolo').style.display = 'none';
             document.getElementById('btn-template-desc').style.display = 'none';
             document.getElementById('grupo-pressplay').style.display = 'flex'; 
-            document.getElementById('grupo-solucionador').style.display = 'none'; // Some na Infra!
+            document.getElementById('grupo-solucionador').style.display = 'none'; 
         }
         update();
     }
@@ -630,6 +655,7 @@
 
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
+        // Ao puxar dados, NÃO passa pelo trocarModo (que limpa). Passa direto pelo setModo.
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
         document.getElementById('cliente').value = dados.cliente || '';
@@ -870,7 +896,7 @@
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
 
         // ==========================================
-        // TEXTOS E TÍTULOS DINÂMICOS (LINK vs INFRA)
+        // TEXTOS E TÍTULOS DINÂMICOS
         // ==========================================
         let labelTerminoForm = '';
         let tituloTerminoBox = '';
@@ -881,8 +907,6 @@
             tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA';
             tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
             document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais <strong>(Bloco Cinza)</strong>";
-            
-            // Fonte do bloco imitando código para colar os diretórios certinho
             document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
             document.getElementById('v-desc').style.fontSize = "12px";
             
@@ -947,7 +971,6 @@
         document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid);
         document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
 
-        // GRID DINÂMICO
         const dynamicGrid = document.getElementById('v-dynamic-grid');
         const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
         
@@ -966,7 +989,6 @@
                 </tr>
             `;
         } else {
-            // A FACA: Remoção completa do Solucionador na Infra = Grid Simétrico de 6 Caixas perfeitas
             dynamicGrid.innerHTML = `
                 <tr>
                     <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td>
