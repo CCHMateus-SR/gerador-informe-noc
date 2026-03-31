@@ -10,14 +10,17 @@
         :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-green: #166534; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         
-        /* NOVO CONTAINER MAIS LARGO PARA 3 COLUNAS */
         .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center;}
         
-        /* COLUNA 1: MEUS CHAMADOS */
+        /* COLUNA 1: MEUS CHAMADOS / EQUIPE */
         .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
-        .history-side h3 { color: var(--its-blue); margin: 0 0 5px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-        .history-side p { font-size: 11px; color: #64748B; margin-bottom: 20px; text-transform: uppercase; font-weight: bold;}
+        .history-side h3 { color: var(--its-blue); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         
+        /* ABAS DE HISTÓRICO */
+        .tabs-container { display: flex; gap: 5px; margin-bottom: 15px; background: #F1F5F9; padding: 4px; border-radius: 8px; border: 1px solid #E2E8F0;}
+        .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
+        .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
         /* ESTILO DOS CARDS DE HISTÓRICO */
         .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; border-left: 4px solid var(--its-blue); transition: 0.2s; display: flex; flex-direction: column; gap: 6px;}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
@@ -131,6 +134,10 @@
         body.dark-mode #texto-alerta { color: #F8FAFC !important; }
         body.dark-mode .section-title { color: #38bdf8; border-color: #334155; }
         
+        body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
+        body.dark-mode .tab-btn { color: #94A3B8; }
+        body.dark-mode .tab-btn.active { background: #1E293B; color: #38bdf8; }
+
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
         body.dark-mode .my-card-client { color: #38bdf8; }
         body.dark-mode .my-card-host { color: #F8FAFC; }
@@ -269,8 +276,13 @@
 <div class="container">
     
     <div class="history-side" id="history-container">
-        <h3>🕰️ Meus Chamados</h3>
-        <p>Preencha com um clique</p>
+        <h3>🕰️ Histórico</h3>
+        
+        <div class="tabs-container">
+            <button id="tab-meus" class="tab-btn active" onclick="setVisaoHistorico('meus')">👤 Meus</button>
+            <button id="tab-equipe" class="tab-btn" onclick="setVisaoHistorico('equipe')">👥 Equipe</button>
+        </div>
+
         <div id="meus-chamados-lista">
             <div style="text-align: center; color: #94A3B8; font-size: 12px; margin-top: 30px;">Carregando histórico...</div>
         </div>
@@ -378,7 +390,7 @@
         
         <div class="button-row">
             <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-            <button class="btn-its-history" onclick="abrirHistorico()">📡 HISTÓRICO DA EQUIPE</button>
+            <button class="btn-its-history" onclick="abrirHistorico()">📡 HISTÓRICO EM TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
             <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
@@ -522,7 +534,7 @@
 
 <script>
     // ==========================================
-    // CONFIGURAÇÃO DO FIREBASE (BANCO DE DADOS)
+    // CONFIGURAÇÃO DO FIREBASE E VARIÁVEIS GLOBAIS
     // ==========================================
     const firebaseConfig = {
         apiKey: "AIzaSyDfs3d6GS9pmVmaRJgMaKNViaGoXErCQgo",
@@ -537,7 +549,10 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    window.meusChamadosCarregados = [];
+    // Novas variáveis para gerenciar as abas de histórico
+    let visaoHistorico = 'meus'; // Pode ser 'meus' ou 'equipe'
+    let chamadosDoTurno = []; 
+    window.chamadosExibidos = []; 
 
     function getInicioDoPlantaoTimestamp() {
         const agora = new Date();
@@ -550,7 +565,7 @@
     }
 
     // ==========================================
-    // SISTEMA DE LOGIN E HISTÓRICO PESSOAL
+    // SISTEMA DE LOGIN
     // ==========================================
     let currentUser = JSON.parse(localStorage.getItem('noc_user_info'));
 
@@ -564,7 +579,7 @@
         } else {
             document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
             document.getElementById('history-container').style.display = 'block';
-            carregarMeuHistorico();
+            iniciarListenerHistorico();
         }
     };
 
@@ -585,7 +600,7 @@
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
         
         document.getElementById('history-container').style.display = 'block';
-        carregarMeuHistorico();
+        iniciarListenerHistorico();
     }
 
     function fazerLogout() {
@@ -598,7 +613,8 @@
             
             document.getElementById('history-container').style.display = 'none';
             document.getElementById('meus-chamados-lista').innerHTML = '';
-            window.meusChamadosCarregados = [];
+            chamadosDoTurno = [];
+            window.chamadosExibidos = [];
         }
     }
 
@@ -616,68 +632,98 @@
     }
 
     // ==========================================
-    // COLUNA 1: LÓGICA DO MEU HISTÓRICO
+    // COLUNA LATERAL DE HISTÓRICO COM ABAS
     // ==========================================
-    function carregarMeuHistorico() {
+    
+    // Função que alterna entre "Meus" e "Equipe"
+    function setVisaoHistorico(visao) {
+        visaoHistorico = visao;
+        document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
+        document.getElementById('tab-equipe').classList.toggle('active', visao === 'equipe');
+        renderizarListaLateral();
+    }
+
+    // Função que fica "escutando" a base de dados o tempo todo
+    function iniciarListenerHistorico() {
         if (!currentUser) return;
-        const lista = document.getElementById('meus-chamados-lista');
         const inicioTurno = getInicioDoPlantaoTimestamp(); 
         
         db.ref('historico_noc').orderByChild('timestamp').startAt(inicioTurno).on('value', (snapshot) => {
-            window.meusChamadosCarregados = [];
+            chamadosDoTurno = [];
             
-            if(!snapshot.exists()) {
-                lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado por você neste plantão ainda.</div>';
-                return;
+            if(snapshot.exists()) {
+                snapshot.forEach(child => { 
+                    const val = child.val();
+                    if(val.form) chamadosDoTurno.push(val);
+                });
             }
-            
-            snapshot.forEach(child => { 
-                const val = child.val();
-                if(val.nome === currentUser.nome && val.form) {
-                    window.meusChamadosCarregados.push(val);
-                }
-            });
-            
-            window.meusChamadosCarregados.reverse();
-
-            if(window.meusChamadosCarregados.length === 0) {
-                lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado salvo com dados de preenchimento.</div>';
-                return;
-            }
-
-            let html = '';
-            window.meusChamadosCarregados.forEach((log, index) => {
-                const partesAssunto = log.assunto.split(' | ');
-                const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
-                
-                let classeBadge = 'badge-aberto';
-                if(acao.includes('FOLLOW')) classeBadge = 'badge-follow';
-                if(acao.includes('ENCERRAMENTO')) classeBadge = 'badge-ok';
-
-                const clienteNome = log.form.cliente || 'CLIENTE NÃO INFORMADO';
-                const hostNome = log.form.host || 'Host/Circuito Não Informado';
-                const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
-
-                html += `
-                <div class="my-card">
-                    <div class="my-card-header">
-                        <span class="my-card-client">${clienteNome}</span>
-                        <span class="my-card-badge ${classeBadge}">${acao}</span>
-                    </div>
-                    <div class="my-card-host">${hostNome}</div>
-                    <div class="my-card-service">🔖 ${servicoNome}</div>
-                    <div class="my-card-bottom">
-                        <span class="my-card-time">🕒 ${log.hora}</span>
-                        <button class="btn-pull" onclick="carregarChamadoParaFormulario(${index})">🔄 Puxar Dados</button>
-                    </div>
-                </div>`;
-            });
-            lista.innerHTML = html;
+            renderizarListaLateral();
         });
     }
 
+    // Função que desenha os cards na tela baseado na aba escolhida
+    function renderizarListaLateral() {
+        const lista = document.getElementById('meus-chamados-lista');
+        window.chamadosExibidos = [];
+
+        if (chamadosDoTurno.length === 0) {
+            lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>';
+            return;
+        }
+
+        // Filtro de aba
+        if (visaoHistorico === 'meus') {
+            window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome);
+        } else {
+            window.chamadosExibidos = [...chamadosDoTurno]; // Puxa todo mundo
+        }
+
+        window.chamadosExibidos.reverse(); // Mais novos no topo
+
+        if(window.chamadosExibidos.length === 0) {
+            lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado encontrado para esta visão.</div>';
+            return;
+        }
+
+        let html = '';
+        window.chamadosExibidos.forEach((log, index) => {
+            const partesAssunto = log.assunto.split(' | ');
+            const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
+            
+            let classeBadge = 'badge-aberto';
+            if(acao.includes('FOLLOW')) classeBadge = 'badge-follow';
+            if(acao.includes('ENCERRAMENTO')) classeBadge = 'badge-ok';
+
+            const clienteNome = log.form.cliente || 'CLIENTE NÃO INFORMADO';
+            const hostNome = log.form.host || 'Host/Circuito Não Informado';
+            const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
+
+            // TAG DE AUTORIA (Aparece na aba equipe se não for você)
+            let infoAnalista = '';
+            if (visaoHistorico === 'equipe' && log.nome !== currentUser.nome) {
+                infoAnalista = `<div style="font-size: 9px; color: var(--its-orange); margin-top: 4px; font-weight: bold; background: #FFF7ED; padding: 3px 6px; border-radius: 4px; display: inline-block;">👤 Criado por: ${log.nome}</div>`;
+            }
+
+            html += `
+            <div class="my-card">
+                <div class="my-card-header">
+                    <span class="my-card-client">${clienteNome}</span>
+                    <span class="my-card-badge ${classeBadge}">${acao}</span>
+                </div>
+                <div class="my-card-host">${hostNome}</div>
+                <div class="my-card-service">🔖 ${servicoNome}</div>
+                ${infoAnalista}
+                <div class="my-card-bottom">
+                    <span class="my-card-time">🕒 ${log.hora}</span>
+                    <button class="btn-pull" onclick="carregarChamadoParaFormulario(${index})">🔄 Puxar Dados</button>
+                </div>
+            </div>`;
+        });
+        lista.innerHTML = html;
+    }
+
     function carregarChamadoParaFormulario(index) {
-        const dados = window.meusChamadosCarregados[index].form;
+        const dados = window.chamadosExibidos[index].form;
         if(!dados) return;
 
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
@@ -695,17 +741,14 @@
         document.getElementById('desc').value = dados.desc || '';
         document.getElementById('solucionador').value = dados.solucionador || '';
         document.getElementById('obs').value = dados.obs || '';
-        
-        // NOVO: Puxa o status da caixinha de evidências
-        document.getElementById('evidencias').checked = dados.evidencias || false;
+        document.getElementById('evidencias').checked = dados.evidencias || false; 
         
         update();
         mostrarToast("✅ Formulário preenchido com sucesso!");
     }
 
-
     // ==========================================
-    // GERADOR DO ALERTA SONORO (WEB AUDIO API)
+    // GERADOR DO ALERTA SONORO
     // ==========================================
     function tocarAlertaSonoro() {
         try {
@@ -727,7 +770,7 @@
     }
 
     // ==========================================
-    // SISTEMA DE ALERTAS INVASIVOS (COM FILA)
+    // SISTEMA DE ALERTAS INVASIVOS
     // ==========================================
     let filaDeAlertas = [];
     let modalAberto = false;
@@ -802,7 +845,7 @@
     }
 
     // ==========================================
-    // GRAVAÇÃO NA NUVEM (AGORA SALVA TUDO!)
+    // GRAVAÇÃO NA NUVEM
     // ==========================================
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
@@ -824,7 +867,7 @@
             desc: document.getElementById('desc').value,
             solucionador: document.getElementById('solucionador').value,
             obs: document.getElementById('obs').value,
-            evidencias: document.getElementById('evidencias').checked // Salva estado da checkbox
+            evidencias: document.getElementById('evidencias').checked
         };
 
         logRef.push({
@@ -1076,7 +1119,6 @@
             obsContainer.style.display = 'none';
         }
         
-        // NOVO: Exibir ou esconder o aviso de evidências
         const temEvidencias = document.getElementById('evidencias').checked;
         document.getElementById('evidencias-container').style.display = temEvidencias ? 'block' : 'none';
 
@@ -1217,7 +1259,7 @@
             document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
             document.getElementById('status').value = 'EM ABERTO';
             document.getElementById('severidade').value = 'WARNING';
-            document.getElementById('evidencias').checked = false; // Desmarca evidencias
+            document.getElementById('evidencias').checked = false; 
             document.getElementById('protocolo').classList.remove('erro-validacao');
             localStorage.removeItem('noc_rascunho_its'); 
             update();
@@ -1239,7 +1281,7 @@
             desc: document.getElementById('desc').value,
             obs: document.getElementById('obs').value,
             statusinfo: document.getElementById('statusinfo').value,
-            evidencias: document.getElementById('evidencias').checked // NOVO
+            evidencias: document.getElementById('evidencias').checked 
         };
         localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho));
     }
@@ -1261,7 +1303,7 @@
             document.getElementById('desc').value = rascunho.desc || '';
             document.getElementById('obs').value = rascunho.obs || '';
             document.getElementById('statusinfo').value = rascunho.statusinfo || '';
-            document.getElementById('evidencias').checked = rascunho.evidencias || false; // NOVO
+            document.getElementById('evidencias').checked = rascunho.evidencias || false; 
         }
     }
 
