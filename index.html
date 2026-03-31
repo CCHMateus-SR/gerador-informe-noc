@@ -28,10 +28,7 @@
         .badge-follow { background: #FEF3C7; color: #92400E; }
         .badge-ok { background: #DCFCE7; color: #166534; }
         .my-card-host { font-size: 12px; font-weight: bold; color: var(--its-text); word-break: break-all; line-height: 1.3;}
-        
-        /* NOVA CLASSE PARA O SERVIÇO NO CARD */
         .my-card-service { font-size: 10px; color: #64748B; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-        
         .my-card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 4px;}
         .my-card-time { font-size: 10px; color: #64748B; font-weight: bold;}
         .btn-pull { background: #E0F2FE; color: #0284C7; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; text-transform: uppercase;}
@@ -371,6 +368,12 @@
             
             <div class="input-group"><label>Solucionador (Operadora)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()"></div>
             <div class="input-group"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
+            
+            <div class="input-group full-width" style="display: flex; flex-direction: row; align-items: center; gap: 8px; background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px dashed #CBD5E1; margin-top: 5px;">
+                <input type="checkbox" id="evidencias" onchange="update()" style="width: 18px; height: 18px; cursor: pointer; margin: 0; accent-color: var(--its-blue);">
+                <label for="evidencias" style="cursor: pointer; margin: 0; color: #0F172A; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong> (Gráficos / CMD)</label>
+            </div>
+
         </div>
         
         <div class="button-row">
@@ -484,6 +487,16 @@
                                 </td>
                             </tr>
                         </table>
+
+                        <div id="evidencias-container" style="display: none; margin-top: 25px;">
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td bgcolor="#EFF6FF" style="padding: 15px; border: 1px dashed #38BDF8; border-radius: 8px; font-size: 12px; color: #0369A1; line-height: 1.5;">
+                                        <strong>📎 Evidências Técnicas:</strong> Gráficos e testes de conectividade foram anexados no corpo deste e-mail para análise.
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
 
                         <div id="obs-container" style="display: none; margin-top: 25px;">
                             <table cellpadding="0" cellspacing="0" border="0" width="100%">
@@ -643,7 +656,6 @@
 
                 const clienteNome = log.form.cliente || 'CLIENTE NÃO INFORMADO';
                 const hostNome = log.form.host || 'Host/Circuito Não Informado';
-                // Captura o serviço e troca as quebras de linha por um espaço para caber no card
                 const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
 
                 html += `
@@ -683,6 +695,9 @@
         document.getElementById('desc').value = dados.desc || '';
         document.getElementById('solucionador').value = dados.solucionador || '';
         document.getElementById('obs').value = dados.obs || '';
+        
+        // NOVO: Puxa o status da caixinha de evidências
+        document.getElementById('evidencias').checked = dados.evidencias || false;
         
         update();
         mostrarToast("✅ Formulário preenchido com sucesso!");
@@ -808,7 +823,8 @@
             termino: document.getElementById('termino').value,
             desc: document.getElementById('desc').value,
             solucionador: document.getElementById('solucionador').value,
-            obs: document.getElementById('obs').value
+            obs: document.getElementById('obs').value,
+            evidencias: document.getElementById('evidencias').checked // Salva estado da checkbox
         };
 
         logRef.push({
@@ -1010,7 +1026,7 @@
                             <img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;">
                         </td>
                         <td width="50%" align="center" valign="middle">
-                            <img src="${clientLogoUrl}" alt="Logo Cliente" style="display: inline-block; max-height: 110px; max-width: 200px; width: auto; height: auto;">
+                            <img src="${clientLogoUrl}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;">
                         </td>
                     </tr>
                 </table>
@@ -1059,6 +1075,10 @@
         } else {
             obsContainer.style.display = 'none';
         }
+        
+        // NOVO: Exibir ou esconder o aviso de evidências
+        const temEvidencias = document.getElementById('evidencias').checked;
+        document.getElementById('evidencias-container').style.display = temEvidencias ? 'block' : 'none';
 
         const status = document.getElementById('status').value;
         const tituloV = document.getElementById('v-titulo');
@@ -1197,6 +1217,7 @@
             document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
             document.getElementById('status').value = 'EM ABERTO';
             document.getElementById('severidade').value = 'WARNING';
+            document.getElementById('evidencias').checked = false; // Desmarca evidencias
             document.getElementById('protocolo').classList.remove('erro-validacao');
             localStorage.removeItem('noc_rascunho_its'); 
             update();
@@ -1217,7 +1238,8 @@
             termino: document.getElementById('termino').value,
             desc: document.getElementById('desc').value,
             obs: document.getElementById('obs').value,
-            statusinfo: document.getElementById('statusinfo').value
+            statusinfo: document.getElementById('statusinfo').value,
+            evidencias: document.getElementById('evidencias').checked // NOVO
         };
         localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho));
     }
@@ -1239,6 +1261,7 @@
             document.getElementById('desc').value = rascunho.desc || '';
             document.getElementById('obs').value = rascunho.obs || '';
             document.getElementById('statusinfo').value = rascunho.statusinfo || '';
+            document.getElementById('evidencias').checked = rascunho.evidencias || false; // NOVO
         }
     }
 
