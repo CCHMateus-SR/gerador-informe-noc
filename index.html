@@ -7,88 +7,71 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* DEFINIÇÃO DE CORES OFICIAIS ITS - AGORA COM PREDOMÍNIO DO VERMELHO */
-        :root { 
-            --its-red: #DC2626; /* Vermelho ITS Principal */
-            --its-red-dark: #991B1B; /* Vermelho Escuro para Hovers/Sombra */
-            --its-blue: #002D5B; /* Azul Marinho (mantido apenas como cor de texto secundária/fundo de badge) */
-            --its-orange: #EA580C; /* Laranja para Alertas Warning/Claiming */
-            --its-green: #166534; /* Verde para OK/Sucesso */
-            --its-light: #F1F5F9; 
-            --its-text: #1E293B; 
-            --its-border: #E2E8F0; 
-        }
-        
+        :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-green: #166534; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         
         .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center;}
         
-        /* COLUNA 1: MEUS CHAMADOS (LATERAL) */
-        .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-red); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
-        .history-side h3 { color: var(--its-red); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+        /* COLUNA 1: MEUS CHAMADOS */
+        .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
+        .history-side h3 { color: var(--its-blue); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         
         .tabs-container { display: flex; gap: 5px; margin-bottom: 15px; background: #F1F5F9; padding: 4px; border-radius: 8px; border: 1px solid #E2E8F0;}
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
-        /* Aba Ativa agora é Vermelha ITS */
-        .tab-btn.active { background: white; color: var(--its-red); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--its-red);}
+        .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--its-blue);}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
-        
-        /* Cores específicas dos modos */
         .my-card.card-link { border-left-color: var(--its-red); }
-        .my-card.card-infra { border-left-color: #0284C7; } /* Mantido azul ciano para diferenciar Infra */
+        .my-card.card-infra { border-left-color: #0284C7; } 
         
-        .my-card.card-aviso { border-left-color: var(--its-orange); background: #FFF7ED; }
-        .my-card.card-aviso .my-card-client { color: #9A3412; }
-        .my-card.card-aviso .my-card-host { color: #92400E; font-size: 13px;}
-        .my-card.card-aviso .my-card-service { color: #C2410C; font-size: 11px;}
+        .my-card.card-aviso { border-left-color: #3B82F6; background: #EFF6FF; }
+        .my-card.card-aviso .my-card-client { color: #1D4ED8; }
+        .my-card.card-aviso .my-card-host { color: #1E3A8A; font-size: 13px;}
+        .my-card.card-aviso .my-card-service { color: #3B82F6; font-size: 11px;}
         
         .my-card-header { display: flex; justify-content: space-between; align-items: center; }
-        .my-card-client { font-size: 11px; font-weight: 800; color: var(--its-red); text-transform: uppercase; }
+        .my-card-client { font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; }
         .my-card-badge { font-size: 9px; font-weight: 800; padding: 3px 6px; border-radius: 4px; }
         .badge-aberto { background: #FEE2E2; color: #991B1B; }
         .badge-follow { background: #FEF3C7; color: #92400E; }
         .badge-ok { background: #DCFCE7; color: #166534; }
+        .badge-aviso { background: #DBEAFE; color: #1D4ED8; }
         
         .my-card-host { font-size: 12px; font-weight: bold; color: var(--its-text); word-break: break-all; line-height: 1.3;}
         .my-card-service { font-size: 10px; color: #64748B; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
         .my-card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 4px;}
         .my-card-time { font-size: 10px; color: #64748B; font-weight: bold;}
-        .btn-pull { background: #FEE2E2; color: var(--its-red); border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; text-transform: uppercase;}
-        .btn-pull:hover { background: #FECACA; color: var(--its-red-dark); }
+        .btn-pull { background: #E0F2FE; color: #0284C7; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; text-transform: uppercase;}
+        .btn-pull:hover { background: #BAE6FD; color: #0369A1; }
 
-        /* COLUNA 2: FORMULÁRIO PRINCIPAL */
-        .form-side { flex: 1.2; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-red); min-width: 530px; max-width: 600px; transition: all 0.3s; position: relative; }
+        /* COLUNA 2: FORMULÁRIO */
+        .form-side { flex: 1.2; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; max-width: 600px; transition: all 0.3s; position: relative; }
         
         .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px; }
-        .header-row h2 { color: var(--its-red); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
+        .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
-        /* FAIXA: AVISO RÁPIDO (Mantido laranja para Warning/Atenção) */
-        .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #FFF7ED; border: 1px solid #FFEDD5; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
-        .quick-claim-title { font-size: 11px; font-weight: 800; color: #9A3412; white-space: nowrap; flex-shrink: 0; }
-        .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #FFEDD5; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
-        .quick-claim-bar button { background: var(--its-orange); color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
-        .quick-claim-bar button:hover { background: #C2410C; transform: scale(1.02); }
+        /* FAIXA: AVISO RÁPIDO */
+        .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
+        .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
+        .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
+        .quick-claim-bar button { background: #0284C7; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
+        .quick-claim-bar button:hover { background: #0369A1; transform: scale(1.02); }
         
-        /* Efeitos de Severidade no Painel (Fogo no Parquinho mantido kkk) */
         .fogo-no-parquinho { border-top: 8px solid var(--its-red) !important; box-shadow: 0 0 25px rgba(220, 38, 38, 0.25) !important; }
         .fogo-no-parquinho h2 { color: var(--its-red) !important; }
-        
         .alerta-laranja { border-top: 8px solid var(--its-orange) !important; box-shadow: 0 0 25px rgba(234, 88, 12, 0.25) !important; }
         .alerta-laranja h2 { color: var(--its-orange) !important; }
-        
         .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
         .alerta-verde h2 { color: var(--its-green) !important; }
 
-        /* CHAVEADOR DE MODOS (Botoes Vermelhos) */
+        /* CHAVEADOR DE MODOS */
         .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; }
         .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
-        .mode-btn.active { background: white; color: var(--its-red); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-        /* Títulos de seção vermelhos */
-        .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-red); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; border-bottom: 2px solid var(--its-border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; border-bottom: 2px solid var(--its-border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 25px; }
         .full-width { grid-column: span 2; }
@@ -98,38 +81,32 @@
         label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; }
         
         .actions-flex { display: flex; gap: 12px; }
-        .btn-action { background: none; border: none; color: #991B1B; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
-        .btn-action:hover { text-decoration: underline; color: var(--its-red); }
+        .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
+        .btn-action:hover { text-decoration: underline; color: #005a9e; }
         .btn-template { color: #166534; } 
         .btn-template:hover { color: #14532d; }
 
         input, select, textarea { padding: 12px; border: 1.5px solid var(--its-border); border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff; color: var(--its-text); box-sizing: border-box; width: 100%;}
-        /* Focus agora fica Vermelho */
-        input:focus, select:focus, textarea:focus { border-color: var(--its-red); box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1); outline: none; }
+        input:focus, select:focus, textarea:focus { border-color: var(--its-blue); box-shadow: 0 0 0 4px rgba(0,45,91,0.1); outline: none; }
         
         .erro-validacao { border-color: #991B1B !important; box-shadow: 0 0 0 4px rgba(153,27,27,0.1) !important; }
         textarea { height: 120px; resize: none; line-height: 1.5; font-family: inherit; }
         .textarea-sm { height: 50px !important; }
 
-        /* BOTÕES DE AÇÃO PRINCIPAIS */
         .button-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        .btn-copy-subject { flex: 1; background-color: #FEE2E2; color: var(--its-red); border: 2px solid var(--its-red); padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
-        .btn-copy-subject:hover { background-color: #FECACA; }
-        
+        .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
+        .btn-copy-subject:hover { background-color: #E0F2FE; }
         .btn-copy { flex: 1.2; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
         .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
-        
-        /* Botão Imagem virou Vermelho ITS */
-        .btn-copy-img { flex: 1.2; background-color: var(--its-red); color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
-        .btn-copy-img:hover { background-color: var(--its-red-dark); transform: translateY(-2px); }
-        
+        .btn-copy-img { flex: 1.2; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+        .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
         .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
         .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
         .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
 
-        .user-badge { font-size: 12px; font-weight: 700; color: var(--its-red); background: #FEE2E2; padding: 6px 12px; border-radius: 20px; border: 1px solid #FECACA; display: flex; align-items: center; gap: 6px; }
+        .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
@@ -142,8 +119,7 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 30px; border-radius: 16px; width: 600px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         .modal-login-content { width: 400px; text-align: center; }
-        
-        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid var(--its-red);}
+        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid #0EA5E9;}
         .log-time { font-size: 11px; color: #64748B; font-weight: bold; display: flex; justify-content: space-between;}
         .log-subject { font-size: 13px; color: #1E293B; font-family: monospace; font-weight: bold;}
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
@@ -152,70 +128,68 @@
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* ESTILOS DO NOVO ALERTA BLOQUEANTE (ITS STYLE COM PREDOMÍNIO DO VERMELHO) */
+        /* ESTILOS DO NOVO ALERTA BLOQUEANTE (ITS STYLE) */
         .alert-box-aviso { background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 6px; color: #9A3412; font-size: 14px; margin-top: 15px; text-align: left; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.05);}
-        /* Report agora tem borda lateral Vermelha ITS */
-        .alert-box-report { font-family: Consolas, monospace; font-size: 13px; background: #F8FAFC; padding: 15px; border-radius: 6px; border-left: 4px solid var(--its-red); word-wrap: break-word; color: #1E293B; font-weight: bold; text-align: left; margin-top: 15px; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.05);}
-        /* Botão Ciente Vermelho ITS */
-        .btn-ciente { padding: 15px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); letter-spacing: 0.5px;}
-        .btn-ciente:hover { background: var(--its-red-dark); transform: translateY(-2px); }
+        .alert-box-report { font-family: Consolas, monospace; font-size: 13px; background: #F8FAFC; padding: 15px; border-radius: 6px; border-left: 4px solid var(--its-blue); word-wrap: break-word; color: var(--its-blue); font-weight: bold; text-align: left; margin-top: 15px; box-shadow: 0 2px 4px rgba(0, 45, 91, 0.05);}
+        .btn-ciente { padding: 15px; background: var(--its-blue); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 45, 91, 0.2); letter-spacing: 0.5px;}
+        .btn-ciente:hover { background: #001d3d; transform: translateY(-2px); }
 
-        /* DARK MODE - AJUSTES PARA PALETA VERMELHA */
+        /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
-        body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: var(--its-red); }
-        body.dark-mode .form-side h2, body.dark-mode .history-side h3 { color: #f87171; } /* Rosa/Vermelho claro */
+        body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
+        body.dark-mode .form-side h2, body.dark-mode .history-side h3 { color: #38bdf8; }
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
         body.dark-mode label { color: #94A3B8; }
         body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
         body.dark-mode .btn-theme:hover { background: #334155; }
-        body.dark-mode .user-badge { background: #0F172A; border-color: #fca5a5; color: #fecaca; }
+        body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
         body.dark-mode .btn-sair { background: #450a0a; border-color: #7f1d1d; color: #f87171; }
         body.dark-mode .btn-sair:hover { background: #7f1d1d; color: white; }
-        body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #f87171; color: #f87171; }
+        body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
         body.dark-mode .btn-copy-subject:hover { background-color: #0F172A; }
         body.dark-mode .preview-side { background: #1E293B; border-color: #334155; }
         body.dark-mode .modal-content { background: #1E293B; border: 1px solid #334155; }
-        body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #f87171;}
+        body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #38bdf8;}
         body.dark-mode .log-subject { color: #F8FAFC; }
-        body.dark-mode .modal-content h3 { color: #f87171; }
-        body.dark-mode .section-title { color: #f87171; border-color: #334155; }
+        body.dark-mode .modal-content h3 { color: #38bdf8; }
+        body.dark-mode .section-title { color: #38bdf8; border-color: #334155; }
         
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
         body.dark-mode .tab-btn { color: #94A3B8; }
-        body.dark-mode .tab-btn.active { background: #1E293B; color: #f87171; }
+        body.dark-mode .tab-btn.active { background: #1E293B; color: #38bdf8; }
         body.dark-mode .mode-switch-container { background: #0F172A; }
         body.dark-mode .mode-btn { color: #94A3B8; }
-        body.dark-mode .mode-btn.active { background: #1E293B; color: #f87171; }
+        body.dark-mode .mode-btn.active { background: #1E293B; color: #38bdf8; }
 
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
         body.dark-mode .my-card.card-link { border-left-color: #f87171; } 
-        body.dark-mode .my-card.card-infra { border-left-color: #38bdf8; } /* Mantido azul p/ infra */
+        body.dark-mode .my-card.card-infra { border-left-color: #38bdf8; } 
         
-        body.dark-mode .my-card.card-aviso { background: #0f172a; border-left-color: var(--its-orange); border: 1px solid #7c2d12;}
-        body.dark-mode .my-card.card-aviso .my-card-client { color: #fdba74; }
-        body.dark-mode .my-card.card-aviso .my-card-host { color: #fed7aa; }
-        body.dark-mode .my-card.card-aviso .my-card-service { color: #fdba74; }
+        body.dark-mode .my-card.card-aviso { background: #0f172a; border-left-color: #3b82f6; border: 1px solid #1e3a8a;}
+        body.dark-mode .my-card.card-aviso .my-card-client { color: #60a5fa; }
+        body.dark-mode .my-card.card-aviso .my-card-host { color: #bfdbfe; }
+        body.dark-mode .my-card.card-aviso .my-card-service { color: #93c5fd; }
 
-        body.dark-mode .my-card-client { color: #f87171; }
+        body.dark-mode .my-card-client { color: #38bdf8; }
         body.dark-mode .my-card-host { color: #F8FAFC; }
         body.dark-mode .my-card-service { color: #94A3B8; }
-        body.dark-mode .btn-pull { background: #450a0a; color: #f87171; }
-        body.dark-mode .btn-pull:hover { background: #7f1d1d; color: white; }
+        body.dark-mode .btn-pull { background: #0c4a6e; color: #38bdf8; }
+        body.dark-mode .btn-pull:hover { background: #075985; }
 
-        body.dark-mode .quick-claim-bar { background: #0f172a; border-color: #7c2d12; }
-        body.dark-mode .quick-claim-title { color: #fdba74; }
-        body.dark-mode .quick-claim-bar input { background: #1e293b; border-color: #7c2d12; color: #f8fafc; }
-        body.dark-mode .quick-claim-bar button { background: var(--its-orange); }
+        body.dark-mode .quick-claim-bar { background: #0f172a; border-color: #0c4a6e; }
+        body.dark-mode .quick-claim-title { color: #38bdf8; }
+        body.dark-mode .quick-claim-bar input { background: #1e293b; border-color: #0c4a6e; color: #f8fafc; }
+        body.dark-mode .quick-claim-bar button { background: #0284c7; }
 
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
 
         .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
-        .btn-danger-its:hover { background-color: var(--its-red-dark); transform: translateY(-2px); }
+        .btn-danger-its:hover { background-color: #991B1B; transform: translateY(-2px); }
         .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
         .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
-        .btn-login-its:hover { background-color: var(--its-red-dark); transform: translateY(-2px); }
+        .btn-login-its:hover { background-color: #991B1B; transform: translateY(-2px); }
         .btn-export { background-color: #10B981; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .btn-export:hover { background-color: #059669; }
 
@@ -224,14 +198,11 @@
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
         
+        /* Dark Mode do Alerta Bloqueante */
         body.dark-mode .alert-box-aviso { background: rgba(234, 88, 12, 0.1); border-color: var(--its-orange); color: #FDBA74; }
-        body.dark-mode .alert-box-report { background: rgba(220, 38, 38, 0.05); color: #fecaca; border-color: var(--its-red);}
-        /* Botão Ciente no Dark Mode fica Vermelho Claro p/ destaque */
-        body.dark-mode .btn-ciente { background: #fca5a5; color: #0F172A; box-shadow: 0 4px 12px rgba(252, 165, 165, 0.2); }
-        body.dark-mode .btn-ciente:hover { background: #fecaca; }
-        
-        /* Focus Focus no Dark Mode p/ paleta vermelha */
-        body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus { border-color: #fca5a5; box-shadow: 0 0 0 4px rgba(252, 165, 165, 0.1); }
+        body.dark-mode .alert-box-report { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; color: #BAE6FD; }
+        body.dark-mode .btn-ciente { background: #38bdf8; color: #0F172A; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); }
+        body.dark-mode .btn-ciente:hover { background: #0ea5e9; }
     </style>
 </head>
 <body>
@@ -247,13 +218,13 @@
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
-    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-red); padding: 35px 30px;">
+    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 35px 30px;">
         
         <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 25px;">
-            <div style="background: #FEE2E2; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #FECACA;">
+            <div style="background: #FFF7ED; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #FFEDD5;">
                 <span style="font-size: 26px;">🚨</span>
             </div>
-            <h3 style="margin: 0; color: var(--its-red); font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Atualização no Radar!</h3>
+            <h3 style="margin: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Atualização no Radar!</h3>
         </div>
 
         <div id="texto-alerta" style="margin-bottom: 30px;">
@@ -432,7 +403,7 @@
             </div>
             
             <div class="input-group full-width" id="grupo-evidencias" style="display: flex; flex-direction: row; align-items: center; gap: 8px; background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px dashed #CBD5E1; margin-top: 5px;">
-                <input type="checkbox" id="evidencias" onchange="update()" style="width: 18px; height: 18px; cursor: pointer; margin: 0; accent-color: var(--its-red);">
+                <input type="checkbox" id="evidencias" onchange="update()" style="width: 18px; height: 18px; cursor: pointer; margin: 0; accent-color: var(--its-blue);">
                 <label for="evidencias" style="cursor: pointer; margin: 0; color: #0F172A; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong></label>
             </div>
 
@@ -454,7 +425,7 @@
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
-                <tr><td id="v-header-bg" align="center" bgcolor="#DC2626" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -475,17 +446,17 @@
                         </table>
 
                         <div id="statusinfo-container" style="display: none; margin-top: 20px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #DC2626;"><div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div><div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #002D5B;"><div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div><div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
                         <div id="pressplay-container" style="display: none; margin-top: 20px;">
                             <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F0FDF4" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #BBF7D0; border-left: 4px solid #22C55E;"><div style="font-size: 10px; color: #166534; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">▶ Retorno PressPlay</div><div id="v-pressplay" style="font-family: Consolas, monospace; font-size: 12px; color: #14532D; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
-                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #DC2626; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 13px; color: #334155; font-weight: 500; border-radius: 0 8px 8px 0;"><span id="v-termino">-</span></td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 13px; color: #334155; font-weight: 500; border-radius: 0 8px 8px 0;"><span id="v-termino">-</span></td></tr></table>
                         
                         <div id="detalhamento-container">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-desc" style="color: #DC2626; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; border-radius: 0 8px 8px 0; font-size: 13px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-desc" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 13px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
                         </div>
 
                         <div id="evidencias-container" style="display: none; margin-top: 25px;">
@@ -774,8 +745,8 @@
                 html += `
                 <div class="my-card card-aviso">
                     <div class="my-card-header">
-                        <span style="font-size: 10px; font-weight: 800; color: #9A3412;">👀 EM ANÁLISE</span>
-                        <span style="font-size: 9px; color: #9A3412; font-weight: bold; background: #FFEDD5; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span>
+                        <span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span>
+                        <span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span>
                     </div>
                     <div class="my-card-host">🔖 ${log.servico}</div>
                     <div class="my-card-service">🖥️ ${log.host}</div>
@@ -856,7 +827,7 @@
     }
 
     // ==========================================
-    // ALERTAS E NUVEM (MÁGICA DO POP-UP ITS VERMELHO)
+    // NOVO: ALERTAS E NUVEM (MÁGICA DO POP-UP ITS)
     // ==========================================
     function tocarAlertaSonoro() {
         try {
@@ -876,7 +847,7 @@
         let htmlMensagem = '';
 
         if (mensagemObj.tipo === 'aviso_rapido') {
-            // Estilo do Modal para Aviso (Claiming) - Mantido Laranja p/ Warning
+            // Estilo do Modal para Aviso (Claiming)
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
             htmlMensagem = `
                 <div style="font-size: 14px; margin-bottom: 10px; color: var(--its-text);">
@@ -888,14 +859,14 @@
                 </div>
             `;
         } else {
-            // Estilo do Modal para Relatório Padrão - AGORA COM BORDA VERMELHA ITS
+            // Estilo do Modal para Relatório Padrão
             const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra / Aplicações' : '🌐 Gestão de Link/Ping';
             htmlMensagem = `
                 <div style="font-size: 14px; margin-bottom: 10px; color: var(--its-text);">
                     👤 <strong style="color: var(--its-text);">${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de ${modoLabel} às ${mensagemObj.hora}:
                 </div>
                 <div class="alert-box-report">
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; margin-bottom: 6px; color: var(--its-red); font-family: 'Segoe UI', sans-serif;">📋 Resumo do Informe</div>
+                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; margin-bottom: 6px; color: var(--its-blue); font-family: 'Segoe UI', sans-serif;">📋 Resumo do Informe</div>
                     ${mensagemObj.assunto}
                 </div>
             `;
@@ -921,7 +892,7 @@
         const data = snapshot.val();
         
         if(currentUser && data.nome !== currentUser.nome) { 
-            mostrarAlertaBloqueante(data); 
+            mostrarAlertaBloqueante(data); // Agora os dois tipos sobem no pop-up travado!
         }
     });
 
@@ -1020,12 +991,12 @@
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
                     html += `
-                    <div class="log-item" style="border-left-color: var(--its-orange); background: #FFF7ED;">
+                    <div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;">
                         <div class="log-time">
                             <span>🕒 ${item.hora} 👀 EM ANÁLISE</span>
-                            <span style="color:#C2410C;">👤 ${item.nome} (${item.turno})</span>
+                            <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
                         </div>
-                        <span class="log-subject" style="color: #9A3412;">Serviço: ${item.servico} | Host: ${item.host}</span>
+                        <span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span>
                     </div>`;
                 } else {
                     const isInfra = item.form && item.form.modo === 'infra';
@@ -1036,7 +1007,7 @@
                     <div class="log-item" style="border-left-color: ${corBorda};">
                         <div class="log-time">
                             <span>🕒 ${item.hora} ${modoLabel}</span>
-                            <span style="color:#C2410C;">👤 ${item.nome} (${item.turno})</span>
+                            <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
                         </div>
                         <span class="log-subject">${item.assunto}</span>
                     </div>`;
@@ -1148,7 +1119,7 @@
             document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
             document.getElementById('v-desc').style.fontSize = "12px";
             
-            headerBg.setAttribute('bgcolor', '#1E293B'); /* Fundo Cinza Escuro p/ Infra no Preview */
+            headerBg.setAttribute('bgcolor', '#1E293B'); 
             topBorder.style.borderTop = '8px solid #0284C7'; 
             
         } else {
@@ -1164,7 +1135,7 @@
                 tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
             }
             
-            headerBg.setAttribute('bgcolor', '#DC2626'); /* CABEÇALHO AGORA É VERMELHO ITS NO PREVIEW */
+            headerBg.setAttribute('bgcolor', '#002D5B'); 
             topBorder.style.borderTop = '8px solid #DC2626'; 
         }
         
@@ -1358,7 +1329,7 @@
 
         const btn = document.getElementById('btn-assunto');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ COPIADO!'; btn.style.backgroundColor = '#FEE2E2'; btn.style.borderColor = var(--its-red); btn.style.color = var(--its-red);
+        btn.innerHTML = '✅ COPIADO!'; btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
         
         setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
     }
