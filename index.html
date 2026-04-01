@@ -16,9 +16,13 @@
         .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
         .history-side h3 { color: var(--its-blue); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         
-        .tabs-container { display: flex; gap: 5px; margin-bottom: 15px; background: #F1F5F9; padding: 4px; border-radius: 8px; border: 1px solid #E2E8F0;}
+        .tabs-container { display: flex; gap: 5px; margin-bottom: 10px; background: #F1F5F9; padding: 4px; border-radius: 8px; border: 1px solid #E2E8F0;}
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
         .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* NOVA BARRA DE BUSCA */
+        .search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--its-border); border-radius: 8px; font-size: 12px; box-sizing: border-box; transition: 0.2s; background: #F8FAFC;}
+        .search-box:focus { border-color: var(--its-blue); outline: none; background: white; box-shadow: 0 0 0 3px rgba(0,45,91,0.1); }
 
         .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--its-blue);}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
@@ -83,8 +87,11 @@
         .actions-flex { display: flex; gap: 12px; }
         .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
         .btn-action:hover { text-decoration: underline; color: #005a9e; }
-        .btn-template { color: #166534; } 
-        .btn-template:hover { color: #14532d; }
+        
+        /* ESTILO SELECT MACROS */
+        .select-macro { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; border: 1px solid #cbd5e1; background: #f8fafc; color: #166534; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
+        .select-macro:hover { border-color: #166534; }
+        .select-macro:focus { outline: none; border-color: var(--its-blue); }
 
         input, select, textarea { padding: 12px; border: 1.5px solid var(--its-border); border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff; color: var(--its-text); box-sizing: border-box; width: 100%;}
         input:focus, select:focus, textarea:focus { border-color: var(--its-blue); box-shadow: 0 0 0 4px rgba(0,45,91,0.1); outline: none; }
@@ -106,6 +113,11 @@
         .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
 
+        /* STATUS DE CONEXÃO ONLINE/OFFLINE */
+        .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase;}
+        .conn-online { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+        .conn-offline { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
@@ -125,7 +137,8 @@
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
+        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 450px; font-weight: bold; line-height: 1.4;}
+        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* DARK MODE */
@@ -137,6 +150,9 @@
         body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
         body.dark-mode .btn-theme:hover { background: #334155; }
         body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
+        body.dark-mode .status-conn { background: #0F172A;}
+        body.dark-mode .conn-online { color: #22C55E; border-color: #166534; }
+        body.dark-mode .conn-offline { color: #F87171; border-color: #991B1B; }
         body.dark-mode .btn-sair { background: #450a0a; border-color: #7f1d1d; color: #f87171; }
         body.dark-mode .btn-sair:hover { background: #7f1d1d; color: white; }
         body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
@@ -174,6 +190,9 @@
         body.dark-mode .quick-claim-title { color: #38bdf8; }
         body.dark-mode .quick-claim-bar input { background: #1e293b; border-color: #0c4a6e; color: #f8fafc; }
         body.dark-mode .quick-claim-bar button { background: #0284c7; }
+        body.dark-mode .search-box { background: #0f172a; border-color: #334155; color: #f8fafc; }
+        body.dark-mode .search-box:focus { background: #1e293b; border-color: #38bdf8; }
+        body.dark-mode .select-macro { background: #1e293b; border-color: #334155; color: #38bdf8; }
 
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
@@ -191,6 +210,12 @@
         body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
+        
+        /* DashBoard Badges */
+        .dash-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;}
+        .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+        .dash-ok { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
     </style>
 </head>
 <body>
@@ -251,8 +276,16 @@
     <div class="modal-content">
         <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div><h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3><p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios e Avisos da equipe (desde as 07h).</p></div>
-            <button id="btn-exportar" class="btn-export" onclick="exportarParaExcel()">📊 EXPORTAR (CSV)</button>
+            <div>
+                <h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3>
+                <p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios e Avisos da equipe (desde as 07h).</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div id="dash-abertos" class="dash-badge dash-aberto">🔴 0</div>
+                <div id="dash-follow" class="dash-badge dash-follow">🟡 0</div>
+                <div id="dash-ok" class="dash-badge dash-ok">🟢 0</div>
+                <button id="btn-exportar" class="btn-export" style="margin-left: 10px;" onclick="exportarParaExcel()">📊 EXPORTAR</button>
+            </div>
         </div>
         <div id="lista-historico" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;"></div>
     </div>
@@ -266,6 +299,8 @@
             <button id="tab-meus" class="tab-btn active" onclick="setVisaoHistorico('meus')">👤 Meus</button>
             <button id="tab-equipe" class="tab-btn" onclick="setVisaoHistorico('equipe')">👥 Equipe</button>
         </div>
+        <input type="text" id="search-history" class="search-box" placeholder="🔍 Buscar cliente, host ou serviço..." oninput="renderizarListaLateral()">
+        
         <div id="meus-chamados-lista">
             <div style="text-align: center; color: #94A3B8; font-size: 12px; margin-top: 30px;">Carregando histórico...</div>
         </div>
@@ -276,6 +311,7 @@
         <div class="header-row">
             <h2 id="titulo-form">Central de Despacho</h2>
             <div class="top-controls">
+                <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="toggleTheme()">🌙</button>
@@ -381,7 +417,14 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
-                    <button type="button" class="btn-action btn-template" id="btn-template-desc" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
+                    <select id="macro-select" class="select-macro" onchange="aplicarMacro(this.value)">
+                        <option value="">📚 Templates Rápidos...</option>
+                        <option value="padrao">Padrão do Status Atual</option>
+                        <option value="fibra">Rompimento de Fibra</option>
+                        <option value="energia">Falha Elétrica (Enel/Cemig)</option>
+                        <option value="tilocal">Aguardando TI Local</option>
+                        <option value="reboot">Reinício de Equipamento</option>
+                    </select>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
             </div>
@@ -480,6 +523,19 @@
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
     let ultimaAssinaturaGerada = ''; 
+    let chamadosAlertadosSLA = new Set(); // Para o Alarme SLA
+
+    // Health Check Firebase (Online/Offline)
+    db.ref('.info/connected').on('value', function(snap) {
+        const statusEl = document.getElementById('conexao-status');
+        if (snap.val() === true) {
+            statusEl.innerHTML = '🟢 Online';
+            statusEl.className = 'status-conn conn-online';
+        } else {
+            statusEl.innerHTML = '🔴 Offline';
+            statusEl.className = 'status-conn conn-offline';
+        }
+    });
 
     function getInicioDoPlantaoTimestamp() {
         const agora = new Date();
@@ -507,6 +563,7 @@
             document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
             document.getElementById('history-container').style.display = 'block';
             iniciarListenerHistorico();
+            iniciarMonitoramentoSLA(); // Inicia o alarme SLA
         }
     };
 
@@ -522,6 +579,7 @@
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
         document.getElementById('history-container').style.display = 'block';
         iniciarListenerHistorico();
+        iniciarMonitoramentoSLA();
     }
 
     function fazerLogout() {
@@ -536,6 +594,7 @@
             chamadosDoTurno = [];
             window.chamadosExibidos = [];
             ultimaAssinaturaGerada = '';
+            chamadosAlertadosSLA.clear();
         }
     }
 
@@ -546,6 +605,8 @@
         if (tipo === 'info') {
             toast.style.background = '#3B82F6'; 
             toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
+        } else if (tipo === 'warning') {
+            toast.classList.add('toast-warning');
         }
         toast.innerHTML = mensagem;
         container.appendChild(toast);
@@ -553,7 +614,59 @@
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-100%)';
             setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
-        }, tipo === 'info' ? 4500 : 3000); 
+        }, tipo === 'success' ? 3000 : 5000); // Avisos e SLA ficam 5s
+    }
+
+    function tocarSomSuaveSLA() {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {}
+    }
+
+    // ==========================================
+    // SISTEMA DE SLA (A CADA 30 MIN)
+    // ==========================================
+    function iniciarMonitoramentoSLA() {
+        setInterval(() => {
+            if (!currentUser || chamadosDoTurno.length === 0) return;
+            const agora = Date.now();
+            let estadoRecente = {};
+            
+            // Agrupa pelo Host+Cliente pra pegar só o último status de cada um
+            chamadosDoTurno.forEach(log => {
+                if (log.nome === currentUser.nome && log.form) {
+                    let chave = `${log.form.cliente}-${log.form.host}`;
+                    if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                        estadoRecente[chave] = log;
+                    }
+                }
+            });
+
+            for (let chave in estadoRecente) {
+                let log = estadoRecente[chave];
+                let acao = log.assunto.split(' | ')[5] || '';
+                
+                // Se a última ação foi Abertura ou Follow-Up, começa a contar
+                if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
+                    let diffMinutos = (agora - log.timestamp) / (1000 * 60);
+                    let cicloAtual = Math.floor(diffMinutos / 30); // Aciona a cada 30 min inteiros
+                    
+                    if (cicloAtual >= 1) {
+                        let alertaId = `${chave}-ciclo-${cicloAtual}`;
+                        if (!chamadosAlertadosSLA.has(alertaId)) {
+                            mostrarToast(`⏰ <strong>SLA ATENÇÃO:</strong> O Host ${log.form.host} (${log.form.cliente}) está sem atualização há ${Math.floor(diffMinutos)} min!`, 'warning');
+                            tocarSomSuaveSLA();
+                            chamadosAlertadosSLA.add(alertaId);
+                        }
+                    }
+                }
+            }
+        }, 60000); // Roda a cada 1 minuto
     }
 
     // ==========================================
@@ -577,6 +690,7 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
+        document.getElementById('macro-select').value = '';
         localStorage.removeItem('noc_rascunho_its');
         ultimaAssinaturaGerada = ''; 
 
@@ -599,7 +713,6 @@
             document.getElementById('item').placeholder = "Ex: Ping\nLINK APEX NET 50MB";
             
             document.getElementById('grupo-protocolo').style.display = 'flex';
-            document.getElementById('btn-template-desc').style.display = 'flex';
             document.getElementById('grupo-pressplay').style.display = 'none'; 
             document.getElementById('grupo-solucionador').style.display = 'flex'; 
         } else {
@@ -612,7 +725,6 @@
             document.getElementById('item').placeholder = "Ex: CPU\nMemory\nServices-Auto";
 
             document.getElementById('grupo-protocolo').style.display = 'none';
-            document.getElementById('btn-template-desc').style.display = 'none';
             document.getElementById('grupo-pressplay').style.display = 'flex'; 
             document.getElementById('grupo-solucionador').style.display = 'none'; 
         }
@@ -622,18 +734,16 @@
     }
 
     // ==========================================
-    // TRUQUE DO DATALIST
+    // TRUQUE DO DATALIST E BUSCA
     // ==========================================
     function abrirDatalist(element) {
         if (element.value === '') {
             try { element.showPicker(); } catch(e) {}
             return;
         }
-        
         const valorSalvo = element.value;
         element.value = '';
         try { element.showPicker(); } catch(e) {}
-        
         element.addEventListener('focusout', function handler() {
             if (element.value === '') {
                 element.value = valorSalvo;
@@ -676,7 +786,7 @@
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL
+    // HISTÓRICO LATERAL E BARRA DE BUSCA
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
@@ -701,6 +811,7 @@
 
     function renderizarListaLateral() {
         const lista = document.getElementById('meus-chamados-lista');
+        const termoBusca = document.getElementById('search-history').value.toLowerCase();
         window.chamadosExibidos = [];
         
         if (chamadosDoTurno.length === 0) {
@@ -714,17 +825,36 @@
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
+        // Aplica o Filtro da Barra de Busca Inteligente
+        if (termoBusca !== '') {
+            window.chamadosExibidos = window.chamadosExibidos.filter(c => {
+                if (c.tipo === 'aviso_rapido') {
+                    return (c.servico && c.servico.toLowerCase().includes(termoBusca)) || 
+                           (c.host && c.host.toLowerCase().includes(termoBusca)) ||
+                           (c.nome && c.nome.toLowerCase().includes(termoBusca));
+                } else if (c.form) {
+                    return (c.form.cliente && c.form.cliente.toLowerCase().includes(termoBusca)) ||
+                           (c.form.host && c.form.host.toLowerCase().includes(termoBusca)) ||
+                           (c.nome && c.nome.toLowerCase().includes(termoBusca));
+                }
+                return false;
+            });
+        }
+
         window.chamadosExibidos.reverse(); 
 
         if(window.chamadosExibidos.length === 0) {
-            const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura";
-            lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`;
+            if(termoBusca !== '') {
+                lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum resultado encontrado para a busca.</div>`;
+            } else {
+                const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura";
+                lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`;
+            }
             return;
         }
 
         let html = '';
         window.chamadosExibidos.forEach((log, index) => {
-            
             if (log.tipo === 'aviso_rapido') {
                 html += `
                 <div class="my-card card-aviso">
@@ -746,7 +876,6 @@
             const partesAssunto = log.assunto.split(' | ');
             const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
             const modoIcon = log.form.modo === 'infra' ? '🖥️' : '🌐';
-            
             const classeCardModo = log.form.modo === 'infra' ? 'card-infra' : 'card-link';
 
             let classeBadge = 'badge-aberto';
@@ -811,25 +940,16 @@
     }
 
     // ==========================================
-    // ALERTAS E NUVEM (COM AUMENTO DE VOLUME NO AUDIO)
+    // ALERTAS E NUVEM
     // ==========================================
     function tocarAlertaSonoro() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
-            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-            
-            // AQUI É ONDE O VOLUME FICA! Aumentado de 0.2 para 0.6
-            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); 
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            
-            osc.connect(gainNode); 
-            gainNode.connect(audioCtx.destination); 
-            osc.start(); 
-            osc.stop(audioCtx.currentTime + 0.3);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         } catch(e) {}
     }
 
@@ -885,10 +1005,7 @@
     db.ref('historico_noc').orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
         if (isInitialLoad) { isInitialLoad = false; return; }
         const data = snapshot.val();
-        
-        if(currentUser && data.nome !== currentUser.nome) { 
-            mostrarAlertaBloqueante(data); 
-        }
+        if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
     });
 
     let ultimosLogsFirebase = [];
@@ -974,15 +1091,25 @@
         });
     }
 
+    // ==========================================
+    // MINI DASHBOARD NA TELA CHEIA
+    // ==========================================
     function abrirHistorico() {
         document.getElementById('modal-historico').style.display = 'flex';
         const listaHtml = document.getElementById('lista-historico');
         listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar do plantão...</div>';
+        
         db.ref('historico_noc').orderByChild('timestamp').startAt(getInicioDoPlantaoTimestamp()).once('value', (snapshot) => {
-            if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; return; }
+            if(!snapshot.exists()) { 
+                listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; 
+                return; 
+            }
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             
+            // Contadores do Dashboard
+            let abertos = 0, follow = 0, resolvidos = 0;
+
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
                     html += `
@@ -998,6 +1125,11 @@
                     const corBorda = isInfra ? '#0284C7' : 'var(--its-red)'; 
                     const modoLabel = isInfra ? '🖥️' : '🌐';
                     
+                    const acao = item.assunto.split(' | ')[5] || '';
+                    if(acao.includes('ABERTURA')) abertos++;
+                    else if(acao.includes('FOLLOW')) follow++;
+                    else if(acao.includes('ENCERRAMENTO')) resolvidos++;
+
                     html += `
                     <div class="log-item" style="border-left-color: ${corBorda};">
                         <div class="log-time">
@@ -1009,13 +1141,18 @@
                 }
             });
             listaHtml.innerHTML = html;
+
+            // Atualiza os Badges
+            document.getElementById('dash-abertos').innerText = `🔴 ${abertos}`;
+            document.getElementById('dash-follow').innerText = `🟡 ${follow}`;
+            document.getElementById('dash-ok').innerText = `🟢 ${resolvidos}`;
         });
     }
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
     // ==========================================
-    // PREENCHIMENTO E LÓGICA DO CARD
+    // BIBLIOTECA DE MACROS (TEMPLATES RÁPIDOS)
     // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
@@ -1023,14 +1160,40 @@
         "RESOLVIDO": "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."
     };
 
-    function inserirTemplate() {
-        const s = document.getElementById('status').value;
-        const sev = document.getElementById('severidade').value;
+    const macroLibrary = {
+        "fibra": "Atualização de Status: Em contato com a operadora, fomos informados de que houve um rompimento de fibra óptica na região.\n\nA equipe técnica de campo já foi acionada e está em deslocamento para o local para realizar o reparo (fusão). Continuamos acompanhando o SLA de perto.",
+        "energia": "Atualização de Status: Identificamos que a queda de comunicação ocorreu devido a uma falha no fornecimento de energia elétrica (Concessionária local) na região do cliente.\n\nOs equipamentos de rede do provedor estão sem alimentação no momento. Estamos aguardando o restabelecimento da energia para normalização do circuito.",
+        "tilocal": "Atualização de Status: Acionamos a equipe de TI local do cliente para verificações físicas.\n\nSolicitamos o reinício elétrico (reboot) do equipamento de borda (Modem/Roteador) e a verificação dos cabos de rede. Aguardamos o retorno da equipe local para dar sequência na tratativa.",
+        "reboot": "Ações e Diagnóstico: Solicitamos o reinício elétrico do equipamento para forçar uma nova sincronização com a rede.\n\nApós o procedimento de reboot físico, os serviços restabeleceram comunicação e no momento encontram-se estáveis. Incidente encerrado."
+    };
+
+    // A função antiga do botão de texto agora lê do Select
+    function aplicarMacro(macroKey) {
+        if (!macroKey) return; 
+
         const desc = document.getElementById('desc');
-        if (desc.value.trim() !== "" && !confirm("Substituir o texto atual?")) return;
-        let final = templates[s];
-        if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
-        desc.value = final; update();
+        if (desc.value.trim() !== "" && !confirm("Deseja substituir o texto atual por este Template?")) {
+            document.getElementById('macro-select').value = ""; // Reseta o select
+            return;
+        }
+
+        if (macroKey === 'padrao') {
+            const s = document.getElementById('status').value;
+            const sev = document.getElementById('severidade').value;
+            let final = templates[s];
+            if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
+            desc.value = final;
+        } else {
+            desc.value = macroLibrary[macroKey];
+        }
+        
+        document.getElementById('macro-select').value = ""; // Reseta pro Placeholder
+        update();
+    }
+
+    // Mantido por compatibilidade caso alguém use a função antiga
+    function inserirTemplate() {
+        aplicarMacro('padrao');
     }
 
     function mudarStatus() {
@@ -1407,6 +1570,7 @@
             document.getElementById('severidade').value = 'WARNING';
             document.getElementById('evidencias').checked = false; 
             document.getElementById('protocolo').classList.remove('erro-validacao');
+            document.getElementById('macro-select').value = '';
             localStorage.removeItem('noc_rascunho_its'); 
             ultimaAssinaturaGerada = ''; 
             update();
