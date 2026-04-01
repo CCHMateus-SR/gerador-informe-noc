@@ -128,12 +128,6 @@
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* ESTILOS DO NOVO ALERTA BLOQUEANTE (ITS STYLE) */
-        .alert-box-aviso { background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 6px; color: #9A3412; font-size: 14px; margin-top: 15px; text-align: left; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.05);}
-        .alert-box-report { font-family: Consolas, monospace; font-size: 13px; background: #F8FAFC; padding: 15px; border-radius: 6px; border-left: 4px solid var(--its-blue); word-wrap: break-word; color: var(--its-blue); font-weight: bold; text-align: left; margin-top: 15px; box-shadow: 0 2px 4px rgba(0, 45, 91, 0.05);}
-        .btn-ciente { padding: 15px; background: var(--its-blue); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 45, 91, 0.2); letter-spacing: 0.5px;}
-        .btn-ciente:hover { background: #001d3d; transform: translateY(-2px); }
-
         /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
         body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
@@ -197,12 +191,6 @@
         body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
-        
-        /* Dark Mode do Alerta Bloqueante */
-        body.dark-mode .alert-box-aviso { background: rgba(234, 88, 12, 0.1); border-color: var(--its-orange); color: #FDBA74; }
-        body.dark-mode .alert-box-report { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; color: #BAE6FD; }
-        body.dark-mode .btn-ciente { background: #38bdf8; color: #0F172A; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); }
-        body.dark-mode .btn-ciente:hover { background: #0ea5e9; }
     </style>
 </head>
 <body>
@@ -218,19 +206,15 @@
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
-    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 35px 30px;">
-        
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 25px;">
-            <div style="background: #FFF7ED; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #FFEDD5;">
-                <span style="font-size: 26px;">🚨</span>
-            </div>
-            <h3 style="margin: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Atualização no Radar!</h3>
+    <div class="modal-content" style="width: 500px; border-top: 8px solid var(--its-orange); padding: 30px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                🚨 Atualização no Radar!
+            </h3>
         </div>
-
-        <div id="texto-alerta" style="margin-bottom: 30px;">
+        <div id="texto-alerta" style="margin-bottom: 25px;">
             </div>
-
-        <button class="btn-ciente" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
+        <button onclick="fecharAlertaBloqueante()" style="padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">CIENTE 👍</button>
     </div>
 </div>
 
@@ -827,7 +811,7 @@
     }
 
     // ==========================================
-    // NOVO: ALERTAS E NUVEM (MÁGICA DO POP-UP ITS)
+    // ALERTAS E NUVEM (NOVO POP-UP ITS)
     // ==========================================
     function tocarAlertaSonoro() {
         try {
@@ -847,27 +831,35 @@
         let htmlMensagem = '';
 
         if (mensagemObj.tipo === 'aviso_rapido') {
-            // Estilo do Modal para Aviso (Claiming)
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
             htmlMensagem = `
-                <div style="font-size: 14px; margin-bottom: 10px; color: var(--its-text);">
-                    👤 <strong style="color: var(--its-text);">${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
-                </div>
-                <div class="alert-box-aviso">
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; color: var(--its-orange);">👀 Em Análise</div>
-                    Serviço: <strong>${mensagemObj.servico}</strong>${hostText}
+                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe assumiu uma análise:</p>
+                <div style="background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> às ${mensagemObj.hora}
+                    </div>
+                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--its-orange); margin-bottom: 5px;">👀 Serviço em Análise</div>
+                    <div style="font-family: Consolas, monospace; font-size: 14px; color: #9A3412; font-weight: bold;">
+                        ${mensagemObj.servico}${hostText}
+                    </div>
                 </div>
             `;
         } else {
-            // Estilo do Modal para Relatório Padrão
-            const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra / Aplicações' : '🌐 Gestão de Link/Ping';
+            const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
+            const modoLabel = isInfra ? '🖥️ Infra / Aplicações' : '🌐 Link / Ping';
+            const corBorda = isInfra ? '#0EA5E9' : 'var(--its-red)'; 
+            const corFundo = isInfra ? '#F0F9FF' : '#FEF2F2';
+            const corTexto = isInfra ? '#0369A1' : '#991B1B';
+
             htmlMensagem = `
-                <div style="font-size: 14px; margin-bottom: 10px; color: var(--its-text);">
-                    👤 <strong style="color: var(--its-text);">${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de ${modoLabel} às ${mensagemObj.hora}:
-                </div>
-                <div class="alert-box-report">
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; margin-bottom: 6px; color: var(--its-blue); font-family: 'Segoe UI', sans-serif;">📋 Resumo do Informe</div>
-                    ${mensagemObj.assunto}
+                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe registrou uma ação:</p>
+                <div style="background: ${corFundo}; border-left: 4px solid ${corBorda}; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um informe de <span style="color: ${corBorda}; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
+                    </div>
+                    <div style="font-family: Consolas, monospace; font-size: 13px; color: ${corTexto}; font-weight: bold; line-height: 1.5; padding: 5px;">
+                        ${mensagemObj.assunto}
+                    </div>
                 </div>
             `;
         }
@@ -892,7 +884,7 @@
         const data = snapshot.val();
         
         if(currentUser && data.nome !== currentUser.nome) { 
-            mostrarAlertaBloqueante(data); // Agora os dois tipos sobem no pop-up travado!
+            mostrarAlertaBloqueante(data); 
         }
     });
 
@@ -991,12 +983,12 @@
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
                     html += `
-                    <div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;">
+                    <div class="log-item" style="border-left-color: var(--its-orange); background: #FFF7ED;">
                         <div class="log-time">
                             <span>🕒 ${item.hora} 👀 EM ANÁLISE</span>
-                            <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
+                            <span style="color:#C2410C;">👤 ${item.nome} (${item.turno})</span>
                         </div>
-                        <span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span>
+                        <span class="log-subject" style="color: #9A3412;">Serviço: ${item.servico} | Host: ${item.host}</span>
                     </div>`;
                 } else {
                     const isInfra = item.form && item.form.modo === 'infra';
