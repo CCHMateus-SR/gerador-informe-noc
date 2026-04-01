@@ -20,7 +20,6 @@
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
         .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        /* NOVA BARRA DE BUSCA */
         .search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--its-border); border-radius: 8px; font-size: 12px; box-sizing: border-box; transition: 0.2s; background: #F8FAFC;}
         .search-box:focus { border-color: var(--its-blue); outline: none; background: white; box-shadow: 0 0 0 3px rgba(0,45,91,0.1); }
 
@@ -56,7 +55,6 @@
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
-        /* FAIXA: AVISO RÁPIDO */
         .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
         .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
         .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
@@ -88,7 +86,6 @@
         .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
         .btn-action:hover { text-decoration: underline; color: #005a9e; }
         
-        /* ESTILO SELECT MACROS */
         .select-macro { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; border: 1px solid #cbd5e1; background: #f8fafc; color: #166534; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
         .select-macro:hover { border-color: #166534; }
         .select-macro:focus { outline: none; border-color: var(--its-blue); }
@@ -113,7 +110,6 @@
         .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
 
-        /* STATUS DE CONEXÃO ONLINE/OFFLINE */
         .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase;}
         .conn-online { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
         .conn-offline { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
@@ -137,8 +133,7 @@
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 450px; font-weight: bold; line-height: 1.4;}
-        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
+        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* DARK MODE */
@@ -211,7 +206,6 @@
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
         
-        /* DashBoard Badges */
         .dash-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;}
         .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
         .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
@@ -231,15 +225,13 @@
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
-    <div class="modal-content" style="width: 500px; border-top: 8px solid var(--its-orange); padding: 30px;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h3 style="margin: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                🚨 Atualização no Radar!
-            </h3>
-        </div>
-        <div id="texto-alerta" style="margin-bottom: 25px;">
+    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
+        <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
+        
+        <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;">
             </div>
-        <button onclick="fecharAlertaBloqueante()" style="padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);">CIENTE 👍</button>
+
+        <button onclick="fecharAlertaBloqueante()" style="padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
     </div>
 </div>
 
@@ -523,9 +515,9 @@
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
     let ultimaAssinaturaGerada = ''; 
-    let chamadosAlertadosSLA = new Set(); // Para o Alarme SLA
+    let chamadosAlertadosSLA = new Set(); 
 
-    // Health Check Firebase (Online/Offline)
+    // Health Check Firebase
     db.ref('.info/connected').on('value', function(snap) {
         const statusEl = document.getElementById('conexao-status');
         if (snap.val() === true) {
@@ -563,7 +555,7 @@
             document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
             document.getElementById('history-container').style.display = 'block';
             iniciarListenerHistorico();
-            iniciarMonitoramentoSLA(); // Inicia o alarme SLA
+            iniciarMonitoramentoSLA();
         }
     };
 
@@ -614,30 +606,29 @@
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-100%)';
             setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
-        }, tipo === 'success' ? 3000 : 5000); // Avisos e SLA ficam 5s
+        }, tipo === 'success' ? 3000 : 5000); 
     }
 
+    // ==========================================
+    // SISTEMA DE SLA (TRAVA A TELA A CADA 30 MIN - SÓ LINK)
+    // ==========================================
     function tocarSomSuaveSLA() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
             osc.type = 'sine'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
             osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
         } catch(e) {}
     }
 
-    // ==========================================
-    // SISTEMA DE SLA (A CADA 30 MIN)
-    // ==========================================
     function iniciarMonitoramentoSLA() {
         setInterval(() => {
             if (!currentUser || chamadosDoTurno.length === 0) return;
             const agora = Date.now();
             let estadoRecente = {};
             
-            // Agrupa pelo Host+Cliente pra pegar só o último status de cada um
             chamadosDoTurno.forEach(log => {
                 if (log.nome === currentUser.nome && log.form) {
                     let chave = `${log.form.cliente}-${log.form.host}`;
@@ -649,24 +640,46 @@
 
             for (let chave in estadoRecente) {
                 let log = estadoRecente[chave];
+                
+                // REQUISITO: SLA APENAS PARA LINK/PING!
+                if (log.form.modo === 'infra') continue; 
+                
                 let acao = log.assunto.split(' | ')[5] || '';
                 
-                // Se a última ação foi Abertura ou Follow-Up, começa a contar
                 if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
                     let diffMinutos = (agora - log.timestamp) / (1000 * 60);
-                    let cicloAtual = Math.floor(diffMinutos / 30); // Aciona a cada 30 min inteiros
+                    let cicloAtual = Math.floor(diffMinutos / 30); 
                     
                     if (cicloAtual >= 1) {
                         let alertaId = `${chave}-ciclo-${cicloAtual}`;
                         if (!chamadosAlertadosSLA.has(alertaId)) {
-                            mostrarToast(`⏰ <strong>SLA ATENÇÃO:</strong> O Host ${log.form.host} (${log.form.cliente}) está sem atualização há ${Math.floor(diffMinutos)} min!`, 'warning');
-                            tocarSomSuaveSLA();
+                            dispararModalSLA(log, diffMinutos);
                             chamadosAlertadosSLA.add(alertaId);
                         }
                     }
                 }
             }
-        }, 60000); // Roda a cada 1 minuto
+        }, 60000); 
+    }
+
+    function dispararModalSLA(log, minutos) {
+        let minArredondado = Math.floor(minutos);
+        let htmlMensagem = `
+            <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">
+                    ⏰ ALERTA DE SLA DE LINK!
+                </div>
+                <div style="color: #1E293B; font-size: 14px; margin-bottom: 10px;">
+                    O Host <strong>${log.form.host}</strong> (${log.form.cliente})
+                </div>
+                <div style="font-family: Consolas, monospace; font-size: 13px; color: #991B1B; font-weight: bold; background: #FEE2E2; padding: 8px; border-radius: 4px;">
+                    Está sem atualização há ${minArredondado} minutos!
+                </div>
+            </div>
+        `;
+        filaDeAlertas.push(htmlMensagem);
+        tocarSomSuaveSLA();
+        if (!modalAberto) exibirProximoAlerta();
     }
 
     // ==========================================
@@ -753,9 +766,6 @@
         }, { once: true });
     }
 
-    // ==========================================
-    // SISTEMA DE CLAIMING (AVISO RÁPIDO)
-    // ==========================================
     function enviarAvisoRapido() {
         if (!currentUser) return;
         const servico = document.getElementById('quick-item').value.trim();
@@ -785,9 +795,6 @@
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
-    // ==========================================
-    // HISTÓRICO LATERAL E BARRA DE BUSCA
-    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -825,7 +832,6 @@
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
-        // Aplica o Filtro da Barra de Busca Inteligente
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -939,10 +945,7 @@
         mostrarToast("✅ Formulário preenchido com sucesso!");
     }
 
-    // ==========================================
-    // ALERTAS E NUVEM
-    // ==========================================
-    function tocarAlertaSonoro() {
+    function tocarAlertaSonoroGeral() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
@@ -953,42 +956,45 @@
         } catch(e) {}
     }
 
-    let filaDeAlertas = [];
-    let modalAberto = false;
-
     function mostrarAlertaBloqueante(mensagemObj) {
         let htmlMensagem = '';
 
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
             htmlMensagem = `
-                <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">
-                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
+                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe assumiu uma análise:</p>
+                <div style="background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> às ${mensagemObj.hora}
                     </div>
-                    <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">
-                        👀 SERVIÇO: ${mensagemObj.servico}${hostText}
+                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--its-orange); margin-bottom: 5px;">👀 Serviço em Análise</div>
+                    <div style="font-family: Consolas, monospace; font-size: 14px; color: #9A3412; font-weight: bold;">
+                        ${mensagemObj.servico}${hostText}
                     </div>
                 </div>
             `;
         } else {
             const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
-            const modoLabel = isInfra ? '🖥️ Infra' : '🌐 Link';
-            
+            const modoLabel = isInfra ? '🖥️ Infra / Aplicações' : '🌐 Link / Ping';
+            const corBorda = isInfra ? '#0EA5E9' : 'var(--its-red)'; 
+            const corFundo = isInfra ? '#F0F9FF' : '#FEF2F2';
+            const corTexto = isInfra ? '#0369A1' : '#991B1B';
+
             htmlMensagem = `
-                <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
-                    <div style="margin-bottom: 15px; color: #1E293B; font-size: 13px; text-align: center;">
-                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de <span style="color: #0284C7; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
+                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe registrou uma ação:</p>
+                <div style="background: ${corFundo}; border-left: 4px solid ${corBorda}; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um informe de <span style="color: ${corBorda}; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
                     </div>
-                    <div style="font-family: Consolas, monospace; font-size: 12px; color: #0369A1; text-align: center; font-weight: bold; line-height: 1.5;">
-                        ${mensagemObj.assunto.replace(/ \| /g, ' | ')}
+                    <div style="font-family: Consolas, monospace; font-size: 13px; color: ${corTexto}; font-weight: bold; line-height: 1.5; padding: 5px;">
+                        ${mensagemObj.assunto}
                     </div>
                 </div>
             `;
         }
 
         filaDeAlertas.push(htmlMensagem);
-        tocarAlertaSonoro();
+        tocarAlertaSonoroGeral();
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -1001,11 +1007,12 @@
 
     function fecharAlertaBloqueante() { filaDeAlertas.shift(); exibirProximoAlerta(); }
 
-    let isInitialLoad = true;
     db.ref('historico_noc').orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
         if (isInitialLoad) { isInitialLoad = false; return; }
         const data = snapshot.val();
-        if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
+        if(currentUser && data.nome !== currentUser.nome) { 
+            mostrarAlertaBloqueante(data); 
+        }
     });
 
     let ultimosLogsFirebase = [];
@@ -1091,9 +1098,6 @@
         });
     }
 
-    // ==========================================
-    // MINI DASHBOARD NA TELA CHEIA
-    // ==========================================
     function abrirHistorico() {
         document.getElementById('modal-historico').style.display = 'flex';
         const listaHtml = document.getElementById('lista-historico');
@@ -1107,7 +1111,6 @@
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             
-            // Contadores do Dashboard
             let abertos = 0, follow = 0, resolvidos = 0;
 
             logs.reverse().forEach(item => {
@@ -1142,7 +1145,6 @@
             });
             listaHtml.innerHTML = html;
 
-            // Atualiza os Badges
             document.getElementById('dash-abertos').innerText = `🔴 ${abertos}`;
             document.getElementById('dash-follow').innerText = `🟡 ${follow}`;
             document.getElementById('dash-ok').innerText = `🟢 ${resolvidos}`;
@@ -1151,9 +1153,6 @@
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
-    // ==========================================
-    // BIBLIOTECA DE MACROS (TEMPLATES RÁPIDOS)
-    // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
@@ -1167,13 +1166,12 @@
         "reboot": "Ações e Diagnóstico: Solicitamos o reinício elétrico do equipamento para forçar uma nova sincronização com a rede.\n\nApós o procedimento de reboot físico, os serviços restabeleceram comunicação e no momento encontram-se estáveis. Incidente encerrado."
     };
 
-    // A função antiga do botão de texto agora lê do Select
     function aplicarMacro(macroKey) {
         if (!macroKey) return; 
 
         const desc = document.getElementById('desc');
         if (desc.value.trim() !== "" && !confirm("Deseja substituir o texto atual por este Template?")) {
-            document.getElementById('macro-select').value = ""; // Reseta o select
+            document.getElementById('macro-select').value = ""; 
             return;
         }
 
@@ -1187,11 +1185,10 @@
             desc.value = macroLibrary[macroKey];
         }
         
-        document.getElementById('macro-select').value = ""; // Reseta pro Placeholder
+        document.getElementById('macro-select').value = ""; 
         update();
     }
 
-    // Mantido por compatibilidade caso alguém use a função antiga
     function inserirTemplate() {
         aplicarMacro('padrao');
     }
