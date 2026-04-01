@@ -25,6 +25,7 @@
         .my-card.card-link { border-left-color: var(--its-red); }
         .my-card.card-infra { border-left-color: #0284C7; } 
         
+        /* ESTILO NOVO: MINI-CARD DE AVISO (EM ANÁLISE) */
         .my-card.card-aviso { border-left-color: #3B82F6; background: #EFF6FF; }
         .my-card.card-aviso .my-card-client { color: #1D4ED8; }
         .my-card.card-aviso .my-card-host { color: #1E3A8A; font-size: 13px;}
@@ -52,6 +53,7 @@
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
+        /* FAIXA: AVISO RÁPIDO */
         .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
         .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
         .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
@@ -65,6 +67,7 @@
         .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
         .alerta-verde h2 { color: var(--its-green) !important; }
 
+        /* CHAVEADOR DE MODOS */
         .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; }
         .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -126,6 +129,10 @@
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
+        /* Estilos Especiais do Modal de Alerta Bloqueante */
+        .alert-box-aviso { background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 12px; border-radius: 6px; color: #1E3A8A; font-size: 14px; margin-top: 10px; text-align: center; }
+        .alert-box-report { font-family: Consolas, monospace; font-size: 13px; background: rgba(14, 165, 233, 0.1); padding: 12px; border-radius: 6px; border-left: 4px solid #0EA5E9; word-wrap: break-word; color: #0369A1; font-weight: bold;}
+
         /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
         body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
@@ -144,7 +151,6 @@
         body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #38bdf8;}
         body.dark-mode .log-subject { color: #F8FAFC; }
         body.dark-mode .modal-content h3 { color: #38bdf8; }
-        body.dark-mode #texto-alerta { color: #F8FAFC !important; }
         body.dark-mode .section-title { color: #38bdf8; border-color: #334155; }
         
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
@@ -188,9 +194,11 @@
 
         body.dark-mode #pressplay-container td { background-color: #052e16 !important; border-color: #166534 !important; border-left-color: #22c55e !important; }
         body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
-        
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
+        
+        body.dark-mode .alert-box-aviso { background: #172554; border-color: #3B82F6; color: #BFDBFE; }
+        body.dark-mode .alert-box-report { background: rgba(14, 165, 233, 0.15); color: #38BDF8; border-color: #0EA5E9;}
     </style>
 </head>
 <body>
@@ -206,11 +214,10 @@
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
-    <div class="modal-content" style="width: 450px; text-align: center; border-top: 8px solid #EA580C;">
-        <h3 style="margin-top: 0; color: #EA580C; font-size: 22px;">🚨 Atualização no Radar!</h3>
-        <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Um colega da equipe acabou de registrar uma ação:</p>
-        <div id="texto-alerta" style="font-size: 15px; color: #1E293B; margin-bottom: 30px; line-height: 1.6; font-weight: 500; background: rgba(14, 165, 233, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid #0EA5E9;">
-        </div>
+    <div class="modal-content" style="width: 450px; border-top: 8px solid #EA580C;">
+        <h3 style="margin-top: 0; color: #EA580C; font-size: 22px; text-align: center;">🚨 Atualização no Radar!</h3>
+        <div id="texto-alerta" style="color: #1E293B; margin-bottom: 30px; line-height: 1.6; text-align: left;">
+            </div>
         <button onclick="fecharAlertaBloqueante()" style="padding: 15px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 15px; transition: 0.2s;">CIENTE 👍</button>
     </div>
 </div>
@@ -644,7 +651,7 @@
     }
 
     // ==========================================
-    // NOVO: SISTEMA DE CLAIMING (AVISO RÁPIDO)
+    // SISTEMA DE CLAIMING (AVISO RÁPIDO)
     // ==========================================
     function enviarAvisoRapido() {
         if (!currentUser) return;
@@ -672,6 +679,8 @@
 
         document.getElementById('quick-item').value = '';
         document.getElementById('quick-host').value = '';
+        
+        // Mantém apenas o toast para o remetente
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
@@ -811,7 +820,7 @@
     }
 
     // ==========================================
-    // ALERTAS E NUVEM
+    // ALERTAS E NUVEM (ATUALIZADO COM MODAL DO CLAIMING)
     // ==========================================
     function tocarAlertaSonoro() {
         try {
@@ -827,12 +836,34 @@
     let filaDeAlertas = [];
     let modalAberto = false;
 
+    // Função central para gerar as telas bloqueantes
     function mostrarAlertaBloqueante(mensagemObj) {
-        const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra' : '🌐 Link';
-        const htmlMensagem = `
-            <strong>👤 ${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de ${modoLabel} às ${mensagemObj.hora}:<br><br>
-            <span style="font-family: monospace; font-size: 16px;">${mensagemObj.assunto}</span>
-        `;
+        let htmlMensagem = '';
+
+        if (mensagemObj.tipo === 'aviso_rapido') {
+            // Estilo do Modal de Aviso (Claiming)
+            const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
+            htmlMensagem = `
+                <div style="font-size: 14px; margin-bottom: 10px;">
+                    👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
+                </div>
+                <div class="alert-box-aviso">
+                    👀 Serviço: <strong>${mensagemObj.servico}</strong>${hostText}
+                </div>
+            `;
+        } else {
+            // Estilo do Modal de Relatório (Link/Infra)
+            const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra' : '🌐 Link';
+            htmlMensagem = `
+                <div style="font-size: 14px; margin-bottom: 10px;">
+                    👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de ${modoLabel} às ${mensagemObj.hora}:
+                </div>
+                <div class="alert-box-report">
+                    ${mensagemObj.assunto}
+                </div>
+            `;
+        }
+
         filaDeAlertas.push(htmlMensagem);
         tocarAlertaSonoro();
         if (!modalAberto) exibirProximoAlerta();
@@ -852,15 +883,9 @@
         if (isInitialLoad) { isInitialLoad = false; return; }
         const data = snapshot.val();
         
+        // Dispara o alerta bloqueante se a notificação for de outra pessoa
         if(currentUser && data.nome !== currentUser.nome) { 
-            tocarAlertaSonoro();
-            
-            if (data.tipo === 'aviso_rapido') {
-                const hostText = data.host !== 'Não informado' ? ` no host <strong>${data.host}</strong>` : '';
-                mostrarToast(`👀 <strong>${data.nome}</strong> está analisando:<br>🔖 ${data.servico}${hostText}`, "info");
-            } else {
-                mostrarAlertaBloqueante(data); 
-            }
+            mostrarAlertaBloqueante(data);
         }
     });
 
