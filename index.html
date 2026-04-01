@@ -409,7 +409,7 @@
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
-                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -811,16 +811,25 @@
     }
 
     // ==========================================
-    // ALERTAS E NUVEM (NOVO POP-UP ITS)
+    // ALERTAS E NUVEM (COM AUMENTO DE VOLUME NO AUDIO)
     // ==========================================
     function tocarAlertaSonoro() {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            osc.type = 'triangle'; 
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+            osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+            
+            // AQUI É ONDE O VOLUME FICA! Aumentado de 0.2 para 0.6
+            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); 
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            
+            osc.connect(gainNode); 
+            gainNode.connect(audioCtx.destination); 
+            osc.start(); 
+            osc.stop(audioCtx.currentTime + 0.3);
         } catch(e) {}
     }
 
@@ -833,32 +842,26 @@
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
             htmlMensagem = `
-                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe assumiu uma análise:</p>
-                <div style="background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
-                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> às ${mensagemObj.hora}
+                <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
                     </div>
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--its-orange); margin-bottom: 5px;">👀 Serviço em Análise</div>
-                    <div style="font-family: Consolas, monospace; font-size: 14px; color: #9A3412; font-weight: bold;">
-                        ${mensagemObj.servico}${hostText}
+                    <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">
+                        👀 SERVIÇO: ${mensagemObj.servico}${hostText}
                     </div>
                 </div>
             `;
         } else {
             const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
-            const modoLabel = isInfra ? '🖥️ Infra / Aplicações' : '🌐 Link / Ping';
-            const corBorda = isInfra ? '#0EA5E9' : 'var(--its-red)'; 
-            const corFundo = isInfra ? '#F0F9FF' : '#FEF2F2';
-            const corTexto = isInfra ? '#0369A1' : '#991B1B';
-
+            const modoLabel = isInfra ? '🖥️ Infra' : '🌐 Link';
+            
             htmlMensagem = `
-                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe registrou uma ação:</p>
-                <div style="background: ${corFundo}; border-left: 4px solid ${corBorda}; padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
-                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um informe de <span style="color: ${corBorda}; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
+                <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
+                    <div style="margin-bottom: 15px; color: #1E293B; font-size: 13px; text-align: center;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de <span style="color: #0284C7; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
                     </div>
-                    <div style="font-family: Consolas, monospace; font-size: 13px; color: ${corTexto}; font-weight: bold; line-height: 1.5; padding: 5px;">
-                        ${mensagemObj.assunto}
+                    <div style="font-family: Consolas, monospace; font-size: 12px; color: #0369A1; text-align: center; font-weight: bold; line-height: 1.5;">
+                        ${mensagemObj.assunto.replace(/ \| /g, ' | ')}
                     </div>
                 </div>
             `;
@@ -983,12 +986,12 @@
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
                     html += `
-                    <div class="log-item" style="border-left-color: var(--its-orange); background: #FFF7ED;">
+                    <div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;">
                         <div class="log-time">
                             <span>🕒 ${item.hora} 👀 EM ANÁLISE</span>
-                            <span style="color:#C2410C;">👤 ${item.nome} (${item.turno})</span>
+                            <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
                         </div>
-                        <span class="log-subject" style="color: #9A3412;">Serviço: ${item.servico} | Host: ${item.host}</span>
+                        <span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span>
                     </div>`;
                 } else {
                     const isInfra = item.form && item.form.modo === 'infra';
