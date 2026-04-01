@@ -25,7 +25,6 @@
         .my-card.card-link { border-left-color: var(--its-red); }
         .my-card.card-infra { border-left-color: #0284C7; } 
         
-        /* ESTILO NOVO: MINI-CARD DE AVISO (EM ANÁLISE) */
         .my-card.card-aviso { border-left-color: #3B82F6; background: #EFF6FF; }
         .my-card.card-aviso .my-card-client { color: #1D4ED8; }
         .my-card.card-aviso .my-card-host { color: #1E3A8A; font-size: 13px;}
@@ -53,7 +52,6 @@
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
-        /* FAIXA: AVISO RÁPIDO (AJUSTADO PARA NÃO QUEBRAR O LAYOUT) */
         .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
         .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
         .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
@@ -67,7 +65,6 @@
         .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
         .alerta-verde h2 { color: var(--its-green) !important; }
 
-        /* CHAVEADOR DE MODOS */
         .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; }
         .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -199,7 +196,7 @@
 <body>
 
 <datalist id="lista-clientes">
-    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S Tecnologia"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
+    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S TECNOLOGIA"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
 </datalist>
 
 <datalist id="lista-operadoras">
@@ -298,7 +295,10 @@
             
             <div class="section-title" id="label-secao-1">📍 1. Identificação do Alarme</div>
 
-            <div class="input-group"><label>Cliente</label><input type="text" id="cliente" list="lista-clientes" placeholder="Ex: Libbs" oninput="update()" onclick="try{this.showPicker();}catch(e){}"></div>
+            <div class="input-group">
+                <label>Cliente</label>
+                <input type="text" id="cliente" list="lista-clientes" placeholder="Ex: Libbs" oninput="update()" onclick="abrirDatalist(this)">
+            </div>
             <div class="input-group"><label id="label-host">Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
             
             <div class="input-group">
@@ -371,7 +371,10 @@
             
             <div class="section-title">🛠️ 3. Tratativa e Diagnóstico</div>
 
-            <div class="input-group" id="grupo-solucionador"><label id="label-solucionador">Solucionador (Operadora / Analista)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()" onclick="try{this.showPicker();}catch(e){}"></div>
+            <div class="input-group" id="grupo-solucionador">
+                <label id="label-solucionador">Solucionador (Operadora / Analista)</label>
+                <input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()" onclick="abrirDatalist(this)">
+            </div>
             
             <div class="input-group" id="grupo-obs"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
 
@@ -616,6 +619,28 @@
         
         renderizarListaLateral();
         update();
+    }
+
+    // ==========================================
+    // TRUQUE DO DATALIST
+    // ==========================================
+    function abrirDatalist(element) {
+        if (element.value === '') {
+            try { element.showPicker(); } catch(e) {}
+            return;
+        }
+        
+        const valorSalvo = element.value;
+        element.value = '';
+        try { element.showPicker(); } catch(e) {}
+        
+        element.addEventListener('focusout', function handler() {
+            if (element.value === '') {
+                element.value = valorSalvo;
+                update();
+            }
+            element.removeEventListener('focusout', handler);
+        }, { once: true });
     }
 
     // ==========================================
