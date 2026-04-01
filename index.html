@@ -53,11 +53,11 @@
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
-        /* FAIXA: AVISO RÁPIDO (NOVO) */
-        .quick-claim-bar { display: flex; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 10px 15px; border-radius: 10px; margin-bottom: 25px; }
-        .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; }
-        .quick-claim-bar input { flex: 1; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; }
-        .quick-claim-bar button { background: #0284C7; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+        /* FAIXA: AVISO RÁPIDO (AJUSTADO PARA NÃO QUEBRAR O LAYOUT) */
+        .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
+        .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
+        .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
+        .quick-claim-bar button { background: #0284C7; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
         .quick-claim-bar button:hover { background: #0369A1; transform: scale(1.02); }
         
         .fogo-no-parquinho { border-top: 8px solid var(--its-red) !important; box-shadow: 0 0 25px rgba(220, 38, 38, 0.25) !important; }
@@ -87,7 +87,7 @@
         .btn-template { color: #166534; } 
         .btn-template:hover { color: #14532d; }
 
-        input, select, textarea { padding: 12px; border: 1.5px solid var(--its-border); border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff; color: var(--its-text); }
+        input, select, textarea { padding: 12px; border: 1.5px solid var(--its-border); border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff; color: var(--its-text); box-sizing: border-box; width: 100%;}
         input:focus, select:focus, textarea:focus { border-color: var(--its-blue); box-shadow: 0 0 0 4px rgba(0,45,91,0.1); outline: none; }
         
         .erro-validacao { border-color: #991B1B !important; box-shadow: 0 0 0 4px rgba(153,27,27,0.1) !important; }
@@ -161,7 +161,7 @@
         body.dark-mode .my-card.card-link { border-left-color: #f87171; } 
         body.dark-mode .my-card.card-infra { border-left-color: #38bdf8; } 
         
-        body.dark-mode .my-card.card-aviso { background: #172554; border-left-color: #3b82f6; }
+        body.dark-mode .my-card.card-aviso { background: #0f172a; border-left-color: #3b82f6; border: 1px solid #1e3a8a;}
         body.dark-mode .my-card.card-aviso .my-card-client { color: #60a5fa; }
         body.dark-mode .my-card.card-aviso .my-card-host { color: #bfdbfe; }
         body.dark-mode .my-card.card-aviso .my-card-service { color: #93c5fd; }
@@ -172,9 +172,9 @@
         body.dark-mode .btn-pull { background: #0c4a6e; color: #38bdf8; }
         body.dark-mode .btn-pull:hover { background: #075985; }
 
-        body.dark-mode .quick-claim-bar { background: #0c4a6e; border-color: #075985; }
+        body.dark-mode .quick-claim-bar { background: #0f172a; border-color: #0c4a6e; }
         body.dark-mode .quick-claim-title { color: #38bdf8; }
-        body.dark-mode .quick-claim-bar input { background: #0f172a; border-color: #075985; color: #f8fafc; }
+        body.dark-mode .quick-claim-bar input { background: #1e293b; border-color: #0c4a6e; color: #f8fafc; }
         body.dark-mode .quick-claim-bar button { background: #0284c7; }
 
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
@@ -191,6 +191,7 @@
 
         body.dark-mode #pressplay-container td { background-color: #052e16 !important; border-color: #166534 !important; border-left-color: #22c55e !important; }
         body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
+        
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
     </style>
@@ -535,7 +536,6 @@
         }
     }
 
-    // Toast Atualizado para suportar tipo 'info' (azul)
     function mostrarToast(mensagem, tipo = 'success') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
@@ -550,7 +550,7 @@
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-100%)';
             setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
-        }, tipo === 'info' ? 4500 : 3000); // Avisos ficam mais tempo na tela
+        }, tipo === 'info' ? 4500 : 3000); 
     }
 
     // ==========================================
@@ -700,7 +700,6 @@
         let html = '';
         window.chamadosExibidos.forEach((log, index) => {
             
-            // RENDERIZAÇÃO DO AVISO RÁPIDO (MINI-CARD)
             if (log.tipo === 'aviso_rapido') {
                 html += `
                 <div class="my-card card-aviso">
@@ -714,10 +713,9 @@
                         <span class="my-card-time">🕒 ${log.hora}</span>
                     </div>
                 </div>`;
-                return; // Pula para o próximo loop
+                return; 
             }
 
-            // RENDERIZAÇÃO NORMAL DOS CHAMADOS
             if (!log.form) return; 
 
             const partesAssunto = log.assunto.split(' | ');
@@ -788,7 +786,7 @@
     }
 
     // ==========================================
-    // ALERTAS DE NUVEM
+    // ALERTAS E NUVEM
     // ==========================================
     function tocarAlertaSonoro() {
         try {
@@ -832,7 +830,6 @@
         if(currentUser && data.nome !== currentUser.nome) { 
             tocarAlertaSonoro();
             
-            // Verifica se é um aviso ou um relatório completo
             if (data.tipo === 'aviso_rapido') {
                 const hostText = data.host !== 'Não informado' ? ` no host <strong>${data.host}</strong>` : '';
                 mostrarToast(`👀 <strong>${data.nome}</strong> está analisando:<br>🔖 ${data.servico}${hostText}`, "info");
@@ -893,7 +890,7 @@
             evidencias: document.getElementById('evidencias').checked 
         };
         db.ref('historico_noc').push({
-            tipo: 'relatorio', // Identifica que é um relatório e não um aviso rápido
+            tipo: 'relatorio', 
             nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
             hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
             timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
@@ -910,7 +907,7 @@
             const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             logs.forEach(log => {
-                if (log.tipo === 'aviso_rapido') return; // Pula os avisos rápidos no excel
+                if (log.tipo === 'aviso_rapido') return; 
                 
                 const p = log.assunto.split(' | ');
                 const dObj = new Date(log.timestamp);
@@ -936,7 +933,6 @@
             
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
-                    // Histórico Global mostrando Aviso
                     html += `
                     <div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;">
                         <div class="log-time">
@@ -946,7 +942,6 @@
                         <span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span>
                     </div>`;
                 } else {
-                    // Histórico Global mostrando Relatório
                     const isInfra = item.form && item.form.modo === 'infra';
                     const corBorda = isInfra ? '#0284C7' : 'var(--its-red)'; 
                     const modoLabel = isInfra ? '🖥️' : '🌐';
