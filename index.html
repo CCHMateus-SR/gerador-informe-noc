@@ -87,6 +87,8 @@
         label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; }
         
         .actions-flex { display: flex; gap: 12px; }
+        .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
+        .btn-action:hover { text-decoration: underline; color: #005a9e; }
         
         .select-macro { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; border: 1px solid #cbd5e1; background: #f8fafc; color: #166534; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
         .select-macro:hover { border-color: #166534; }
@@ -117,7 +119,8 @@
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
         .btn-theme:hover { background: #F1F5F9; }
-        
+
+        /* ESTILO DO BOTÃO DE DESFAZER TOAST */
         .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
         .btn-undo:hover { background: rgba(0,0,0,0.2); }
 
@@ -208,6 +211,7 @@
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
         
+        /* DashBoard Badges */
         .dash-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;}
         .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
         .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
@@ -230,8 +234,10 @@
     <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
         <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
         
-        <div id="texto-alerta" style="margin-bottom: 0; text-align: left;">
+        <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;">
             </div>
+
+        <button onclick="fecharAlertaBloqueante()" style="padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
     </div>
 </div>
 
@@ -435,10 +441,10 @@
             <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
-            <button class="btn-copy-subject" id="btn-assunto" title="Atalho: Ctrl+Shift+A" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" title="Atalho: Ctrl+Shift+I" onclick="copyAsImage()">📸 IMAGEM</button>
-            <button class="btn-copy-itssm" id="btn-copiar-itssm" title="Atalho: Ctrl+Shift+X" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
+            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
+            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
 
@@ -519,7 +525,7 @@
     let ultimaAssinaturaGerada = ''; 
     let chamadosAlertadosSLA = new Set(); 
     let chamadosSilenciadosSLA = new Set(); 
-    let backupFormulario = null; 
+    let backupFormulario = null; // Para a função Desfazer Limpeza
 
     // Health Check Firebase
     db.ref('.info/connected').on('value', function(snap) {
@@ -546,18 +552,7 @@
     // ==========================================
     // SISTEMA DE LOGIN E INICIALIZAÇÃO
     // ==========================================
-    let currentUser = null;
-    
-    // TRATAMENTO ANTI-FROZEN F5
-    try {
-        const storedUser = localStorage.getItem('noc_user_info');
-        if (storedUser && storedUser !== "undefined") {
-            currentUser = JSON.parse(storedUser);
-        }
-    } catch (error) {
-        console.error("Erro ao carregar usuário da memória. Limpando dados...", error);
-        localStorage.removeItem('noc_user_info');
-    }
+    let currentUser = JSON.parse(localStorage.getItem('noc_user_info'));
 
     window.onload = function() {
         document.getElementById('severidade').value = 'WARNING'; 
@@ -615,7 +610,7 @@
             toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
         } else if (tipo === 'warning') {
             toast.classList.add('toast-warning');
-            toast.style.pointerEvents = 'auto'; 
+            toast.style.pointerEvents = 'auto'; // Permitir clique se tiver botão
         } else {
             toast.style.pointerEvents = 'none';
         }
@@ -633,7 +628,7 @@
     }
 
     // ==========================================
-    // SISTEMA DE SONS (AVANÇADO)
+    // SISTEMA DE SONS (NOVO)
     // ==========================================
     function tocarSom(tipo) {
         try {
@@ -678,7 +673,7 @@
     }
 
     // ==========================================
-    // SISTEMA DE SLA E SILENCIAMENTO
+    // SISTEMA DE SLA (SÓ LINK) E SILENCIAR
     // ==========================================
     function iniciarMonitoramentoSLA() {
         setInterval(() => {
@@ -736,7 +731,7 @@
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button onclick="fecharAlertaBloqueante()" style="flex: 1; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px;">CIENTE 👍</button>
-                <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 12px; background: white; color: var(--its-red); border: 1px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;">🔕 SILENCIAR HOST</button>
+                <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 12px; background: white; color: var(--its-red); border: 1px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;">🔕 SILENCIAR ESTE HOST</button>
             </div>
         `;
         filaDeAlertas.push(htmlMensagem);
@@ -771,8 +766,7 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
-        const macroSel = document.getElementById('macro-select');
-        if(macroSel) macroSel.value = '';
+        document.getElementById('macro-select').value = '';
         localStorage.removeItem('noc_rascunho_its');
         ultimaAssinaturaGerada = ''; 
 
@@ -865,7 +859,7 @@
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL E BARRA DE BUSCA
+    // HISTÓRICO LATERAL COM RAIO-X
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
@@ -904,7 +898,6 @@
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
-        // Aplica o Filtro da Barra de Busca Inteligente
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -1046,7 +1039,6 @@
                         👀 SERVIÇO: ${mensagemObj.servico}${hostText}
                     </div>
                 </div>
-                <button onclick="fecharAlertaBloqueante()" style="margin-top: 25px; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
             `;
             tocarSom('aviso');
         } else {
@@ -1063,7 +1055,6 @@
                         ${mensagemObj.assunto.replace(/ \| /g, ' | ')}
                     </div>
                 </div>
-                <button onclick="fecharAlertaBloqueante()" style="margin-top: 25px; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
             `;
             
             if (isCritical) tocarSom('critical');
@@ -1149,7 +1140,7 @@
     }
 
     // ==========================================
-    // EXCEL, DASHBOARD E PASSAGEM DE TURNO
+    // DASHBOARD E PASSAGEM DE TURNO
     // ==========================================
     function exportarParaExcel() {
         const btn = document.getElementById('btn-exportar');
@@ -1290,7 +1281,7 @@
             const key = e.key.toLowerCase();
             if (key === 'a') { e.preventDefault(); copiarAssuntoAcao(); }
             if (key === 'i') { e.preventDefault(); copyAsImage(); }
-            if (key === 'x') { e.preventDefault(); copyITSSM(); } 
+            if (key === 't') { e.preventDefault(); copyITSSM(); }
         }
     });
 
@@ -1331,7 +1322,9 @@
         update();
     }
 
-    function inserirTemplate() { aplicarMacro('padrao'); }
+    function inserirTemplate() {
+        aplicarMacro('padrao');
+    }
 
     function mudarStatus() {
         if (document.getElementById('status').value === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; }
@@ -1339,7 +1332,6 @@
     }
 
     function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
-    
     function inserirDataPicker(idTexto, valor) {
         if (!valor) return;
         const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`;
@@ -1347,7 +1339,6 @@
         input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt;
         update();
     }
-    
     function preencherAgoraText(idTexto) {
         const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
         const input = document.getElementById(idTexto);
@@ -1547,6 +1538,14 @@
     }
 
     function copyITSSM() {
+        const assinaturaAtual = obterAssinaturaFormulario();
+        
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return;
+            registrarHistoricoNuvem(obterAssuntoGerado());
+            ultimaAssinaturaGerada = assinaturaAtual;
+        }
+
         const vHost = document.getElementById('host').value || '---';
         const vInicio = document.getElementById('inicio').value || '---';
         const vFgrid = document.getElementById('f-grid').value || '-';
@@ -1593,25 +1592,62 @@
         document.execCommand("copy");
         document.body.removeChild(tempTextarea);
 
-        mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "success");
+        const btn = document.getElementById('btn-copiar-itssm');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ COPIADO!';
+        btn.style.backgroundColor = '#10B981'; 
+        btn.style.color = '#fff';
+        
+        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.color = ''; }, 3000);
     }
 
     function copiarAssuntoAcao() {
+        const assinaturaAtual = obterAssinaturaFormulario();
+        
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return; 
+            registrarHistoricoNuvem(obterAssuntoGerado()); 
+            ultimaAssinaturaGerada = assinaturaAtual;
+        }
+
         const assunto = obterAssuntoGerado();
         const tempInput = document.createElement("input");
         tempInput.value = assunto; document.body.appendChild(tempInput);
         tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
 
-        mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "success");
+        const btn = document.getElementById('btn-assunto');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '✅ COPIADO!'; btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
+        
+        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
     }
 
     function copyHTML() {
+        const status = document.getElementById('status').value;
+        const protocolo = document.getElementById('protocolo');
+        
+        if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento no modo Link/Ping.');
+            protocolo.classList.add('erro-validacao'); protocolo.focus();
+            setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
+            return; 
+        }
+
+        const assinaturaAtual = obterAssinaturaFormulario();
+        if (assinaturaAtual !== ultimaAssinaturaGerada) {
+            if (!verificarDuplicidade()) return; 
+            registrarHistoricoNuvem(obterAssuntoGerado()); 
+            ultimaAssinaturaGerada = assinaturaAtual;
+        }
+
         const node = document.getElementById('render');
         const range = document.createRange(); range.selectNode(node);
         window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
         document.execCommand('copy'); window.getSelection().removeAllRanges();
 
-        mostrarToast("📋 HTML COPIADO COM SUCESSO!", "success");
+        const btn = document.getElementById('btn-copiar-html');
+        const txtOriginal = btn.innerHTML; btn.innerHTML = '✅ COPIADO!';
+        setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
     }
 
     function copyAsImage() {
@@ -1646,8 +1682,8 @@
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     navigator.clipboard.write([item]).then(() => {
-                        btn.innerHTML = originalText;
-                        mostrarToast("📸 IMAGEM COPIADA COM SUCESSO E SALVA NO HISTÓRICO!", "success");
+                        btn.innerHTML = '✅ IMAGEM COPIADA!';
+                        setTimeout(() => { btn.innerHTML = originalText; }, 3000);
                     });
                 } catch (err) {
                     alert("A cópia automática de imagem não é suportada por este navegador.");
@@ -1681,10 +1717,7 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false; 
         document.getElementById('protocolo').classList.remove('erro-validacao');
-        
-        const macroSel = document.getElementById('macro-select');
-        if (macroSel) macroSel.value = '';
-        
+        document.getElementById('macro-select').value = '';
         localStorage.removeItem('noc_rascunho_its'); 
         ultimaAssinaturaGerada = ''; 
         update();
@@ -1713,6 +1746,44 @@
         backupFormulario = null;
         update();
         mostrarToast("✅ Ação desfeita! Dados restaurados.", "success");
+    }
+
+    function salvarRascunho() {
+        const rascunho = {
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value,
+            host: document.getElementById('host').value, status: document.getElementById('status').value,
+            item: document.getElementById('item').value, protocolo: document.getElementById('protocolo').value,
+            solucionador: document.getElementById('solucionador').value, inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+            desc: document.getElementById('desc').value, obs: document.getElementById('obs').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value,
+            evidencias: document.getElementById('evidencias').checked 
+        };
+        localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho));
+    }
+
+    function carregarRascunho() {
+        const salvo = localStorage.getItem('noc_rascunho_its');
+        if (salvo) {
+            const rascunho = JSON.parse(salvo);
+            if (rascunho.modo) modoAtual = rascunho.modo; 
+            document.getElementById('cliente').value = rascunho.cliente || '';
+            document.getElementById('severidade').value = rascunho.severidade || 'WARNING';
+            document.getElementById('host').value = rascunho.host || '';
+            document.getElementById('status').value = rascunho.status || 'EM ABERTO';
+            document.getElementById('item').value = rascunho.item || '';
+            document.getElementById('protocolo').value = rascunho.protocolo || '';
+            document.getElementById('solucionador').value = rascunho.solucionador || '';
+            document.getElementById('inicio').value = rascunho.inicio || '';
+            document.getElementById('f-grid').value = rascunho.fgrid || '';
+            document.getElementById('termino').value = rascunho.termino || '';
+            document.getElementById('desc').value = rascunho.desc || '';
+            document.getElementById('obs').value = rascunho.obs || '';
+            document.getElementById('statusinfo').value = rascunho.statusinfo || '';
+            document.getElementById('pressplay').value = rascunho.pressplay || ''; 
+            document.getElementById('evidencias').checked = rascunho.evidencias || false; 
+        }
     }
 
     function toggleTheme() {
