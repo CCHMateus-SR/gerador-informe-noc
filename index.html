@@ -87,8 +87,6 @@
         label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; }
         
         .actions-flex { display: flex; gap: 12px; }
-        .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
-        .btn-action:hover { text-decoration: underline; color: #005a9e; }
         
         .select-macro { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; border: 1px solid #cbd5e1; background: #f8fafc; color: #166534; cursor: pointer; text-transform: uppercase; transition: 0.2s;}
         .select-macro:hover { border-color: #166534; }
@@ -136,7 +134,7 @@
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 450px; font-weight: bold; line-height: 1.4;}
+        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
         .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -231,6 +229,7 @@
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
     <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
         <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
+        
         <div id="texto-alerta" style="margin-bottom: 0; text-align: left;">
             </div>
     </div>
@@ -436,9 +435,9 @@
             <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
-            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+            <button class="btn-copy-subject" id="btn-assunto" title="Atalho: Ctrl+Shift+A" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
+            <button class="btn-copy-img" id="btn-copiar-img" title="Atalho: Ctrl+Shift+I" onclick="copyAsImage()">📸 IMAGEM</button>
             <button class="btn-copy-itssm" id="btn-copiar-itssm" title="Atalho: Ctrl+Shift+X" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
@@ -547,7 +546,18 @@
     // ==========================================
     // SISTEMA DE LOGIN E INICIALIZAÇÃO
     // ==========================================
-    let currentUser = JSON.parse(localStorage.getItem('noc_user_info'));
+    let currentUser = null;
+    
+    // TRATAMENTO ANTI-FROZEN F5
+    try {
+        const storedUser = localStorage.getItem('noc_user_info');
+        if (storedUser && storedUser !== "undefined") {
+            currentUser = JSON.parse(storedUser);
+        }
+    } catch (error) {
+        console.error("Erro ao carregar usuário da memória. Limpando dados...", error);
+        localStorage.removeItem('noc_user_info');
+    }
 
     window.onload = function() {
         document.getElementById('severidade').value = 'WARNING'; 
@@ -726,7 +736,7 @@
             
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button onclick="fecharAlertaBloqueante()" style="flex: 1; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px;">CIENTE 👍</button>
-                <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 12px; background: white; color: var(--its-red); border: 1px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;">🔕 SILENCIAR ESTE HOST</button>
+                <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 12px; background: white; color: var(--its-red); border: 1px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;">🔕 SILENCIAR HOST</button>
             </div>
         `;
         filaDeAlertas.push(htmlMensagem);
@@ -761,7 +771,8 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
-        document.getElementById('macro-select').value = '';
+        const macroSel = document.getElementById('macro-select');
+        if(macroSel) macroSel.value = '';
         localStorage.removeItem('noc_rascunho_its');
         ultimaAssinaturaGerada = ''; 
 
@@ -804,6 +815,9 @@
         update();
     }
 
+    // ==========================================
+    // TRUQUE DO DATALIST E BUSCA
+    // ==========================================
     function abrirDatalist(element) {
         if (element.value === '') {
             try { element.showPicker(); } catch(e) {}
@@ -850,6 +864,9 @@
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
+    // ==========================================
+    // HISTÓRICO LATERAL E BARRA DE BUSCA
+    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -887,6 +904,7 @@
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
+        // Aplica o Filtro da Barra de Busca Inteligente
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -943,6 +961,7 @@
             if(acao.includes('FOLLOW')) classeBadge = 'badge-follow';
             if(acao.includes('ENCERRAMENTO')) classeBadge = 'badge-ok';
             
+            // RAIO-X DE SEVERIDADE
             let dotSev = '⚪';
             if (log.form.severidade === 'CRITICAL') dotSev = '🔴';
             else if (log.form.severidade === 'WARNING') dotSev = '🟡';
@@ -1007,6 +1026,9 @@
         mostrarToast("✅ Formulário preenchido com sucesso!");
     }
 
+    // ==========================================
+    // ALERTAS E NUVEM
+    // ==========================================
     let filaDeAlertas = [];
     let modalAberto = false;
 
@@ -1256,21 +1278,19 @@
     }
 
     // ==========================================
-    // CÓPIAS, HOTKEYS E LIMPEZA
+    // CÓPIAS, HOTKEYS E LIMPEZA COM DESFAZER
     // ==========================================
     document.addEventListener('keydown', function(e) {
-        // ESC fecha os modais da tela
         if (e.key === 'Escape') {
             if (modalAberto) fecharAlertaBloqueante();
             fecharHistorico();
         }
         
-        // Hotkeys Ninjas
         if (e.ctrlKey && e.shiftKey) {
             const key = e.key.toLowerCase();
             if (key === 'a') { e.preventDefault(); copiarAssuntoAcao(); }
             if (key === 'i') { e.preventDefault(); copyAsImage(); }
-            if (key === 'x') { e.preventDefault(); copyITSSM(); } // Alt. Segura para não abrir abas
+            if (key === 'x') { e.preventDefault(); copyITSSM(); } 
         }
     });
 
@@ -1526,9 +1546,6 @@
         salvarRascunho();
     }
 
-    // ==========================================
-    // CÓPIAS - APENAS IMAGEM REGISTRA NO HISTÓRICO
-    // ==========================================
     function copyITSSM() {
         const vHost = document.getElementById('host').value || '---';
         const vInicio = document.getElementById('inicio').value || '---';
@@ -1576,13 +1593,7 @@
         document.execCommand("copy");
         document.body.removeChild(tempTextarea);
 
-        const btn = document.getElementById('btn-copiar-itssm');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ COPIADO!';
-        btn.style.backgroundColor = '#10B981'; 
-        btn.style.color = '#fff';
-        
-        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.color = ''; }, 3000);
+        mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "success");
     }
 
     function copiarAssuntoAcao() {
@@ -1591,35 +1602,18 @@
         tempInput.value = assunto; document.body.appendChild(tempInput);
         tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
 
-        const btn = document.getElementById('btn-assunto');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '✅ COPIADO!'; btn.style.backgroundColor = '#DCFCE7'; btn.style.borderColor = '#166534'; btn.style.color = '#166534';
-        
-        setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; btn.style.borderColor = ''; btn.style.color = ''; }, 3000);
+        mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "success");
     }
 
     function copyHTML() {
-        const status = document.getElementById('status').value;
-        const protocolo = document.getElementById('protocolo');
-        
-        if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
-            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento no modo Link/Ping.');
-            protocolo.classList.add('erro-validacao'); protocolo.focus();
-            setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
-            return; 
-        }
-
         const node = document.getElementById('render');
         const range = document.createRange(); range.selectNode(node);
         window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
         document.execCommand('copy'); window.getSelection().removeAllRanges();
 
-        const btn = document.getElementById('btn-copiar-html');
-        const txtOriginal = btn.innerHTML; btn.innerHTML = '✅ COPIADO!';
-        setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
+        mostrarToast("📋 HTML COPIADO COM SUCESSO!", "success");
     }
 
-    // O ÚNICO GATILHO QUE SALVA O HISTÓRICO PARA A EQUIPE!
     function copyAsImage() {
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
@@ -1652,8 +1646,8 @@
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
                     navigator.clipboard.write([item]).then(() => {
-                        btn.innerHTML = '✅ IMAGEM COPIADA!';
-                        setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+                        btn.innerHTML = originalText;
+                        mostrarToast("📸 IMAGEM COPIADA COM SUCESSO E SALVA NO HISTÓRICO!", "success");
                     });
                 } catch (err) {
                     alert("A cópia automática de imagem não é suportada por este navegador.");
@@ -1663,9 +1657,6 @@
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
-    // ==========================================
-    // FUNÇÃO DESFAZER LIMPEZA 
-    // ==========================================
     function limparFormulario() {
         backupFormulario = {
             cliente: document.getElementById('cliente').value,
@@ -1690,7 +1681,10 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false; 
         document.getElementById('protocolo').classList.remove('erro-validacao');
-        document.getElementById('macro-select').value = '';
+        
+        const macroSel = document.getElementById('macro-select');
+        if (macroSel) macroSel.value = '';
+        
         localStorage.removeItem('noc_rascunho_its'); 
         ultimaAssinaturaGerada = ''; 
         update();
