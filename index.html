@@ -571,7 +571,7 @@
     let ultimaAssinaturaGerada = ''; 
     let chamadosAlertadosSLA = new Set(); 
     let chamadosSilenciadosSLA = new Set(); 
-    let backupLimpeza = null; 
+    let backupFormulario = null; 
 
     // Função para as Seções Sanfonadas (Collapsible)
     window.toggleSecao = function(secaoId, iconId) {
@@ -1070,7 +1070,7 @@
         if (infra.length > 0) textoFinal += "\n🖥️ INFRA / APLICAÇÕES:\n" + infra.join("\n") + "\n";
 
         navigator.clipboard.writeText(textoFinal).then(() => {
-            mostrarToast("📋 Resumo de Pendências copiado para a área de clipboard!", "success", 4000);
+            mostrarToast("📋 Resumo de Pendências copiado para a área de transferência!", "success", 4000);
         });
     }
 
@@ -1209,7 +1209,7 @@
         const dados = window.chamadosExibidos[index].form;
         if(!dados) return;
 
-        if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
+        if(!confirm("Deseja substituir os dados actuais do formulário por este chamado histórico?")) return;
 
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
@@ -1329,10 +1329,10 @@
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
     function limparHistoricoPlantao() {
-        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exatamente a palavra: CONFIRMAR");
+        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exactamente a palavra: CONFIRMAR");
         
         if (confirmacao !== "CONFIRMAR") {
-            if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada corretamente.");
+            if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada correctamente.");
             return;
         }
 
@@ -1395,7 +1395,7 @@
         }
         
         if (desc.value.trim() !== "") {
-            if(confirm("Substituir o texto atual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
+            if(confirm("Substituir o texto actual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
         } else { desc.value = texto; }
         update();
     }
@@ -1474,9 +1474,11 @@
 
         const headerCell = document.getElementById('render-header-cell');
         if (logosClientes[vCliente]) { 
-            headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 80px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 55px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 55px; width: auto; display: inline-block;"></td></tr></table>`; 
+            // CORREÇÃO: Altura das logos duplas aumentada para 80px e adicionado max-width
+            headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 100px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td></tr></table>`; 
         } else { 
-            headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" style="height: 60px; width: auto; display: block; margin: 0 auto;">`; 
+            // CORREÇÃO: Altura da logo única aumentada para 90px
+            headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" style="height: 90px; max-width: 300px; width: auto; display: block; margin: 0 auto;">`; 
         }
 
         document.getElementById('v-titulo').innerText = tituloTexto; document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
