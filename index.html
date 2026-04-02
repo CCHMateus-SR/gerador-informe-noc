@@ -66,11 +66,9 @@
         .time-critical { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5;}
 
         /* COLUNA 2: FORMULÁRIO */
-        /* Ajustado para ter position relative e permitir o sticky footer perfeitamente */
         .form-side { flex: 1.2; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; max-width: 600px; transition: all 0.3s; position: relative; display: flex; flex-direction: column;}
         
         .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px; }
-        /* Ajuste do tamanho da fonte para evitar quebra de layout */
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; flex: 1;}
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
@@ -96,10 +94,11 @@
         .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-        /* Section Titles Redesenhados */
-        .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; padding: 10px 15px; background: #F1F5F9; border-radius: 8px; border-left: 4px solid var(--its-blue); display: flex; align-items: center; gap: 8px; }
+        /* Section Titles Sanfonados */
+        .section-title { font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; padding: 10px 15px; background: #F1F5F9; border-radius: 8px; border-left: 4px solid var(--its-blue); display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; user-select: none; transition: background 0.2s;}
+        .section-title:hover { background: #E2E8F0; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 10px; flex: 1; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 10px; flex: 1; overflow: hidden;}
         .full-width { grid-column: span 2; }
         
         .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
@@ -124,7 +123,7 @@
         textarea { height: 120px; resize: none; line-height: 1.5; font-family: inherit; }
         .textarea-sm { height: 50px !important; }
 
-        /* Sticky Footer - Barra de ações presa ao fundo */
+        /* Sticky Footer */
         .action-footer { position: sticky; bottom: -30px; background: white; padding: 15px 30px 30px 30px; margin: 20px -30px -30px -30px; border-top: 1px solid var(--its-border); z-index: 10; display: flex; flex-direction: column; gap: 10px; transition: background-color 0.3s; }
         .button-row { display: flex; gap: 8px; }
         .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
@@ -190,6 +189,7 @@
         body.dark-mode .modal-content h3 { color: #38bdf8; }
         
         body.dark-mode .section-title { color: #38bdf8; border-color: #334155; background: #0F172A; border-left-color: #38bdf8; }
+        body.dark-mode .section-title:hover { background: #1E293B; }
         body.dark-mode .action-footer { background: #1E293B; border-top-color: #334155; }
         
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
@@ -363,10 +363,11 @@
             <button onclick="enviarAvisoRapido()">📣 AVISAR</button>
         </div>
 
-        <div class="form-grid">
-            
-            <div class="section-title" id="label-secao-1">📍 1. Identificação do Alarme</div>
-
+        <div class="section-title" onclick="toggleSecao('secao-1', 'icon-1')">
+            <span id="label-secao-1" style="display: flex; align-items: center; gap: 8px;">📍 1. Identificação do Alarme</span>
+            <span id="icon-1" style="transition: transform 0.3s; font-size: 12px;">▼</span>
+        </div>
+        <div class="form-grid" id="secao-1">
             <div class="input-group">
                 <label>Cliente</label>
                 <input type="text" id="cliente" list="lista-clientes" placeholder="Ex: Libbs" oninput="update()" onclick="abrirDatalist(this)">
@@ -398,9 +399,13 @@
                 <label>Retorno / Logs do PressPlay (Opcional)</label>
                 <textarea id="pressplay" class="textarea-sm" placeholder="Cole o retorno da execução do PressPlay aqui..." oninput="update()"></textarea>
             </div>
+        </div>
 
-            <div class="section-title">⏱️ 2. SLA e Acompanhamento</div>
-
+        <div class="section-title" onclick="toggleSecao('secao-2', 'icon-2')">
+            <span style="display: flex; align-items: center; gap: 8px;">⏱️ 2. SLA e Acompanhamento</span>
+            <span id="icon-2" style="transition: transform 0.3s; font-size: 12px;">▼</span>
+        </div>
+        <div class="form-grid" id="secao-2">
             <div class="input-group"><label>Status Atual</label><select id="status" onchange="mudarStatus()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
             
             <div class="input-group" id="grupo-protocolo"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
@@ -440,9 +445,13 @@
                 </div>
                 <input type="text" id="termino" placeholder="Ex: 20/03/2026 às 21:00..." oninput="update()">
             </div>
-            
-            <div class="section-title">🛠️ 3. Tratativa e Diagnóstico</div>
+        </div>
 
+        <div class="section-title" onclick="toggleSecao('secao-3', 'icon-3')">
+            <span style="display: flex; align-items: center; gap: 8px;">🛠️ 3. Tratativa e Diagnóstico</span>
+            <span id="icon-3" style="transition: transform 0.3s; font-size: 12px;">▼</span>
+        </div>
+        <div class="form-grid" id="secao-3" style="margin-bottom: 10px;">
             <div class="input-group" id="grupo-solucionador"><label id="label-solucionador">Solucionador (Operadora / Analista)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()" onclick="abrirDatalist(this)"></div>
             
             <div class="input-group" id="grupo-obs"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
@@ -467,7 +476,6 @@
                 <input type="checkbox" id="evidencias" onchange="update()" style="width: 18px; height: 18px; cursor: pointer; margin: 0; accent-color: var(--its-blue);">
                 <label for="evidencias" style="cursor: pointer; margin: 0; color: #0F172A; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong></label>
             </div>
-
         </div>
         
         <div class="action-footer">
@@ -489,7 +497,7 @@
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
-                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px; transition: background-color 0.3s;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -564,6 +572,19 @@
     let chamadosAlertadosSLA = new Set(); 
     let chamadosSilenciadosSLA = new Set(); 
     let backupLimpeza = null; 
+
+    // Função para as Seções Sanfonadas (Collapsible)
+    window.toggleSecao = function(secaoId, iconId) {
+        const secao = document.getElementById(secaoId);
+        const icon = document.getElementById(iconId);
+        if (secao.style.display === 'none') {
+            secao.style.display = 'grid';
+            icon.style.transform = 'rotate(0deg)';
+        } else {
+            secao.style.display = 'none';
+            icon.style.transform = 'rotate(-90deg)';
+        }
+    }
 
     // Módulo de Checagem Online nativo do Navegador (Sem travar F5)
     function atualizarStatusConexao() {
@@ -1010,7 +1031,6 @@
         document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
     }
 
-    // GERADOR DE RESUMO DE PENDÊNCIAS (PASSAGEM DE PLANTÃO)
     window.gerarPassagemPlantao = function() {
         if (chamadosDoTurno.length === 0) { mostrarToast("Não há chamados neste plantão.", "warning"); return; }
 
@@ -1028,7 +1048,7 @@
         for (let chave in estadoRecente) {
             let log = estadoRecente[chave];
             let status = log.form.status;
-            if (status === 'RESOLVIDO') continue; // Ignora encerrados
+            if (status === 'RESOLVIDO') continue; 
 
             let modo = log.form.modo || 'link';
             let cliente = log.form.cliente || 'N/A';
@@ -1246,6 +1266,7 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
+    // Apenas a IMAGEM aciona esta função
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
@@ -1329,8 +1350,25 @@
     }
 
     // ==========================================
-    // PREENCHIMENTO E MACROS CLIENT-FACING
+    // PREENCHIMENTO INTELIGENTE E AUTO-RELOGIO
     // ==========================================
+    window.mudarStatus = function() { 
+        const status = document.getElementById('status').value; 
+        
+        // Autopreenchimento de Relógio Inteligente
+        const d = new Date(); 
+        const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        
+        if (status === 'RESOLVIDO') { 
+            document.getElementById('severidade').value = 'OK'; 
+            document.getElementById('termino').value = pt;
+        } else if (status === 'FOLLOW-UP') {
+            document.getElementById('f-grid').value = pt;
+        }
+        
+        update(); 
+    }
+
     window.inserirMacro = function(valor) {
         if(!valor) return;
         const desc = document.getElementById('desc'); const statusAtual = document.getElementById('status').value; const severidadeAtual = document.getElementById('severidade').value;
@@ -1356,7 +1394,6 @@
         update();
     }
 
-    function mudarStatus() { if (document.getElementById('status').value === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; } update(); }
     function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
     function inserirDataPicker(idTexto, valor) {
         if (!valor) return; const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; const input = document.getElementById(idTexto);
@@ -1386,6 +1423,8 @@
         const vPressplay = document.getElementById('pressplay').value.trim(); const vDesc = document.getElementById('desc').value.trim(); const vObs = document.getElementById('obs').value.trim();
         const temEvidencias = document.getElementById('evidencias').checked;
 
+        if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
+
         let corSeveridade = '#64748B'; 
         if(severidade === 'CRITICAL') corSeveridade = '#DC2626'; if(severidade === 'WARNING') corSeveridade = '#D97706'; if(severidade === 'INTERMITENTE') corSeveridade = '#EA580C'; if(severidade === 'OK') corSeveridade = '#166534'; 
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
@@ -1393,24 +1432,31 @@
         let labelTerminoForm = ''; let tituloTerminoBox = ''; let tituloDescBox = 'DETALHAMENTO';
         const headerBg = document.getElementById('v-header-bg'); const topBorder = document.getElementById('render-header-cell');
 
+        // Lógica de Cor do Cabeçalho Dinâmico
+        let headerBgColor = '#002D5B'; // Azul ITS default (Follow-up)
+        if (status === 'EM ABERTO') headerBgColor = '#B91C1C'; // Vermelho
+        if (status === 'RESOLVIDO') headerBgColor = '#166534'; // Verde
+
         if (modoAtual === 'infra') {
             labelTerminoForm = 'Término da Ocorrência'; tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA'; tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
             document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais"; 
-            headerBg.setAttribute('bgcolor', '#1E293B'); topBorder.style.borderTop = '8px solid #0284C7'; 
+            headerBg.setAttribute('bgcolor', headerBgColor); 
+            topBorder.style.borderTop = '8px solid #0284C7'; 
         } else {
             document.getElementById('label-desc').innerText = "Ações / Diagnóstico";
             if (status === 'RESOLVIDO') { labelTerminoForm = 'Fim da Ocorrência'; tituloTerminoBox = 'FIM DA OCORRÊNCIA'; } else { labelTerminoForm = 'Previsão de Normalização (SLA)'; tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)'; }
-            headerBg.setAttribute('bgcolor', '#002D5B'); topBorder.style.borderTop = '8px solid #DC2626'; 
+            headerBg.setAttribute('bgcolor', headerBgColor); 
+            topBorder.style.borderTop = '8px solid #DC2626'; 
         }
         
         document.getElementById('label-termino').innerText = labelTerminoForm; document.getElementById('v-titulo-termino').innerText = tituloTerminoBox; document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
-        let bgColor, textColor, badgeTexto, tituloTexto;
+        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
         
-        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
-        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
-        else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
+        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
+        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
+        else { bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
