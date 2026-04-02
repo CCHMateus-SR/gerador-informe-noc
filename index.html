@@ -412,6 +412,7 @@
                     <label id="label-desc">Ações / Diagnóstico</label>
                     <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';">
                         <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
+                        <option value="padrao">📋 Texto Padrão (Baseado no Status)</option>
                         <option value="fibra">✂️ Rompimento de Fibra</option>
                         <option value="eletrica">⚡ Falha Elétrica (Concessionária)</option>
                         <option value="pos_reparo">👀 Acompanhamento Pós-Reparo</option>
@@ -1254,12 +1255,24 @@
     window.inserirMacro = function(valor) {
         if(!valor) return;
         const desc = document.getElementById('desc');
-        if (desc.value.trim() !== "" && !confirm("Adicionar este texto ao que já está escrito? (Cancelar irá substituir o texto atual)")) {
-            desc.value = "";
-        }
-        
+        const statusAtual = document.getElementById('status').value;
+        const severidadeAtual = document.getElementById('severidade').value;
         let texto = "";
+        
         switch(valor) {
+            case 'padrao':
+                if (statusAtual === 'EM ABERTO') {
+                    texto = "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.";
+                } else if (statusAtual === 'FOLLOW-UP') {
+                    texto = "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.";
+                } else if (statusAtual === 'RESOLVIDO') {
+                    texto = "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências.";
+                }
+                
+                if (severidadeAtual === 'INTERMITENTE') { 
+                    texto = texto.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); 
+                }
+                break;
             case 'fibra': texto = "Identificamos indícios de rompimento de fibra ótica na região. A equipe técnica de campo da operadora já foi acionada e encontra-se em deslocamento para realizar o mapeamento e reparo físico no trecho afetado."; break;
             case 'eletrica': texto = "Identificamos que o equipamento encontra-se indisponível devido a uma provável falha massiva no fornecimento de energia elétrica na região (incidente com a concessionária local). Aguardamos o restabelecimento da energia comercial para normalização do serviço."; break;
             case 'pos_reparo': texto = "Informamos que o serviço de comunicação foi restabelecido. Contudo, o NOC manterá o circuito em acompanhamento de estabilidade e verificação de métricas antes do encerramento definitivo do incidente."; break;
@@ -1267,7 +1280,16 @@
             case 'validacao': texto = "A operadora informa que os testes apontam normalidade no circuito. Solicitamos, por gentileza, que a equipe local valide a disponibilidade dos serviços e acesso às aplicações internas para seguirmos com o encerramento."; break;
         }
         
-        desc.value = desc.value ? desc.value + "\n\n" + texto : texto;
+        if (desc.value.trim() !== "") {
+            if(confirm("Substituir o texto atual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) {
+                desc.value = texto;
+            } else {
+                desc.value = desc.value + "\n\n" + texto;
+            }
+        } else {
+            desc.value = texto;
+        }
+        
         update();
     }
 
