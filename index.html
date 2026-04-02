@@ -120,6 +120,10 @@
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
         .btn-theme:hover { background: #F1F5F9; }
 
+        /* ESTILO DO BOTÃO DE DESFAZER TOAST */
+        .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
+        .btn-undo:hover { background: rgba(0,0,0,0.2); }
+
         /* COLUNA 3: PREVIEW DO E-MAIL */
         .preview-side { flex: 1.4; background: #CBD5E1; padding: 40px; border-radius: 16px; position: sticky; top: 20px; border: 1px solid #94A3B8; overflow-y: auto; max-height: 92vh; display: flex; justify-content: center; transition: background-color 0.3s; min-width: 650px;}
 
@@ -134,14 +138,15 @@
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
-        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
+        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; pointer-events: auto;}
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* ESTILOS DOS BOTÕES DO POP-UP DE ALERTA */
-        .btn-ciente-red { flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
-        .btn-ciente-red:hover { background: #991B1B; transform: translateY(-2px); }
-        .btn-silenciar { flex: 1; padding: 14px; background: white; color: var(--its-red); border: 2px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s; }
-        .btn-silenciar:hover { background: #FEF2F2; transform: translateY(-2px); }
+        /* BOTÕES DOS ALERTAS (VERMELHOS) */
+        .botoes-alerta-container { display: flex; gap: 10px; margin-top: 25px; width: 100%; }
+        .btn-ciente { flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); letter-spacing: 0.5px;}
+        .btn-ciente:hover { background: #991B1B; transform: translateY(-2px); }
+        .btn-ignorar { flex: 1; padding: 14px; background: #991B1B; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2); letter-spacing: 0.5px;}
+        .btn-ignorar:hover { background: #7f1d1d; transform: translateY(-2px); }
 
         /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
@@ -218,12 +223,11 @@
         .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
         .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
         .dash-ok { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
-        
-        /* Dark Mode dos botões de Alerta */
-        body.dark-mode .btn-ciente-red { background: var(--its-red); color: white; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
-        body.dark-mode .btn-ciente-red:hover { background: #991B1B; }
-        body.dark-mode .btn-silenciar { background: #450a0a; color: white; border-color: #7f1d1d; }
-        body.dark-mode .btn-silenciar:hover { background: #7f1d1d; }
+
+        body.dark-mode .btn-ciente { background: var(--its-red); color: white; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
+        body.dark-mode .btn-ciente:hover { background: #991B1B; }
+        body.dark-mode .btn-ignorar { background: #450a0a; color: white; border-color: #7f1d1d; }
+        body.dark-mode .btn-ignorar:hover { background: #7f1d1d; }
     </style>
 </head>
 <body>
@@ -239,16 +243,12 @@
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
-    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 35px 30px;">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 25px;">
-            <div style="background: #FFF7ED; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #FFEDD5;">
-                <span style="font-size: 26px;">🚨</span>
-            </div>
-            <h3 style="margin: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Atualização no Radar!</h3>
-        </div>
-        <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;"></div>
+    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
+        <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
         
-        <div id="botoes-alerta" style="display: flex; gap: 10px; width: 100%;"></div>
+        <div id="texto-alerta" style="margin-bottom: 0; text-align: left;"></div>
+
+        <div id="botoes-alerta" class="botoes-alerta-container"></div>
     </div>
 </div>
 
@@ -322,6 +322,7 @@
             <div class="top-controls">
                 <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
+                <button class="btn-theme" title="Copiar Passagem de Turno" onclick="gerarPassagemTurno()">📋</button>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="toggleTheme()">🌙</button>
             </div>
@@ -426,7 +427,15 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
-                    <button type="button" class="btn-action btn-template" id="btn-template-desc" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
+                    <select id="macro-select" class="select-macro" onchange="aplicarMacro(this.value)">
+                        <option value="">📚 Templates Rápidos...</option>
+                        <option value="padrao">Padrão do Status Atual</option>
+                        <option value="fibra">Rompimento de Fibra</option>
+                        <option value="energia">Falha Elétrica (Concessionária)</option>
+                        <option value="monitoramento">Acompanhamento Pós-Reparo</option>
+                        <option value="n2">Escalonado para Engenharia (N2)</option>
+                        <option value="confirmacao">Aguardando Validação do Cliente</option>
+                    </select>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
             </div>
@@ -525,10 +534,10 @@
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
     let ultimaAssinaturaGerada = ''; 
-    let chamadosAlertadosSLA = new Set();
-    let chamadosSilenciadosSLA = new Set();
+    let chamadosAlertadosSLA = new Set(); 
+    let chamadosSilenciadosSLA = new Set(); 
+    let backupFormulario = null; 
 
-    // Verificador de Conexão Online/Offline
     function atualizarStatusConexao() {
         const statusEl = document.getElementById('conexao-status');
         if (!statusEl) return;
@@ -553,33 +562,34 @@
         return inicioPlantao.getTime();
     }
 
-    // ==========================================
-    // SISTEMA DE LOGIN E INICIALIZAÇÃO - BLINDADO
-    // ==========================================
     let currentUser = null;
-    
+    try {
+        const storedUser = localStorage.getItem('noc_user_info');
+        if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
+            currentUser = JSON.parse(storedUser);
+        }
+    } catch(e) {
+        localStorage.removeItem('noc_user_info');
+    }
+
     window.onload = function() {
-        atualizarStatusConexao(); // Checa rede imediato
+        atualizarStatusConexao();
+        try { document.getElementById('severidade').value = 'WARNING'; } catch(e) {}
+        try { carregarRascunho(); } catch(e) {}
+        try { setModo(modoAtual); } catch(e) {}
         
-        // Proteção total na leitura de memória (Impede tela congelada no F5)
         try {
             if (!currentUser) {
                 document.getElementById('modal-login').style.display = 'flex';
-                document.getElementById('user-display').innerText = '👤 Entrando...';
             } else {
-                document.getElementById('modal-login').style.display = 'none';
                 document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
                 document.getElementById('history-container').style.display = 'block';
                 iniciarListenerHistorico();
                 iniciarMonitoramentoSLA();
             }
-        } catch(e) { console.error("Erro na verificação de auth:", e); }
-
-        try {
-            document.getElementById('severidade').value = 'WARNING'; 
-            carregarRascunho();
-            setModo(modoAtual); 
-        } catch(e) { console.error("Erro na carga inicial da UI:", e); }
+        } catch(e) {
+            console.error("Erro na inicialização", e);
+        }
     };
 
     function salvarLogin() {
@@ -600,7 +610,7 @@
 
     function fazerLogout() {
         if(confirm("Deseja sair do seu usuário atual?")) {
-            localStorage.removeItem('noc_user_info');
+            try { localStorage.removeItem('noc_user_info'); } catch(e) {}
             currentUser = null;
             document.getElementById('modal-login').style.display = 'flex';
             document.getElementById('user-display').innerText = `👤 Entrando...`;
@@ -611,38 +621,75 @@
             window.chamadosExibidos = [];
             ultimaAssinaturaGerada = '';
             chamadosAlertadosSLA.clear();
-            chamadosSilenciadosSLA.clear();
+            chamadosSilenciadosSLA.clear(); 
         }
     }
 
-    function mostrarToast(mensagem, tipo = 'success') {
+    function mostrarToast(mensagem, tipo = 'success', duracao = null) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = 'toast';
         if (tipo === 'info') {
             toast.style.background = '#3B82F6'; 
             toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
+        } else if (tipo === 'warning') {
+            toast.classList.add('toast-warning');
+            toast.style.pointerEvents = 'auto'; 
+        } else {
+            toast.style.pointerEvents = 'none';
         }
+        
         toast.innerHTML = mensagem;
         container.appendChild(toast);
+        
+        let time = duracao || (tipo === 'success' ? 3000 : 5000);
+        
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-100%)';
             setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
-        }, tipo === 'info' ? 4500 : 3000); 
+        }, time); 
     }
 
-    // ==========================================
-    // SISTEMA DE SLA DE 30 MINUTOS
-    // ==========================================
-    function tocarAlertaSonoro() {
+    function tocarSom(tipo) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            
+            if (tipo === 'aviso') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (tipo === 'sla') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if (tipo === 'critical') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.5);
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            } else {
+                osc.type = 'triangle'; 
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); 
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+            
+            osc.connect(gainNode); 
+            gainNode.connect(audioCtx.destination); 
         } catch(e) {}
     }
 
@@ -665,10 +712,8 @@
                 if (chamadosSilenciadosSLA.has(chave)) continue;
 
                 let log = estadoRecente[chave];
+                if (log.form.modo === 'infra') continue; 
                 
-                // SÓ APITA PARA MODO LINK!
-                if (log.form.modo === 'infra') continue;
-
                 let acao = log.assunto.split(' | ')[5] || '';
                 
                 if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
@@ -687,15 +732,12 @@
         }, 60000); 
     }
 
-    // ==========================================
-    // GERENCIADOR DE ALERTAS E MODAIS
-    // ==========================================
     let filaDeAlertas = [];
     let modalAberto = false;
 
     function mostrarAlertaBloqueante(mensagemObj) {
         let htmlMensagem = '';
-        let botoesHTML = `<button class="btn-ciente-red" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
+        let botoes = `<button class="btn-ciente" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
 
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
@@ -709,8 +751,13 @@
                     </div>
                 </div>
             `;
+            filaDeAlertas.push({ html: htmlMensagem, botoes: botoes });
+            tocarSom('aviso');
         } else {
-            const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra / Aplicações' : '🌐 Gestão de Link/Ping';
+            const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
+            const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
+            const modoLabel = isInfra ? '🖥️ Infra' : '🌐 Link';
+            
             htmlMensagem = `
                 <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
                     <div style="margin-bottom: 15px; color: #1E293B; font-size: 13px; text-align: center;">
@@ -721,14 +768,16 @@
                     </div>
                 </div>
             `;
+            filaDeAlertas.push({ html: htmlMensagem, botoes: botoes });
+            if (isCritical) tocarSom('critical');
+            else tocarSom('default');
         }
 
-        filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML });
-        tocarAlertaSonoro();
         if (!modalAberto) exibirProximoAlerta();
     }
 
     function dispararModalSLA(log, minutos, chave) {
+        let minArredondado = Math.floor(minutos);
         let htmlMensagem = `
             <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">
@@ -738,24 +787,24 @@
                     O Host <strong>${log.form.host}</strong> (${log.form.cliente})
                 </div>
                 <div style="font-family: Consolas, monospace; font-size: 13px; color: #991B1B; font-weight: bold; background: #FEE2E2; padding: 8px; border-radius: 4px;">
-                    Está sem atualização há ${Math.floor(minutos)} minutos!
+                    Está sem atualização há ${minArredondado} minutos!
                 </div>
             </div>
         `;
-        let botoesHTML = `
-            <button class="btn-ciente-red" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
-            <button class="btn-silenciar" onclick="silenciarSLA('${chave}')">🔕 SILENCIAR HOST</button>
+        let botoes = `
+            <button class="btn-ignorar" onclick="silenciarSLA('${chave}')">🔕 SILENCIAR HOST</button>
+            <button class="btn-ciente" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
         `;
         
-        filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML });
-        tocarAlertaSonoro();
+        filaDeAlertas.push({ html: htmlMensagem, botoes: botoes });
+        tocarSom('sla');
         if (!modalAberto) exibirProximoAlerta();
     }
 
     window.silenciarSLA = function(chave) {
         chamadosSilenciadosSLA.add(chave);
         fecharAlertaBloqueante();
-        mostrarToast("🔕 Alertas silenciados para este host.", "info");
+        mostrarToast("🔕 Alertas de SLA silenciados para este host.", "info");
     }
 
     function exibirProximoAlerta() {
@@ -783,26 +832,34 @@
         if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
     });
 
-    // ==========================================
-    // SELETOR DE MODO E ATUALIZAÇÕES GERAIS
-    // ==========================================
     function trocarModo(novoModo) {
         if (modoAtual === novoModo) return; 
-        const temDado = document.getElementById('cliente').value.trim() !== '' || document.getElementById('host').value.trim() !== '' || document.getElementById('item').value.trim() !== '';
-        if (temDado) { if(!confirm("Alternar de módulo irá limpar os dados atuais do formulário. Deseja continuar?")) { return; } }
+
+        const temDado = document.getElementById('cliente').value.trim() !== '' ||
+                        document.getElementById('host').value.trim() !== '' ||
+                        document.getElementById('item').value.trim() !== '';
+
+        if (temDado) {
+            if(!confirm("Alternar de módulo irá limpar os dados atuais do formulário. Deseja continuar?")) {
+                return; 
+            }
+        }
 
         document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
         document.getElementById('status').value = 'EM ABERTO';
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
-        localStorage.removeItem('noc_rascunho_its');
+        document.getElementById('macro-select').value = '';
+        try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
         ultimaAssinaturaGerada = ''; 
+
         setModo(novoModo);
     }
 
     function setModo(modo) {
         modoAtual = modo;
+        
         document.getElementById('btn-modo-link').classList.toggle('active', modo === 'link');
         document.getElementById('btn-modo-infra').classList.toggle('active', modo === 'infra');
 
@@ -811,8 +868,10 @@
             document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Alarme";
             document.getElementById('label-host').innerText = "Host / Circuito";
             document.getElementById('v-label-host').innerText = "Host";
+            
             document.getElementById('host').placeholder = "Ex: FURACAO_FGT_BELO_HORIZONTE";
             document.getElementById('item').placeholder = "Ex: Ping\nLINK APEX NET 50MB";
+            
             document.getElementById('grupo-protocolo').style.display = 'flex';
             document.getElementById('grupo-pressplay').style.display = 'none'; 
             document.getElementById('grupo-solucionador').style.display = 'flex'; 
@@ -821,21 +880,32 @@
             document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
             document.getElementById('label-host').innerText = "Host / Servidor";
             document.getElementById('v-label-host').innerText = "Host / Servidor";
+            
             document.getElementById('host').placeholder = "Ex: Libbs-CO-DC-PM-01";
             document.getElementById('item').placeholder = "Ex: CPU\nMemory\nServices-Auto";
+
             document.getElementById('grupo-protocolo').style.display = 'none';
             document.getElementById('grupo-pressplay').style.display = 'flex'; 
             document.getElementById('grupo-solucionador').style.display = 'none'; 
         }
+        
         renderizarListaLateral();
         update();
     }
 
     function abrirDatalist(element) {
-        if (element.value === '') { try { element.showPicker(); } catch(e) {} return; }
-        const valorSalvo = element.value; element.value = ''; try { element.showPicker(); } catch(e) {}
+        if (element.value === '') {
+            try { element.showPicker(); } catch(e) {}
+            return;
+        }
+        const valorSalvo = element.value;
+        element.value = '';
+        try { element.showPicker(); } catch(e) {}
         element.addEventListener('focusout', function handler() {
-            if (element.value === '') { element.value = valorSalvo; update(); }
+            if (element.value === '') {
+                element.value = valorSalvo;
+                update();
+            }
             element.removeEventListener('focusout', handler);
         }, { once: true });
     }
@@ -844,21 +914,31 @@
         if (!currentUser) return;
         const servico = document.getElementById('quick-item').value.trim();
         const host = document.getElementById('quick-host').value.trim();
-        if (!servico) { alert("Para avisar a equipe, preencha pelo menos o Serviço (Item Monitorado) que você está analisando!"); document.getElementById('quick-item').focus(); return; }
-        const agora = new Date(); const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-        
+
+        if (!servico) {
+            alert("Para avisar a equipe, preencha pelo menos o Serviço (Item Monitorado) que você está analisando!");
+            document.getElementById('quick-item').focus();
+            return;
+        }
+
+        const agora = new Date();
+        const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
         db.ref('historico_noc').push({
-            tipo: 'aviso_rapido', nome: currentUser.nome, turno: currentUser.turno,
-            servico: servico, host: host || 'Não informado', hora: horaStr,
+            tipo: 'aviso_rapido',
+            nome: currentUser.nome,
+            turno: currentUser.turno,
+            servico: servico,
+            host: host || 'Não informado',
+            hora: horaStr,
             timestamp: firebase.database.ServerValue.TIMESTAMP
         });
-        document.getElementById('quick-item').value = ''; document.getElementById('quick-host').value = '';
+
+        document.getElementById('quick-item').value = '';
+        document.getElementById('quick-host').value = '';
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
-    // ==========================================
-    // HISTÓRICO LATERAL
-    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -871,35 +951,82 @@
         const inicioTurno = getInicioDoPlantaoTimestamp(); 
         db.ref('historico_noc').orderByChild('timestamp').startAt(inicioTurno).on('value', (snapshot) => {
             chamadosDoTurno = [];
-            if(snapshot.exists()) { snapshot.forEach(child => { chamadosDoTurno.push(child.val()); }); }
+            if(snapshot.exists()) {
+                snapshot.forEach(child => { 
+                    chamadosDoTurno.push(child.val());
+                });
+            }
             renderizarListaLateral();
         });
     }
 
     function renderizarListaLateral() {
         const lista = document.getElementById('meus-chamados-lista');
+        const searchEl = document.getElementById('search-history');
+        const termoBusca = searchEl ? searchEl.value.toLowerCase().trim() : '';
         window.chamadosExibidos = [];
-        if (chamadosDoTurno.length === 0) { lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>'; return; }
+        
+        if (chamadosDoTurno.length === 0) {
+            lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>';
+            return;
+        }
 
-        if (visaoHistorico === 'meus') { window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); } 
-        else { window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); }
+        if (visaoHistorico === 'meus') { 
+            window.chamadosExibidos = chamadosDoTurno.filter(c => currentUser && c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); 
+        } else { 
+            window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
+        }
+
+        if (termoBusca !== '') {
+            window.chamadosExibidos = window.chamadosExibidos.filter(c => {
+                if (c.tipo === 'aviso_rapido') {
+                    return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || 
+                           (c.host && String(c.host).toLowerCase().includes(termoBusca)) ||
+                           (c.nome && String(c.nome).toLowerCase().includes(termoBusca));
+                } else if (c.form) {
+                    return (c.form.cliente && String(c.form.cliente).toLowerCase().includes(termoBusca)) ||
+                           (c.form.host && String(c.form.host).toLowerCase().includes(termoBusca)) ||
+                           (c.form.item && String(c.form.item).toLowerCase().includes(termoBusca)) ||
+                           (c.nome && String(c.nome).toLowerCase().includes(termoBusca));
+                }
+                return false;
+            });
+        }
 
         window.chamadosExibidos.reverse(); 
+
         if(window.chamadosExibidos.length === 0) {
-            const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura";
-            lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`;
+            if(termoBusca !== '') {
+                lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum resultado encontrado para a busca.</div>`;
+            } else {
+                const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura";
+                lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`;
+            }
             return;
         }
 
         let html = '';
         window.chamadosExibidos.forEach((log, index) => {
             if (log.tipo === 'aviso_rapido') {
-                html += `<div class="my-card card-aviso"><div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div><div class="my-card-host">🔖 ${log.servico}</div><div class="my-card-service">🖥️ ${log.host}</div><div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div></div>`;
+                html += `
+                <div class="my-card card-aviso">
+                    <div class="my-card-header">
+                        <span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span>
+                        <span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span>
+                    </div>
+                    <div class="my-card-host">🔖 ${log.servico}</div>
+                    <div class="my-card-service">🖥️ ${log.host}</div>
+                    <div class="my-card-bottom">
+                        <span class="my-card-time">🕒 ${log.hora}</span>
+                    </div>
+                </div>`;
                 return; 
             }
+
             if (!log.form) return; 
 
-            const partesAssunto = log.assunto.split(' | '); const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
+            const partesAssunto = log.assunto.split(' | ');
+            const acao = partesAssunto[5] ? partesAssunto[5].trim() : 'CHAMADO';
             const modoIcon = log.form.modo === 'infra' ? '🖥️' : '🌐';
             const classeCardModo = log.form.modo === 'infra' ? 'card-infra' : 'card-link';
 
@@ -912,38 +1039,62 @@
             const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
 
             let infoAnalista = '';
-            if (visaoHistorico === 'equipe' && log.nome !== currentUser.nome) { infoAnalista = `<div style="font-size: 9px; color: var(--its-orange); margin-top: 4px; font-weight: bold; background: #FFF7ED; padding: 3px 6px; border-radius: 4px; display: inline-block;">👤 Criado por: ${log.nome}</div>`; }
+            if (visaoHistorico === 'equipe' && currentUser && log.nome !== currentUser.nome) {
+                infoAnalista = `<div style="font-size: 9px; color: var(--its-orange); margin-top: 4px; font-weight: bold; background: #FFF7ED; padding: 3px 6px; border-radius: 4px; display: inline-block;">👤 Criado por: ${log.nome}</div>`;
+            }
 
-            html += `<div class="my-card ${classeCardModo}"><div class="my-card-header"><span class="my-card-client">${modoIcon} ${clienteNome}</span><span class="my-card-badge ${classeBadge}">${acao}</span></div><div class="my-card-host">${hostNome}</div><div class="my-card-service">🔖 ${servicoNome}</div>${infoAnalista}<div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span><button class="btn-pull" onclick="carregarChamadoParaFormulario(${index})">🔄 Puxar Dados</button></div></div>`;
+            html += `
+            <div class="my-card ${classeCardModo}">
+                <div class="my-card-header">
+                    <span class="my-card-client">${modoIcon} ${clienteNome}</span>
+                    <span class="my-card-badge ${classeBadge}">${acao}</span>
+                </div>
+                <div class="my-card-host">${hostNome}</div>
+                <div class="my-card-service">🔖 ${servicoNome}</div>
+                ${infoAnalista}
+                <div class="my-card-bottom">
+                    <span class="my-card-time">🕒 ${log.hora}</span>
+                    <button class="btn-pull" onclick="carregarChamadoParaFormulario(${index})">🔄 Puxar Dados</button>
+                </div>
+            </div>`;
         });
         lista.innerHTML = html;
     }
 
     function carregarChamadoParaFormulario(index) {
-        const dados = window.chamadosExibidos[index].form; if(!dados) return;
+        const dados = window.chamadosExibidos[index].form;
+        if(!dados) return;
+
         if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
-        document.getElementById('cliente').value = dados.cliente || ''; document.getElementById('host').value = dados.host || '';
-        document.getElementById('item').value = dados.item || ''; document.getElementById('severidade').value = dados.severidade || 'WARNING';
-        document.getElementById('statusinfo').value = dados.statusinfo || ''; document.getElementById('pressplay').value = dados.pressplay || ''; 
-        document.getElementById('status').value = dados.status || 'EM ABERTO'; document.getElementById('protocolo').value = dados.protocolo || '';
-        document.getElementById('inicio').value = dados.inicio || ''; document.getElementById('f-grid').value = dados.fgrid || '';
-        document.getElementById('termino').value = dados.termino || ''; document.getElementById('desc').value = dados.desc || '';
-        document.getElementById('solucionador').value = dados.solucionador || ''; document.getElementById('obs').value = dados.obs || '';
+        document.getElementById('cliente').value = dados.cliente || '';
+        document.getElementById('host').value = dados.host || '';
+        document.getElementById('item').value = dados.item || '';
+        document.getElementById('severidade').value = dados.severidade || 'WARNING';
+        document.getElementById('statusinfo').value = dados.statusinfo || '';
+        document.getElementById('pressplay').value = dados.pressplay || ''; 
+        document.getElementById('status').value = dados.status || 'EM ABERTO'; 
+        document.getElementById('protocolo').value = dados.protocolo || '';
+        document.getElementById('inicio').value = dados.inicio || '';
+        document.getElementById('f-grid').value = dados.fgrid || '';
+        document.getElementById('termino').value = dados.termino || '';
+        document.getElementById('desc').value = dados.desc || '';
+        document.getElementById('solucionador').value = dados.solucionador || '';
+        document.getElementById('obs').value = dados.obs || '';
         document.getElementById('evidencias').checked = dados.evidencias || false; 
         
-        ultimaAssinaturaGerada = ''; update();
+        ultimaAssinaturaGerada = ''; 
+        
+        update();
         mostrarToast("✅ Formulário preenchido com sucesso!");
     }
 
-    // ==========================================
-    // EXPORTAÇÃO E DUPLICIDADE
-    // ==========================================
     let ultimosLogsFirebase = [];
     db.ref('historico_noc').orderByChild('timestamp').limitToLast(150).on('value', (snapshot) => {
-        ultimosLogsFirebase = []; snapshot.forEach(child => { ultimosLogsFirebase.push(child.val()); });
+        ultimosLogsFirebase = [];
+        snapshot.forEach(child => { ultimosLogsFirebase.push(child.val()); });
     });
 
     function verificarDuplicidade() {
@@ -958,27 +1109,65 @@
         for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
             let log = ultimosLogsFirebase[i];
             if (log.timestamp < inicioTurno || log.tipo === 'aviso_rapido') continue; 
+            
             if(log.assunto && log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
-                if(currentUser && log.nome !== currentUser.nome) { return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este cliente/host às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`); }
+                if(currentUser && log.nome !== currentUser.nome) {
+                    return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este cliente/host às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`);
+                }
                 return true; 
             }
         }
         return true; 
     }
 
+    function obterAssinaturaFormulario() {
+        const cliente = document.getElementById('cliente').value.toUpperCase().trim();
+        const host = document.getElementById('host').value.toUpperCase().trim();
+        const status = document.getElementById('status').value;
+        const fgrid = document.getElementById('f-grid').value.trim(); 
+        return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
+    }
+
+    function registrarHistoricoNuvem(assunto) {
+        if(!currentUser) return;
+        const formData = {
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, host: document.getElementById('host').value,
+            item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, 
+            status: document.getElementById('status').value, protocolo: document.getElementById('protocolo').value, 
+            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, 
+            termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
+            solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, 
+            evidencias: document.getElementById('evidencias').checked 
+        };
+        db.ref('historico_noc').push({
+            tipo: 'relatorio', 
+            nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
+            hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
+        });
+    }
+
     function exportarParaExcel() {
-        const btn = document.getElementById('btn-exportar'); const txtOriginal = btn.innerHTML; btn.innerHTML = '⏳ Baixando...';
+        const btn = document.getElementById('btn-exportar');
+        const txtOriginal = btn.innerHTML;
+        btn.innerHTML = '⏳ Baixando...';
         db.ref('historico_noc').once('value', (snapshot) => {
             if(!snapshot.exists()) { alert("Nenhum dado encontrado."); btn.innerHTML = txtOriginal; return; }
-            let csvContent = "Data,Hora,Analista,Turno,Modo,Cliente,Host,Servico,Severidade,Acao\n"; const logs = [];
+            let csvContent = "Data,Hora,Analista,Turno,Modo,Cliente,Host,Servico,Severidade,Acao\n";
+            const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             logs.forEach(log => {
                 if (log.tipo === 'aviso_rapido') return; 
-                const p = log.assunto.split(' | '); const dObj = new Date(log.timestamp);
+                
+                const p = log.assunto.split(' | ');
+                const dObj = new Date(log.timestamp);
                 csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${log.nome}","${log.turno}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? p[0].trim() : '-'}","${p[1] ? p[1].trim() : '-'}","${p[2] ? p[2].replace(/\n/g, ' ').trim() : '-'}","${p[3] ? p[3].trim() : '-'}","${p[5] ? p[5].trim() : '-'}"\n`;
             });
             const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
             link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
             btn.innerHTML = '✅ Concluído!'; setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
@@ -989,48 +1178,185 @@
         document.getElementById('modal-historico').style.display = 'flex';
         const listaHtml = document.getElementById('lista-historico');
         listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar do plantão...</div>';
+        
         db.ref('historico_noc').orderByChild('timestamp').startAt(getInicioDoPlantaoTimestamp()).once('value', (snapshot) => {
-            if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; return; }
-            let html = ''; const logs = []; snapshot.forEach(child => { logs.push(child.val()); });
+            if(!snapshot.exists()) { 
+                listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; 
+                return; 
+            }
+            let html = ''; const logs = [];
+            snapshot.forEach(child => { logs.push(child.val()); });
             
+            let abertos = 0, follow = 0, resolvidos = 0;
+
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
-                    html += `<div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;"><div class="log-time"><span>🕒 ${item.hora} 👀 EM ANÁLISE</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span></div>`;
+                    html += `
+                    <div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;">
+                        <div class="log-time">
+                            <span>🕒 ${item.hora} 👀 EM ANÁLISE</span>
+                            <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
+                        </div>
+                        <span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span>
+                    </div>`;
                 } else {
                     const isInfra = item.form && item.form.modo === 'infra';
-                    const corBorda = isInfra ? '#0284C7' : 'var(--its-red)'; const modoLabel = isInfra ? '🖥️' : '🌐';
-                    html += `<div class="log-item" style="border-left-color: ${corBorda};"><div class="log-time"><span>🕒 ${item.hora} ${modoLabel}</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject">${item.assunto}</span></div>`;
+                    const corBorda = isInfra ? '#0284C7' : 'var(--its-red)'; 
+                    const modoLabel = isInfra ? '🖥️' : '🌐';
+                    
+                    const acao = item.assunto.split(' | ')[5] || '';
+                    if(acao.includes('ABERTURA')) abertos++;
+                    else if(acao.includes('FOLLOW')) follow++;
+                    else if(acao.includes('ENCERRAMENTO')) resolvidos++;
+
+                    html += `
+                    <div class="log-item" style="border-left-color: ${corBorda};">
+                        <div class="log-time">
+                            <span>🕒 ${item.hora} ${modoLabel}</span>
+                            <span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span>
+                        </div>
+                        <span class="log-subject">${item.assunto}</span>
+                    </div>`;
                 }
             });
             listaHtml.innerHTML = html;
+
+            document.getElementById('dash-abertos').innerText = `🔴 ${abertos}`;
+            document.getElementById('dash-follow').innerText = `🟡 ${follow}`;
+            document.getElementById('dash-ok').innerText = `🟢 ${resolvidos}`;
         });
     }
+
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
-    // ==========================================
-    // PREENCHIMENTO E LÓGICA DO CARD
-    // ==========================================
+    function gerarPassagemTurno() {
+        if (chamadosDoTurno.length === 0) {
+            alert("Nenhum chamado no plantão para gerar passagem.");
+            return;
+        }
+        
+        let estadoRecente = {};
+        chamadosDoTurno.forEach(log => {
+            if (log.form) {
+                let chave = `${log.form.cliente}-${log.form.host}`;
+                if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                    estadoRecente[chave] = log;
+                }
+            }
+        });
+
+        let textoPassagem = `📋 *PASSAGEM DE TURNO - ITS NOC*\nData: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+        let temPendencia = false;
+
+        for (let chave in estadoRecente) {
+            let log = estadoRecente[chave];
+            let acao = log.assunto.split(' | ')[5] || '';
+            
+            if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
+                temPendencia = true;
+                let icone = '🔴';
+                if (log.form.status === 'FOLLOW-UP') icone = '🟡';
+                
+                textoPassagem += `${icone} *[${log.form.status}]* ${log.form.cliente} - ${log.form.host}\n`;
+                if (log.form.termino) { textoPassagem += `   SLA: ${log.form.termino}\n`; }
+                textoPassagem += `   Serviço: ${log.form.item.replace(/\n/g, ' ')}\n\n`;
+            }
+        }
+
+        if (!temPendencia) { textoPassagem += "✅ Nenhuma pendência em aberto ou follow-up no momento.\n"; }
+
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = textoPassagem;
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempTextarea);
+        
+        mostrarToast("📋 Passagem de turno copiada para a área de transferência!", "info");
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
+            if (e.key !== 'Escape') return;
+        }
+
+        if (e.key === 'Escape') {
+            if (modalAberto) fecharAlertaBloqueante();
+            fecharHistorico();
+        }
+        
+        if (e.ctrlKey && e.shiftKey) {
+            const key = e.key.toLowerCase();
+            if (key === 'a') { e.preventDefault(); copiarAssuntoAcao(); }
+            if (key === 'i') { e.preventDefault(); copyAsImage(); }
+            if (key === 'x') { e.preventDefault(); copyITSSM(); }
+        }
+    });
+
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
         "RESOLVIDO": "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."
     };
 
-    function inserirTemplate() {
-        const s = document.getElementById('status').value; const sev = document.getElementById('severidade').value; const desc = document.getElementById('desc');
-        if (desc.value.trim() !== "" && !confirm("Substituir o texto atual?")) return;
-        let final = templates[s];
-        if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
-        desc.value = final; update();
+    const macroLibrary = {
+        "fibra": "Atualização de Status: Informamos que nossa equipe técnica identificou um rompimento de fibra óptica na região.\n\nA equipe de campo da operadora já foi acionada e encontra-se em tratativa para realizar o reparo (fusão). Manteremos o acompanhamento rigoroso do SLA até a normalização.",
+        "energia": "Atualização de Status: Identificamos que a indisponibilidade é decorrente de uma falha massiva no fornecimento de energia elétrica (concessionária local) na região do site.\n\nOs equipamentos de rede encontram-se sem alimentação. Estamos monitorando e aguardamos o restabelecimento da energia para normalização do circuito.",
+        "monitoramento": "Atualização de Status: A operadora informou a conclusão das intervenções na região. Os serviços restabeleceram comunicação e respondem aos testes.\n\nNo momento, manteremos o circuito em período de observação e monitoramento contínuo para garantir a estabilidade antes do encerramento final do incidente.",
+        "n2": "Atualização de Status: O incidente foi escalonado internamente para a nossa equipe de Engenharia Avançada (N2) para uma análise mais aprofundada da falha.\n\nEstamos investigando logs e rotas para identificar a causa raiz. Enviaremos um novo parecer técnico assim que tivermos atualizações.",
+        "confirmacao": "Atualização de Status: Nossas ferramentas de monitoramento indicam o restabelecimento e a estabilização dos serviços no host supracitado.\n\nSolicitamos a gentileza de realizarem testes internos e confirmarem se o acesso foi devidamente normalizado do lado de vocês para procedermos com o encerramento."
+    };
+
+    function aplicarMacro(macroKey) {
+        if (!macroKey) return; 
+
+        const desc = document.getElementById('desc');
+        if (desc.value.trim() !== "" && !confirm("Deseja substituir o texto atual por este Template?")) {
+            document.getElementById('macro-select').value = ""; 
+            return;
+        }
+
+        if (macroKey === 'padrao') {
+            const s = document.getElementById('status').value;
+            const sev = document.getElementById('severidade').value;
+            let final = templates[s];
+            if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
+            desc.value = final;
+        } else {
+            desc.value = macroLibrary[macroKey];
+        }
+        
+        document.getElementById('macro-select').value = ""; 
+        update();
     }
 
-    function mudarStatus() { if (document.getElementById('status').value === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; } update(); }
+    function inserirTemplate() {
+        aplicarMacro('padrao');
+    }
+
+    function mudarStatus() {
+        if (document.getElementById('status').value === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; }
+        update();
+    }
+
     function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
-    function inserirDataPicker(idTexto, valor) { if (!valor) return; const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; const input = document.getElementById(idTexto); input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update(); }
-    function preencherAgoraText(idTexto) { const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; const input = document.getElementById(idTexto); input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update(); }
+    function inserirDataPicker(idTexto, valor) {
+        if (!valor) return;
+        const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`;
+        const input = document.getElementById(idTexto);
+        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt;
+        update();
+    }
+    function preencherAgoraText(idTexto) {
+        const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        const input = document.getElementById(idTexto);
+        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt;
+        update();
+    }
+
     function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
 
-    function obterAssinaturaFormulario() {
+    function obterAssuntoGerado() {
         const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
         const host = document.getElementById('host').value.toUpperCase() || 'HOST';
         let itemRaw = document.getElementById('item').value.toUpperCase().trim();
@@ -1038,10 +1364,12 @@
         const severidade = document.getElementById('severidade').value;
         const statusSelect = document.getElementById('status').value;
         let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+        
         const agora = new Date();
         const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'});
         const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
         const timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
+
         return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
     }
 
@@ -1080,127 +1408,233 @@
         const topBorder = document.getElementById('render-header-cell');
 
         if (modoAtual === 'infra') {
-            labelTerminoForm = 'Término da Ocorrência'; tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA'; tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
+            labelTerminoForm = 'Término da Ocorrência';
+            tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA';
+            tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
             document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais <strong>(Bloco Cinza)</strong>";
-            document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace"; document.getElementById('v-desc').style.fontSize = "12px";
-            headerBg.setAttribute('bgcolor', '#1E293B'); topBorder.style.borderTop = '8px solid #0284C7'; 
+            document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
+            document.getElementById('v-desc').style.fontSize = "12px";
+            
+            headerBg.setAttribute('bgcolor', '#1E293B'); 
+            topBorder.style.borderTop = '8px solid #0284C7'; 
+            
         } else {
             document.getElementById('label-desc').innerText = "Ações / Diagnóstico";
-            document.getElementById('v-desc').style.fontFamily = "inherit"; document.getElementById('v-desc').style.fontSize = "13px";
-            if (status === 'RESOLVIDO') { labelTerminoForm = 'Fim da Ocorrência'; tituloTerminoBox = 'FIM DA OCORRÊNCIA'; } else { labelTerminoForm = 'Previsão de Normalização (SLA)'; tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)'; }
-            headerBg.setAttribute('bgcolor', '#002D5B'); topBorder.style.borderTop = '8px solid #DC2626'; 
+            document.getElementById('v-desc').style.fontFamily = "inherit";
+            document.getElementById('v-desc').style.fontSize = "13px";
+
+            if (status === 'RESOLVIDO') {
+                labelTerminoForm = 'Fim da Ocorrência';
+                tituloTerminoBox = 'FIM DA OCORRÊNCIA';
+            } else {
+                labelTerminoForm = 'Previsão de Normalização (SLA)';
+                tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)';
+            }
+            
+            headerBg.setAttribute('bgcolor', '#002D5B'); 
+            topBorder.style.borderTop = '8px solid #DC2626'; 
         }
         
-        document.getElementById('label-termino').innerText = labelTerminoForm; document.getElementById('v-titulo-termino').innerText = tituloTerminoBox; document.getElementById('v-titulo-desc').innerText = tituloDescBox;
+        document.getElementById('label-termino').innerText = labelTerminoForm;
+        document.getElementById('v-titulo-termino').innerText = tituloTerminoBox;
+        document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
-        let bgColor, textColor, badgeTexto, tituloTexto;
+        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
         
-        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
-        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
-        else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
+        if (status === 'RESOLVIDO') { 
+            bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO';
+            tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`;
+        } else if (status === 'EM ABERTO') { 
+            bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO';
+            tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`;
+        } else { 
+            bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP';
+            tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`;
+        }
 
-        const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
+        const formContainer = document.getElementById('form-container');
+        const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
-        if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); tituloForm.innerText = modoAtual === 'link' ? "🚨 Gestão de Link/Ping (CRITICAL)" : "🚨 Infra / Aplicações (CRITICAL)"; } 
-        else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); tituloForm.innerText = modoAtual === 'link' ? "⚠️ Gestão de Link/Ping (INTERMITENTE)" : "⚠️ Infra / Aplicações (INTERMITENTE)"; } 
-        else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); tituloForm.innerText = modoAtual === 'link' ? "✅ Gestão de Link/Ping (NORMALIZADO)" : "✅ Infra / Aplicações (NORMALIZADO)"; } 
-        else { tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link/Ping" : "Infra / Aplicações"; }
+        if (severidade === 'CRITICAL') {
+            formContainer.classList.add('fogo-no-parquinho');
+            tituloForm.innerText = modoAtual === 'link' ? "🚨 Gestão de Link/Ping (CRITICAL)" : "🚨 Infra / Aplicações (CRITICAL)";
+        } else if (severidade === 'INTERMITENTE') {
+            formContainer.classList.add('alerta-laranja');
+            tituloForm.innerText = modoAtual === 'link' ? "⚠️ Gestão de Link/Ping (INTERMITENTE)" : "⚠️ Infra / Aplicações (INTERMITENTE)";
+        } else if (severidade === 'OK') {
+            formContainer.classList.add('alerta-verde');
+            tituloForm.innerText = modoAtual === 'link' ? "✅ Gestão de Link/Ping (NORMALIZADO)" : "✅ Infra / Aplicações (NORMALIZADO)";
+        } else {
+            tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link/Ping" : "Infra / Aplicações";
+        }
 
         const headerCell = document.getElementById('render-header-cell');
-        if (logosClientes[vCliente]) { headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;"></td></tr></table>`; } 
-        else { headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" width="160" style="display: block; margin: 0 auto;">`; }
+        if (logosClientes[vCliente]) {
+            headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;"></td></tr></table>`;
+        } else {
+            headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" width="160" style="display: block; margin: 0 auto;">`;
+        }
 
-        document.getElementById('v-titulo').innerText = tituloTexto; document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
-        document.getElementById('v-host').innerText = vHost; document.getElementById('v-inicio').innerText = vInicio;
-        document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid); document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
+        document.getElementById('v-titulo').innerText = tituloTexto;
+        document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
+        document.getElementById('v-host').innerText = vHost;
+        document.getElementById('v-inicio').innerText = vInicio;
+        document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid);
+        document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
 
         const dynamicGrid = document.getElementById('v-dynamic-grid');
         const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
         
         if (modoAtual === 'link') {
-            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vProtocolo}</div></td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="12"><td></td></tr><tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vSolucionador}</div></td><td></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vProtocolo}</div></td>
+                    <td width="4%"></td>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td>
+                </tr>
+                <tr height="12"><td></td></tr>
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vSolucionador}</div></td>
+                    <td></td>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td>
+                </tr>
+            `;
         } else {
-            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td>
+                    <td width="4%"></td>
+                    <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td>
+                </tr>
+            `;
         }
 
-        if (vStatusInfo) { document.getElementById('statusinfo-container').style.display = 'block'; document.getElementById('v-statusinfo').innerHTML = formatarColchetes(vStatusInfo.replace(/\n/g, '<br>')); } else { document.getElementById('statusinfo-container').style.display = 'none'; }
-        if (vPressplay && modoAtual === 'infra') { document.getElementById('pressplay-container').style.display = 'block'; document.getElementById('v-pressplay').innerHTML = formatarColchetes(vPressplay.replace(/\n/g, '<br>')); } else { document.getElementById('pressplay-container').style.display = 'none'; }
-        if (vDesc) { document.getElementById('detalhamento-container').style.display = 'block'; document.getElementById('v-desc').innerHTML = formatarColchetes(vDesc.replace(/\n/g, '<br>')); } else { document.getElementById('detalhamento-container').style.display = modoAtual === 'link' ? 'block' : 'none'; document.getElementById('v-desc').innerHTML = 'Aguardando atualização técnica...'; }
+        if (vStatusInfo) {
+            document.getElementById('statusinfo-container').style.display = 'block';
+            document.getElementById('v-statusinfo').innerHTML = formatarColchetes(vStatusInfo.replace(/\n/g, '<br>'));
+        } else {
+            document.getElementById('statusinfo-container').style.display = 'none';
+        }
+
+        if (vPressplay && modoAtual === 'infra') {
+            document.getElementById('pressplay-container').style.display = 'block';
+            document.getElementById('v-pressplay').innerHTML = formatarColchetes(vPressplay.replace(/\n/g, '<br>'));
+        } else {
+            document.getElementById('pressplay-container').style.display = 'none';
+        }
+
+        if (vDesc) {
+            document.getElementById('detalhamento-container').style.display = 'block';
+            document.getElementById('v-desc').innerHTML = formatarColchetes(vDesc.replace(/\n/g, '<br>'));
+        } else {
+            document.getElementById('detalhamento-container').style.display = modoAtual === 'link' ? 'block' : 'none';
+            document.getElementById('v-desc').innerHTML = 'Aguardando atualização técnica...';
+        }
+        
         document.getElementById('evidencias-container').style.display = temEvidencias ? 'block' : 'none';
-        if (vObs) { document.getElementById('obs-container').style.display = 'block'; document.getElementById('v-obs').innerHTML = formatarColchetes(vObs.replace(/\n/g, '<br>')); } else { document.getElementById('obs-container').style.display = 'none'; }
+        
+        if (vObs) {
+            document.getElementById('obs-container').style.display = 'block';
+            document.getElementById('v-obs').innerHTML = formatarColchetes(vObs.replace(/\n/g, '<br>'));
+        } else {
+            document.getElementById('obs-container').style.display = 'none';
+        }
 
-        try{ salvarRascunho(); }catch(e){}
-    }
-
-    // ==========================================
-    // FUNÇÕES DE CÓPIA - APENAS IMAGEM SALVA HISTÓRICO!
-    // ==========================================
-    function registrarHistoricoNuvem(assunto) {
-        if(!currentUser) return;
-        const formData = {
-            modo: modoAtual, cliente: document.getElementById('cliente').value, host: document.getElementById('host').value,
-            item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
-            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, 
-            status: document.getElementById('status').value, protocolo: document.getElementById('protocolo').value, 
-            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, 
-            termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
-            solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, 
-            evidencias: document.getElementById('evidencias').checked 
-        };
-        db.ref('historico_noc').push({
-            tipo: 'relatorio', nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
-            hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-            timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
-        });
+        try { salvarRascunho(); } catch(e){}
     }
 
     function copyITSSM() {
-        const vHost = document.getElementById('host').value || '---'; const vInicio = document.getElementById('inicio').value || '---';
-        const vFgrid = document.getElementById('f-grid').value || '-'; const vTermino = document.getElementById('termino').value || '-';
-        const vCliente = document.getElementById('cliente').value || '---'; const vStatusInfo = document.getElementById('statusinfo').value.trim();
-        let textoITSSM = `Host: ${vHost}\nInício da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\nCliente: ${vCliente}\n`;
-        if (vStatusInfo) { textoITSSM += `\nDados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`; }
-        const vPressplay = document.getElementById('pressplay').value.trim(); if (modoAtual === 'infra' && vPressplay) { textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`; }
-        const vSolucionador = document.getElementById('solucionador').value.trim(); if (vSolucionador) { const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)'; textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`; }
-        const vDesc = document.getElementById('desc').value.trim(); if (vDesc) { const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico'; textoITSSM += `\n${labelDesc}:\n${vDesc}\n`; }
-        const vObs = document.getElementById('obs').value.trim(); if (vObs) { textoITSSM += `\nObservação:\n${vObs}\n`; }
+        const vHost = document.getElementById('host').value || '---';
+        const vInicio = document.getElementById('inicio').value || '---';
+        const vFgrid = document.getElementById('f-grid').value || '-';
+        const vTermino = document.getElementById('termino').value || '-';
+        const vCliente = document.getElementById('cliente').value || '---';
+        const vStatusInfo = document.getElementById('statusinfo').value.trim();
+
+        let textoITSSM = `Host: ${vHost}\n`;
+        textoITSSM += `Início da ocorrência: ${vInicio}\n`;
+        textoITSSM += `Follow-up da ocorrência: ${vFgrid}\n`;
+        textoITSSM += `Término da ocorrência: ${vTermino}\n`;
+        textoITSSM += `Cliente: ${vCliente}\n`;
         
+        if (vStatusInfo) {
+            textoITSSM += `\nDados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`;
+        }
+
+        const vPressplay = document.getElementById('pressplay').value.trim();
+        if (modoAtual === 'infra' && vPressplay) {
+            textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`;
+        }
+
+        const vSolucionador = document.getElementById('solucionador').value.trim();
+        if (vSolucionador) {
+            const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)';
+            textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`;
+        }
+
+        const vDesc = document.getElementById('desc').value.trim();
+        if (vDesc) {
+            const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico';
+            textoITSSM += `\n${labelDesc}:\n${vDesc}\n`;
+        }
+
+        const vObs = document.getElementById('obs').value.trim();
+        if (vObs) {
+            textoITSSM += `\nObservação:\n${vObs}\n`;
+        }
+
         try {
-            const tempTextarea = document.createElement("textarea"); tempTextarea.value = textoITSSM;
-            document.body.appendChild(tempTextarea); tempTextarea.select(); document.execCommand("copy"); document.body.removeChild(tempTextarea);
+            const tempTextarea = document.createElement("textarea");
+            tempTextarea.value = textoITSSM;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextarea);
             mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info");
         } catch(e) {}
     }
 
     function copiarAssuntoAcao() {
         try {
-            const assunto = obterAssuntoGerado(); const tempInput = document.createElement("input");
-            tempInput.value = assunto; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
+            const assunto = obterAssuntoGerado();
+            const tempInput = document.createElement("input");
+            tempInput.value = assunto; document.body.appendChild(tempInput);
+            tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
             mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info");
-        } catch(e) {}
+        } catch(e){}
     }
 
     function copyHTML() {
-        const status = document.getElementById('status').value; const protocolo = document.getElementById('protocolo');
+        const status = document.getElementById('status').value;
+        const protocolo = document.getElementById('protocolo');
+        
         if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
             alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento no modo Link/Ping.');
-            protocolo.classList.add('erro-validacao'); protocolo.focus(); setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000); return; 
+            protocolo.classList.add('erro-validacao'); protocolo.focus();
+            setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
+            return; 
         }
+
         try {
-            const node = document.getElementById('render'); const range = document.createRange(); range.selectNode(node);
-            window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges();
+            const node = document.getElementById('render');
+            const range = document.createRange(); range.selectNode(node);
+            window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
+            document.execCommand('copy'); window.getSelection().removeAllRanges();
             mostrarToast("📋 HTML COPIADO COM SUCESSO!", "info");
-        } catch(e) {}
+        } catch(e){}
     }
 
-    // A ÚNICA FUNÇÃO QUE REGISTRA NO HISTÓRICO 
     function copyAsImage() {
-        const status = document.getElementById('status').value; const protocolo = document.getElementById('protocolo');
+        const status = document.getElementById('status').value;
+        const protocolo = document.getElementById('protocolo');
+        
         if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
             alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora.');
-            protocolo.classList.add('erro-validacao'); protocolo.focus(); setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000); return; 
+            protocolo.classList.add('erro-validacao'); protocolo.focus();
+            setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000);
+            return; 
         }
 
         const assinaturaAtual = obterAssinaturaFormulario();
@@ -1212,7 +1646,9 @@
 
         const btn = document.getElementById('btn-copiar-img');
         const originalText = btn.innerHTML; btn.innerHTML = '⏳ GERANDO...';
-        const node = document.getElementById('render'); const clone = node.cloneNode(true);
+
+        const node = document.getElementById('render');
+        const clone = node.cloneNode(true);
         clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px';
         clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
@@ -1221,49 +1657,74 @@
             canvas.toBlob(blob => {
                 try {
                     const item = new ClipboardItem({ "image/png": blob });
-                    navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM COPIADA E SALVA NO HISTÓRICO!", "success"); });
-                } catch (err) { alert("A cópia automática de imagem não é suportada."); btn.innerHTML = originalText; }
+                    navigator.clipboard.write([item]).then(() => {
+                        btn.innerHTML = originalText;
+                        mostrarToast("📸 IMAGEM COPIADA E SALVA NO HISTÓRICO!", "success");
+                    });
+                } catch (err) {
+                    alert("A cópia automática de imagem não é suportada por este navegador.");
+                    btn.innerHTML = originalText;
+                }
             });
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
     function limparFormulario() {
-        if(confirm("Deseja limpar todos os campos?")) {
-            document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-            document.getElementById('status').value = 'EM ABERTO'; document.getElementById('severidade').value = 'WARNING';
-            document.getElementById('evidencias').checked = false; document.getElementById('protocolo').classList.remove('erro-validacao');
-            try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
-            ultimaAssinaturaGerada = ''; update();
-        }
-    }
-
-    function salvarRascunho() {
-        const rascunho = {
-            modo: modoAtual, cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value,
-            host: document.getElementById('host').value, status: document.getElementById('status').value, item: document.getElementById('item').value, 
-            protocolo: document.getElementById('protocolo').value, solucionador: document.getElementById('solucionador').value, 
-            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
-            desc: document.getElementById('desc').value, obs: document.getElementById('obs').value, statusinfo: document.getElementById('statusinfo').value, 
-            pressplay: document.getElementById('pressplay').value, evidencias: document.getElementById('evidencias').checked 
+        backupFormulario = {
+            cliente: document.getElementById('cliente').value,
+            host: document.getElementById('host').value,
+            item: document.getElementById('item').value,
+            severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value,
+            pressplay: document.getElementById('pressplay').value,
+            status: document.getElementById('status').value,
+            protocolo: document.getElementById('protocolo').value,
+            inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value,
+            termino: document.getElementById('termino').value,
+            solucionador: document.getElementById('solucionador').value,
+            obs: document.getElementById('obs').value,
+            desc: document.getElementById('desc').value,
+            evidencias: document.getElementById('evidencias').checked
         };
-        try { localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho)); } catch(e){}
+
+        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+        document.getElementById('status').value = 'EM ABERTO';
+        document.getElementById('severidade').value = 'WARNING';
+        document.getElementById('evidencias').checked = false; 
+        document.getElementById('protocolo').classList.remove('erro-validacao');
+        
+        const macroSel = document.getElementById('macro-select');
+        if (macroSel) macroSel.value = '';
+        
+        try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
+        ultimaAssinaturaGerada = ''; 
+        update();
+        
+        mostrarToast(`🗑️ Formulário limpo. <span class="btn-undo" onclick="desfazerLimpeza()">DESFAZER</span>`, 'warning', 10000);
     }
 
-    function carregarRascunho() {
-        try {
-            const salvo = localStorage.getItem('noc_rascunho_its');
-            if (salvo) {
-                const rascunho = JSON.parse(salvo); if (rascunho.modo) modoAtual = rascunho.modo; 
-                document.getElementById('cliente').value = rascunho.cliente || ''; document.getElementById('severidade').value = rascunho.severidade || 'WARNING';
-                document.getElementById('host').value = rascunho.host || ''; document.getElementById('status').value = rascunho.status || 'EM ABERTO';
-                document.getElementById('item').value = rascunho.item || ''; document.getElementById('protocolo').value = rascunho.protocolo || '';
-                document.getElementById('solucionador').value = rascunho.solucionador || ''; document.getElementById('inicio').value = rascunho.inicio || '';
-                document.getElementById('f-grid').value = rascunho.fgrid || ''; document.getElementById('termino').value = rascunho.termino || '';
-                document.getElementById('desc').value = rascunho.desc || ''; document.getElementById('obs').value = rascunho.obs || '';
-                document.getElementById('statusinfo').value = rascunho.statusinfo || ''; document.getElementById('pressplay').value = rascunho.pressplay || ''; 
-                document.getElementById('evidencias').checked = rascunho.evidencias || false; 
-            }
-        } catch(e) { console.error("Erro ao carregar rascunho.", e); }
+    window.desfazerLimpeza = function() {
+        if (!backupFormulario) return;
+        document.getElementById('cliente').value = backupFormulario.cliente;
+        document.getElementById('host').value = backupFormulario.host;
+        document.getElementById('item').value = backupFormulario.item;
+        document.getElementById('severidade').value = backupFormulario.severidade;
+        document.getElementById('statusinfo').value = backupFormulario.statusinfo;
+        document.getElementById('pressplay').value = backupFormulario.pressplay;
+        document.getElementById('status').value = backupFormulario.status;
+        document.getElementById('protocolo').value = backupFormulario.protocolo;
+        document.getElementById('inicio').value = backupFormulario.inicio;
+        document.getElementById('f-grid').value = backupFormulario.fgrid;
+        document.getElementById('termino').value = backupFormulario.termino;
+        document.getElementById('solucionador').value = backupFormulario.solucionador;
+        document.getElementById('obs').value = backupFormulario.obs;
+        document.getElementById('desc').value = backupFormulario.desc;
+        document.getElementById('evidencias').checked = backupFormulario.evidencias;
+        
+        backupFormulario = null;
+        update();
+        mostrarToast("✅ Ação desfeita! Dados restaurados.", "success");
     }
 
     function toggleTheme() {
