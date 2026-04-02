@@ -503,17 +503,17 @@
                         
                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                             <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div></td>
-                                <td width="4%"></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800;">---</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div></td>
+                                <td width="8%"></td>
+                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800;">---</div></td>
                             </tr>
-                            <tr height="12"><td></td></tr>
+                            <tr height="15"><td></td></tr>
                             <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 13px; color: #334155; font-weight: 500;">---</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 13px; color: #334155; font-weight: 500;">---</div></td>
                                 <td></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 13px; color: #334155; font-weight: 500;">-</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 13px; color: #334155; font-weight: 500;">-</div></td>
                             </tr>
-                            <tr height="12"><td></td></tr>
+                            <tr height="15"><td></td></tr>
                             <tbody id="v-dynamic-grid"></tbody>
                         </table>
 
@@ -540,7 +540,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr><td align="center" bgcolor="#F8FAFC" style="padding: 20px; border-top: 1px solid #E2E8F0; color: #94A3B8; font-size: 11px; letter-spacing: 0.05em;">SISTEMA DE GESTÃO NOC • <strong>ITS SOLUÇÕES</strong></td></tr>
+                <tr><td align="center" bgcolor="#F8FAFC" style="padding: 20px; border-top: 1px solid #E2E8F0; color: #64748B; font-size: 11px; letter-spacing: 0.05em; line-height: 1.6;">SISTEMA DE GESTÃO NOC • <strong style="color: #002D5B;">ITS SOLUÇÕES</strong><br><span style="font-size: 11px; color: #475569;">📞 Dúvidas? Ligue para nosso SOC/NOC: <strong>(11) 2202 0950</strong></span></td></tr>
             </table>
         </div>
     </div>
@@ -1031,7 +1031,6 @@
         document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
     }
 
-    // GERADOR DE RESUMO DE PENDÊNCIAS (PASSAGEM DE PLANTÃO)
     window.gerarPassagemPlantao = function() {
         if (chamadosDoTurno.length === 0) { mostrarToast("Não há chamados neste plantão.", "warning"); return; }
 
@@ -1049,7 +1048,7 @@
         for (let chave in estadoRecente) {
             let log = estadoRecente[chave];
             let status = log.form.status;
-            if (status === 'RESOLVIDO') continue; // Ignora encerrados
+            if (status === 'RESOLVIDO') continue; 
 
             let modo = log.form.modo || 'link';
             let cliente = log.form.cliente || 'N/A';
@@ -1082,14 +1081,12 @@
         
         if (chamadosDoTurno.length === 0) { lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>'; return; }
 
-        // Filtro de Visão (Meus/Equipe)
         if (visaoHistorico === 'meus') { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => currentUser && c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); 
         } else { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
-        // Filtro de Texto (Busca)
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -1101,7 +1098,6 @@
             });
         }
 
-        // Filtro Rápido (Chips)
         if (filtroAtivo !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') return false; 
@@ -1115,7 +1111,6 @@
             });
         }
 
-        // Descobre quais hosts já foram resolvidos hoje para não deixar o card vermelho atoa
         let hostsResolvidos = new Set();
         chamadosDoTurno.forEach(log => {
             if(log.form && log.form.status === 'RESOLVIDO') hostsResolvidos.add(`${log.form.cliente}-${log.form.host}`);
@@ -1167,7 +1162,6 @@
             else if(log.form.severidade === 'INTERMITENTE') ledSeveridade = '🟠';
             else if(log.form.severidade === 'UNKNOWN') ledSeveridade = '🟣';
 
-            // Lógica do Termômetro Visual
             let ageClass = ''; let ageBadge = '';
             let isResolvidoHoje = hostsResolvidos.has(`${log.form.cliente}-${log.form.host}`);
             
@@ -1272,7 +1266,6 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
-    // Apenas a IMAGEM aciona esta função
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
@@ -1361,7 +1354,6 @@
     window.mudarStatus = function() { 
         const status = document.getElementById('status').value; 
         
-        // Autopreenchimento de Relógio Inteligente
         const d = new Date(); 
         const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
         
@@ -1431,17 +1423,22 @@
 
         if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
 
-        let corSeveridade = '#64748B'; 
-        if(severidade === 'CRITICAL') corSeveridade = '#DC2626'; if(severidade === 'WARNING') corSeveridade = '#D97706'; if(severidade === 'INTERMITENTE') corSeveridade = '#EA580C'; if(severidade === 'OK') corSeveridade = '#166534'; 
+        // Configurando as cores da Severidade para o novo Badge Sólido
+        let bgSeveridade = '#64748B'; 
+        if(severidade === 'CRITICAL') bgSeveridade = '#DC2626'; 
+        if(severidade === 'WARNING') bgSeveridade = '#D97706'; 
+        if(severidade === 'INTERMITENTE') bgSeveridade = '#EA580C'; 
+        if(severidade === 'OK') bgSeveridade = '#166534'; 
+        
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
+        let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
 
         let labelTerminoForm = ''; let tituloTerminoBox = ''; let tituloDescBox = 'DETALHAMENTO';
         const headerBg = document.getElementById('v-header-bg'); const topBorder = document.getElementById('render-header-cell');
 
-        // Lógica de Cor do Cabeçalho Dinâmico
-        let headerBgColor = '#002D5B'; // Azul ITS default (Follow-up)
-        if (status === 'EM ABERTO') headerBgColor = '#B91C1C'; // Vermelho
-        if (status === 'RESOLVIDO') headerBgColor = '#166534'; // Verde
+        let headerBgColor = '#002D5B'; 
+        if (status === 'EM ABERTO') headerBgColor = '#B91C1C'; 
+        if (status === 'RESOLVIDO') headerBgColor = '#166534'; 
 
         if (modoAtual === 'infra') {
             labelTerminoForm = 'Término da Ocorrência'; tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA'; tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
@@ -1474,10 +1471,8 @@
 
         const headerCell = document.getElementById('render-header-cell');
         if (logosClientes[vCliente]) { 
-            // CORREÇÃO: Altura das logos duplas aumentada para 80px e adicionado max-width
             headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 100px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td></tr></table>`; 
         } else { 
-            // CORREÇÃO: Altura da logo única aumentada para 90px
             headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" style="height: 90px; max-width: 300px; width: auto; display: block; margin: 0 auto;">`; 
         }
 
@@ -1489,9 +1484,9 @@
         const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
         
         if (modoAtual === 'link') {
-            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="12"><td></td></tr><tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
+            dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="15"><td></td></tr><tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
         } else {
-            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
+            dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
         }
 
         if (vStatusInfo) { document.getElementById('statusinfo-container').style.display = 'block'; document.getElementById('v-statusinfo').innerHTML = formatarColchetes(vStatusInfo.replace(/\n/g, '<br>')); } 
