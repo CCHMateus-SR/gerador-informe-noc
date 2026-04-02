@@ -198,7 +198,7 @@
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
 
         .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
-        .btn-danger-its:hover { background-color: #991B1B; transform: translateY(-2px); }
+        .btn-danger-its:hover { background: #991B1B; transform: translateY(-2px); }
         .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
         .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
@@ -233,7 +233,9 @@
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
     <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
         <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
-        <div id="texto-alerta" style="margin-bottom: 0; text-align: left;"></div>
+        <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;"></div>
+        
+        <div id="botoes-alerta"></div>
     </div>
 </div>
 
@@ -307,7 +309,6 @@
             <div class="top-controls">
                 <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
-                <button class="btn-theme" title="Copiar Passagem de Turno" onclick="gerarPassagemTurno()">📋</button>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="toggleTheme()">🌙</button>
             </div>
@@ -429,10 +430,10 @@
             <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
-            <button class="btn-copy-subject" id="btn-assunto" title="Atalho: Ctrl+Shift+A" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" title="Atalho: Ctrl+Shift+I" onclick="copyAsImage()">📸 IMAGEM</button>
-            <button class="btn-copy-itssm" id="btn-copiar-itssm" title="Atalho: Ctrl+Shift+X" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
+            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
+            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
 
@@ -515,7 +516,7 @@
     let chamadosSilenciadosSLA = new Set(); 
     let backupFormulario = null; 
 
-    // Health Check
+    // Módulo de Checagem Online nativo do Navegador (Sem travar F5)
     function atualizarStatusConexao() {
         const statusEl = document.getElementById('conexao-status');
         if (!statusEl) return;
@@ -541,34 +542,37 @@
     }
 
     // ==========================================
-    // SISTEMA DE LOGIN COM BLINDAGEM ANTI-CRASH
+    // SISTEMA DE LOGIN E INICIALIZAÇÃO BLINDADOS
     // ==========================================
     let currentUser = null;
-    try {
-        const rawUser = localStorage.getItem('noc_user_info');
-        if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
-            currentUser = JSON.parse(rawUser);
-        }
-    } catch (e) {
-        localStorage.removeItem('noc_user_info');
-    }
+    let timestampCarregamento = Date.now(); // Ponto de ancoragem para notificações futuras
 
     window.onload = function() {
         atualizarStatusConexao();
+        
+        try {
+            const salvo = localStorage.getItem('noc_user_info');
+            if (salvo && salvo !== "undefined" && salvo !== "null") {
+                currentUser = JSON.parse(salvo);
+            }
+        } catch (e) {
+            localStorage.removeItem('noc_user_info');
+        }
+
         try {
             document.getElementById('severidade').value = 'WARNING'; 
             carregarRascunho();
             setModo(modoAtual); 
-            
-            if (!currentUser) {
-                document.getElementById('modal-login').style.display = 'flex';
-            } else {
-                document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
-                document.getElementById('history-container').style.display = 'block';
-                iniciarListenerHistorico();
-                iniciarMonitoramentoSLA();
-            }
         } catch(e) {}
+        
+        if (!currentUser) {
+            document.getElementById('modal-login').style.display = 'flex';
+        } else {
+            document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
+            document.getElementById('history-container').style.display = 'block';
+            iniciarListenerHistorico();
+            iniciarMonitoramentoSLA();
+        }
     };
 
     function salvarLogin() {
@@ -613,7 +617,6 @@
             toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
         } else if (tipo === 'warning') {
             toast.classList.add('toast-warning');
-            toast.style.pointerEvents = 'auto'; 
         } else {
             toast.style.pointerEvents = 'none';
         }
@@ -659,20 +662,19 @@
     }
 
     // ==========================================
-    // SISTEMA DE SLA (SÓ LINK) E SILENCIAR
+    // SISTEMA DE SLA E CONVERSÃO DE MINUTOS
     // ==========================================
     function formatarTempoSLA(minutosTotais) {
         let mins = Math.floor(minutosTotais);
-        if (mins < 60) return `${mins} minutos`;
+        if (mins < 60) return `${mins} minuto${mins !== 1 ? 's' : ''}`;
         
         let horas = Math.floor(mins / 60);
         let minsRestantes = mins % 60;
         
         let textoHoras = horas === 1 ? '1 hora' : `${horas} horas`;
-        let textoMins = minsRestantes === 1 ? '1 minuto' : `${minsRestantes} minutos`;
+        let textoMins = minsRestantes === 0 ? '' : (minsRestantes === 1 ? ' e 1 minuto' : ` e ${minsRestantes} minutos`);
         
-        if (minsRestantes === 0) return textoHoras;
-        return `${textoHoras} e ${textoMins}`;
+        return `${textoHoras}${textoMins}`;
     }
 
     function iniciarMonitoramentoSLA() {
@@ -722,7 +724,7 @@
 
     function mostrarAlertaBloqueante(mensagemObj) {
         let htmlMensagem = '';
-        let botoesHTML = `<button style="padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
+        let botoesHTML = `<button style="padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); letter-spacing: 0.5px;" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
 
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
@@ -736,9 +738,11 @@
                     </div>
                 </div>
             `;
+            filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'aviso' });
         } else {
             const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
-            const modoLabel = isInfra ? '🖥️ Infra' : '🌐 Link';
+            const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
+            const modoLabel = isInfra ? '🖥️ Infra / Aplicações' : '🌐 Gestão de Link/Ping';
             
             htmlMensagem = `
                 <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
@@ -750,10 +754,9 @@
                     </div>
                 </div>
             `;
+            filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: isCritical ? 'critical' : 'default' });
         }
-
-        filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: mensagemObj.tipo, form: mensagemObj.form });
-        tocarSom(mensagemObj.tipo === 'aviso_rapido' ? 'aviso' : (mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL' ? 'critical' : 'default'));
+        
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -774,12 +777,13 @@
             </div>
         `;
         let botoesHTML = `
-            <button style="flex: 1; padding: 14px; background: #991B1B; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2);" onclick="silenciarSLA('${chave}')">🔕 SILENCIAR HOST</button>
-            <button style="flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 14px; background: white; color: var(--its-red); border: 2px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s;">🔕 SILENCIAR HOST</button>
+                <button onclick="fecharAlertaBloqueante()" style="flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); letter-spacing: 0.5px;">CIENTE 👍</button>
+            </div>
         `;
         
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'sla' });
-        tocarSom('sla');
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -799,6 +803,7 @@
         let proximo = filaDeAlertas[0];
         document.getElementById('texto-alerta').innerHTML = proximo.html;
         document.getElementById('botoes-alerta').innerHTML = proximo.botoes;
+        tocarSom(proximo.tipo);
         document.getElementById('modal-alerta').style.display = 'flex';
     }
 
@@ -807,11 +812,13 @@
         exibirProximoAlerta(); 
     }
 
-    let isInitialLoad = true;
-    db.ref('historico_noc').orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
-        if (isInitialLoad) { isInitialLoad = false; return; }
+    // Listener de Alertas blindado para capturar apenas eventos NOVOS após a página carregar
+    db.ref('historico_noc').orderByChild('timestamp').startAt(timestampCarregamento).on('child_added', (snapshot) => {
         const data = snapshot.val();
-        if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
+        if (data.timestamp <= timestampCarregamento) return; // Garante que não apite os velhos
+        if (currentUser && data.nome !== currentUser.nome) { 
+            mostrarAlertaBloqueante(data); 
+        }
     });
 
     // ==========================================
@@ -964,7 +971,6 @@
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
-        // LÓGICA DE BUSCA BLINDADA
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -1138,41 +1144,6 @@
         });
     }
 
-    // ==========================================
-    // EXCEL E HISTORICO (TELA CHEIA)
-    // ==========================================
-    function sanearCSV(str) {
-        if (!str) return '-';
-        return str.toString().replace(/"/g, '""').replace(/\n/g, ' ');
-    }
-
-    function exportarParaExcel() {
-        const btn = document.getElementById('btn-exportar');
-        const txtOriginal = btn.innerHTML;
-        btn.innerHTML = '⏳ Baixando...';
-        db.ref('historico_noc').once('value', (snapshot) => {
-            if(!snapshot.exists()) { alert("Nenhum dado encontrado."); btn.innerHTML = txtOriginal; return; }
-            let csvContent = "Data,Hora,Analista,Turno,Modo,Cliente,Host,Servico,Severidade,Acao\n";
-            const logs = [];
-            snapshot.forEach(child => { logs.push(child.val()); });
-            logs.forEach(log => {
-                if (log.tipo === 'aviso_rapido') return; 
-                
-                const p = log.assunto.split(' | ');
-                const dObj = new Date(log.timestamp);
-                csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${sanearCSV(log.nome)}","${sanearCSV(log.turno)}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? sanearCSV(p[0].trim()) : '-'}","${p[1] ? sanearCSV(p[1].trim()) : '-'}","${p[2] ? sanearCSV(p[2].replace(/\n/g, ' ').trim()) : '-'}","${p[3] ? sanearCSV(p[3].trim()) : '-'}","${p[5] ? sanearCSV(p[5].trim()) : '-'}"\n`;
-            });
-            try {
-                const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            } catch(e) {}
-            btn.innerHTML = '✅ Concluído!'; setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
-        });
-    }
-
     function abrirHistorico() {
         document.getElementById('modal-historico').style.display = 'flex';
         const listaHtml = document.getElementById('lista-historico');
@@ -1182,8 +1153,6 @@
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             
-            let abertos = 0, follow = 0, resolvidos = 0;
-
             logs.reverse().forEach(item => {
                 if (item.tipo === 'aviso_rapido') {
                     html += `
@@ -1199,11 +1168,6 @@
                     const corBorda = isInfra ? '#0284C7' : 'var(--its-red)'; 
                     const modoLabel = isInfra ? '🖥️' : '🌐';
                     
-                    const acao = item.assunto.split(' | ')[5] || '';
-                    if(acao.includes('ABERTURA')) abertos++;
-                    else if(acao.includes('FOLLOW')) follow++;
-                    else if(acao.includes('ENCERRAMENTO')) resolvidos++;
-
                     html += `
                     <div class="log-item" style="border-left-color: ${corBorda};">
                         <div class="log-time">
@@ -1215,82 +1179,10 @@
                 }
             });
             listaHtml.innerHTML = html;
-            
-            if(document.getElementById('dash-abertos')) document.getElementById('dash-abertos').innerText = `🔴 ${abertos}`;
-            if(document.getElementById('dash-follow')) document.getElementById('dash-follow').innerText = `🟡 ${follow}`;
-            if(document.getElementById('dash-ok')) document.getElementById('dash-ok').innerText = `🟢 ${resolvidos}`;
         });
     }
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
-
-    // ==========================================
-    // PASSAGEM DE TURNO E HOTKEYS
-    // ==========================================
-    function gerarPassagemTurno() {
-        if (chamadosDoTurno.length === 0) {
-            alert("Nenhum chamado no plantão para gerar passagem.");
-            return;
-        }
-        
-        let estadoRecente = {};
-        chamadosDoTurno.forEach(log => {
-            if (log.form) {
-                let chave = `${log.form.cliente}-${log.form.host}`;
-                if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
-                    estadoRecente[chave] = log;
-                }
-            }
-        });
-
-        let textoPassagem = `📋 *PASSAGEM DE TURNO - ITS NOC*\nData: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
-        let temPendencia = false;
-
-        for (let chave in estadoRecente) {
-            let log = estadoRecente[chave];
-            let acao = log.assunto.split(' | ')[5] || '';
-            
-            if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
-                temPendencia = true;
-                let icone = '🔴';
-                if (log.form.status === 'FOLLOW-UP') icone = '🟡';
-                
-                textoPassagem += `${icone} *[${log.form.status}]* ${log.form.cliente} - ${log.form.host}\n`;
-                if (log.form.termino) { textoPassagem += `   SLA: ${log.form.termino}\n`; }
-                textoPassagem += `   Serviço: ${log.form.item.replace(/\n/g, ' ')}\n\n`;
-            }
-        }
-
-        if (!temPendencia) { textoPassagem += "✅ Nenhuma pendência em aberto ou follow-up no momento.\n"; }
-
-        try {
-            const tempTextarea = document.createElement("textarea");
-            tempTextarea.value = textoPassagem;
-            document.body.appendChild(tempTextarea);
-            tempTextarea.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempTextarea);
-            mostrarToast("📋 Passagem de turno copiada para a área de transferência!", "info");
-        } catch(e) {}
-    }
-
-    document.addEventListener('keydown', function(e) {
-        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
-            if (e.key !== 'Escape') return;
-        }
-
-        if (e.key === 'Escape') {
-            if (modalAberto) fecharAlertaBloqueante();
-            fecharHistorico();
-        }
-        
-        if (e.ctrlKey && e.shiftKey) {
-            const key = e.key.toLowerCase();
-            if (key === 'a') { e.preventDefault(); copiarAssuntoAcao(); }
-            if (key === 'i') { e.preventDefault(); copyAsImage(); }
-            if (key === 'x') { e.preventDefault(); copyITSSM(); }
-        }
-    });
 
     // ==========================================
     // PREENCHIMENTO E LÓGICA DO CARD
@@ -1523,7 +1415,7 @@
     }
 
     // ==========================================
-    // FUNÇÕES DE CÓPIA - (NÃO SALVAM HISTÓRICO)
+    // FUNÇÕES DE CÓPIA - (SOMENTE IMAGEM SALVA HISTÓRICO)
     // ==========================================
     function copyITSSM() {
         const vHost = document.getElementById('host').value || '---';
@@ -1572,7 +1464,6 @@
             tempTextarea.select();
             document.execCommand("copy");
             document.body.removeChild(tempTextarea);
-
             mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info");
         } catch(e) {}
     }
@@ -1583,9 +1474,8 @@
             const tempInput = document.createElement("input");
             tempInput.value = assunto; document.body.appendChild(tempInput);
             tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
-
             mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info");
-        } catch(e){}
+        } catch(e) {}
     }
 
     function copyHTML() {
@@ -1604,12 +1494,11 @@
             const range = document.createRange(); range.selectNode(node);
             window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
             document.execCommand('copy'); window.getSelection().removeAllRanges();
-
             mostrarToast("📋 HTML COPIADO COM SUCESSO!", "info");
-        } catch(e){}
+        } catch(e) {}
     }
 
-    // A ÚNICA FUNÇÃO QUE MANDA PARA O HISTÓRICO
+    // O ÚNICO QUE REGISTRA NA NUVEM!
     function copyAsImage() {
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
