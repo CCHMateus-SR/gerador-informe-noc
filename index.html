@@ -486,7 +486,7 @@
             <div class="button-row" style="margin-bottom: 0;">
                 <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
                 <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM HD</button>
+                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
                 <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
             </div>
         </div>
@@ -1031,6 +1031,7 @@
         document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
     }
 
+    // GERADOR DE RESUMO DE PENDÊNCIAS (PASSAGEM DE PLANTÃO)
     window.gerarPassagemPlantao = function() {
         if (chamadosDoTurno.length === 0) { mostrarToast("Não há chamados neste plantão.", "warning"); return; }
 
@@ -1048,7 +1049,7 @@
         for (let chave in estadoRecente) {
             let log = estadoRecente[chave];
             let status = log.form.status;
-            if (status === 'RESOLVIDO') continue; 
+            if (status === 'RESOLVIDO') continue; // Ignora encerrados
 
             let modo = log.form.modo || 'link';
             let cliente = log.form.cliente || 'N/A';
@@ -1069,7 +1070,7 @@
         if (infra.length > 0) textoFinal += "\n🖥️ INFRA / APLICAÇÕES:\n" + infra.join("\n") + "\n";
 
         navigator.clipboard.writeText(textoFinal).then(() => {
-            mostrarToast("📋 Resumo de Pendências copiado para a área de transferência!", "success", 4000);
+            mostrarToast("📋 Resumo de Pendências copiado para a área de clipboard!", "success", 4000);
         });
     }
 
@@ -1081,12 +1082,14 @@
         
         if (chamadosDoTurno.length === 0) { lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>'; return; }
 
+        // Filtro de Visão (Meus/Equipe)
         if (visaoHistorico === 'meus') { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => currentUser && c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); 
         } else { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
+        // Filtro de Texto (Busca)
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -1098,6 +1101,7 @@
             });
         }
 
+        // Filtro Rápido (Chips)
         if (filtroAtivo !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') return false; 
@@ -1111,6 +1115,7 @@
             });
         }
 
+        // Descobre quais hosts já foram resolvidos hoje para não deixar o card vermelho atoa
         let hostsResolvidos = new Set();
         chamadosDoTurno.forEach(log => {
             if(log.form && log.form.status === 'RESOLVIDO') hostsResolvidos.add(`${log.form.cliente}-${log.form.host}`);
@@ -1162,6 +1167,7 @@
             else if(log.form.severidade === 'INTERMITENTE') ledSeveridade = '🟠';
             else if(log.form.severidade === 'UNKNOWN') ledSeveridade = '🟣';
 
+            // Lógica do Termômetro Visual
             let ageClass = ''; let ageBadge = '';
             let isResolvidoHoje = hostsResolvidos.has(`${log.form.cliente}-${log.form.host}`);
             
@@ -1203,7 +1209,7 @@
         const dados = window.chamadosExibidos[index].form;
         if(!dados) return;
 
-        if(!confirm("Deseja substituir os dados actuais do formulário por este chamado histórico?")) return;
+        if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
 
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
@@ -1323,10 +1329,10 @@
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
     function limparHistoricoPlantao() {
-        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exactamente a palavra: CONFIRMAR");
+        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exatamente a palavra: CONFIRMAR");
         
         if (confirmacao !== "CONFIRMAR") {
-            if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada correctamente.");
+            if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada corretamente.");
             return;
         }
 
@@ -1389,7 +1395,7 @@
         }
         
         if (desc.value.trim() !== "") {
-            if(confirm("Substituir o texto actual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
+            if(confirm("Substituir o texto atual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
         } else { desc.value = texto; }
         update();
     }
@@ -1467,8 +1473,11 @@
         else { tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link/Ping" : "Infra / Aplicações"; }
 
         const headerCell = document.getElementById('render-header-cell');
-        if (logosClientes[vCliente]) { headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" width="150" style="display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="display: inline-block; max-height: 80px; max-width: 200px; width: auto; height: auto;"></td></tr></table>`; } 
-        else { headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" width="160" style="display: block; margin: 0 auto;">`; }
+        if (logosClientes[vCliente]) { 
+            headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 80px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 55px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 55px; width: auto; display: inline-block;"></td></tr></table>`; 
+        } else { 
+            headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" style="height: 60px; width: auto; display: block; margin: 0 auto;">`; 
+        }
 
         document.getElementById('v-titulo').innerText = tituloTexto; document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
         document.getElementById('v-host').innerText = vHost; document.getElementById('v-inicio').innerText = vInicio;
@@ -1539,9 +1548,9 @@
         const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ A GERAR...';
         const node = document.getElementById('render'); const clone = node.cloneNode(true); clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px'; clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
-        html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+        html2canvas(clone, { scale: 1, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             document.body.removeChild(clone);
-            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
+            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
