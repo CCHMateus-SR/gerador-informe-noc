@@ -119,8 +119,7 @@
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
         .btn-theme:hover { background: #F1F5F9; }
-
-        /* ESTILO DO BOTÃO DE DESFAZER TOAST */
+        
         .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
         .btn-undo:hover { background: rgba(0,0,0,0.2); }
 
@@ -137,15 +136,9 @@
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
-        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; pointer-events: auto;}
+        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold; line-height: 1.4;}
+        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* ESTILOS DO NOVO ALERTA BLOQUEANTE (ITS STYLE) */
-        .alert-box-aviso { background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 6px; color: #9A3412; font-size: 14px; margin-top: 15px; text-align: left; box-shadow: 0 2px 4px rgba(234, 88, 12, 0.05);}
-        .alert-box-report { font-family: Consolas, monospace; font-size: 13px; background: #F8FAFC; padding: 15px; border-radius: 6px; border-left: 4px solid var(--its-blue); word-wrap: break-word; color: var(--its-blue); font-weight: bold; text-align: left; margin-top: 15px; box-shadow: 0 2px 4px rgba(0, 45, 91, 0.05);}
-        .btn-ciente { padding: 15px; background: var(--its-blue); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(0, 45, 91, 0.2); letter-spacing: 0.5px;}
-        .btn-ciente:hover { background: #001d3d; transform: translateY(-2px); }
 
         /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
@@ -156,6 +149,9 @@
         body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
         body.dark-mode .btn-theme:hover { background: #334155; }
         body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
+        body.dark-mode .status-conn { background: #0F172A;}
+        body.dark-mode .conn-online { color: #22C55E; border-color: #166534; }
+        body.dark-mode .conn-offline { color: #F87171; border-color: #991B1B; }
         body.dark-mode .btn-sair { background: #450a0a; border-color: #7f1d1d; color: #f87171; }
         body.dark-mode .btn-sair:hover { background: #7f1d1d; color: white; }
         body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
@@ -193,6 +189,9 @@
         body.dark-mode .quick-claim-title { color: #38bdf8; }
         body.dark-mode .quick-claim-bar input { background: #1e293b; border-color: #0c4a6e; color: #f8fafc; }
         body.dark-mode .quick-claim-bar button { background: #0284c7; }
+        body.dark-mode .search-box { background: #0f172a; border-color: #334155; color: #f8fafc; }
+        body.dark-mode .search-box:focus { background: #1e293b; border-color: #38bdf8; }
+        body.dark-mode .select-macro { background: #1e293b; border-color: #334155; color: #38bdf8; }
 
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
@@ -211,11 +210,11 @@
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
         
-        /* Dark Mode do Alerta Bloqueante */
-        body.dark-mode .alert-box-aviso { background: rgba(234, 88, 12, 0.1); border-color: var(--its-orange); color: #FDBA74; }
-        body.dark-mode .alert-box-report { background: rgba(56, 189, 248, 0.1); border-color: #38bdf8; color: #BAE6FD; }
-        body.dark-mode .btn-ciente { background: #38bdf8; color: #0F172A; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); }
-        body.dark-mode .btn-ciente:hover { background: #0ea5e9; }
+        /* DashBoard Badges */
+        .dash-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;}
+        .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+        .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+        .dash-ok { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
     </style>
 </head>
 <body>
@@ -231,16 +230,10 @@
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
-    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 35px 30px;">
+    <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
+        <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
         
-        <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 25px;">
-            <div style="background: #FFF7ED; padding: 10px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #FFEDD5;">
-                <span style="font-size: 26px;">🚨</span>
-            </div>
-            <h3 style="margin: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Atualização no Radar!</h3>
-        </div>
-
-        <div id="texto-alerta" style="margin-bottom: 30px;">
+        <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;">
             </div>
 
         <button class="btn-ciente" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
@@ -280,8 +273,16 @@
     <div class="modal-content">
         <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div><h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3><p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios e Avisos da equipe (desde as 07h).</p></div>
-            <button id="btn-exportar" class="btn-export" onclick="exportarParaExcel()">📊 EXPORTAR (CSV)</button>
+            <div>
+                <h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3>
+                <p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios e Avisos da equipe (desde as 07h).</p>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div id="dash-abertos" class="dash-badge dash-aberto">🔴 0</div>
+                <div id="dash-follow" class="dash-badge dash-follow">🟡 0</div>
+                <div id="dash-ok" class="dash-badge dash-ok">🟢 0</div>
+                <button id="btn-exportar" class="btn-export" style="margin-left: 10px;" onclick="exportarParaExcel()">📊 EXPORTAR</button>
+            </div>
         </div>
         <div id="lista-historico" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;"></div>
     </div>
@@ -295,6 +296,8 @@
             <button id="tab-meus" class="tab-btn active" onclick="setVisaoHistorico('meus')">👤 Meus</button>
             <button id="tab-equipe" class="tab-btn" onclick="setVisaoHistorico('equipe')">👥 Equipe</button>
         </div>
+        <input type="text" id="search-history" class="search-box" placeholder="🔍 Buscar cliente, host ou serviço..." oninput="renderizarListaLateral()">
+        
         <div id="meus-chamados-lista">
             <div style="text-align: center; color: #94A3B8; font-size: 12px; margin-top: 30px;">Carregando histórico...</div>
         </div>
@@ -305,6 +308,7 @@
         <div class="header-row">
             <h2 id="titulo-form">Central de Despacho</h2>
             <div class="top-controls">
+                <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="toggleTheme()">🌙</button>
@@ -427,10 +431,10 @@
             <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
-            <button class="btn-copy-subject" id="btn-assunto" title="Atalho: Ctrl+Shift+A" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" title="Atalho: Ctrl+Shift+I" onclick="copyAsImage()">📸 IMAGEM</button>
-            <button class="btn-copy-itssm" id="btn-copiar-itssm" title="Atalho: Ctrl+Shift+X" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
+            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
+            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
 
@@ -438,7 +442,7 @@
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
-                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
+                <tr><td id="v-header-bg" align="center" bgcolor="#002D5B" style="padding: 16px 20px;"><h1 id="v-titulo" style="margin: 0; color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800;">INFORME GESTÃO OPERACIONAL | Acompanhamento de Incidente</h1></td></tr>
                 <tr>
                     <td style="padding: 35px 35px;">
                         
@@ -509,6 +513,7 @@
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
     let ultimaAssinaturaGerada = ''; 
+    let chamadosAlertadosSLA = new Set(); // Para o Alarme SLA
 
     function getInicioDoPlantaoTimestamp() {
         const agora = new Date();
@@ -521,16 +526,16 @@
     }
 
     // ==========================================
-    // SISTEMA DE LOGIN E INICIALIZAÇÃO (BLINDADO)
+    // SISTEMA DE LOGIN COM BLINDAGEM DE F5
     // ==========================================
     let currentUser = null;
     try {
-        const storedUser = localStorage.getItem('noc_user_info');
+        let storedUser = localStorage.getItem('noc_user_info');
         if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
             currentUser = JSON.parse(storedUser);
         }
-    } catch (error) {
-        console.error("Erro ao carregar usuário da memória. Limpando...", error);
+    } catch(e) {
+        console.error("Erro ao carregar usuário da memória:", e);
         localStorage.removeItem('noc_user_info');
     }
 
@@ -545,6 +550,7 @@
             document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
             document.getElementById('history-container').style.display = 'block';
             iniciarListenerHistorico();
+            iniciarMonitoramentoSLA(); 
         }
     };
 
@@ -557,12 +563,13 @@
         currentUser = { nome, turno };
         try {
             localStorage.setItem('noc_user_info', JSON.stringify(currentUser));
-        } catch(e) { console.error("Erro ao salvar login", e); }
-        
+        } catch(e) {}
+
         document.getElementById('modal-login').style.display = 'none';
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
         document.getElementById('history-container').style.display = 'block';
         iniciarListenerHistorico();
+        iniciarMonitoramentoSLA();
     }
 
     function fazerLogout() {
@@ -577,6 +584,7 @@
             chamadosDoTurno = [];
             window.chamadosExibidos = [];
             ultimaAssinaturaGerada = '';
+            chamadosAlertadosSLA.clear();
         }
     }
 
@@ -595,6 +603,75 @@
             toast.style.transform = 'translateX(-100%)';
             setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
         }, tipo === 'info' ? 4500 : 3000); 
+    }
+
+    // ==========================================
+    // SISTEMA DE SLA (A CADA 30 MIN - SOMENTE LINK)
+    // ==========================================
+    function iniciarMonitoramentoSLA() {
+        setInterval(() => {
+            if (!currentUser || chamadosDoTurno.length === 0) return;
+            const agora = Date.now();
+            let estadoRecente = {};
+            
+            chamadosDoTurno.forEach(log => {
+                if (log.nome === currentUser.nome && log.form) {
+                    let chave = `${log.form.cliente}-${log.form.host}`;
+                    if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                        estadoRecente[chave] = log;
+                    }
+                }
+            });
+
+            for (let chave in estadoRecente) {
+                let log = estadoRecente[chave];
+
+                // BLINDAGEM: O SLA DE 30 MIN SÓ APITA PARA MODO LINK!
+                if (log.form.modo === 'infra') continue;
+
+                let acao = log.assunto.split(' | ')[5] || '';
+                
+                if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
+                    let diffMinutos = (agora - log.timestamp) / (1000 * 60);
+                    let cicloAtual = Math.floor(diffMinutos / 30); 
+                    
+                    if (cicloAtual >= 1) {
+                        let alertaId = `${chave}-ciclo-${cicloAtual}`;
+                        if (!chamadosAlertadosSLA.has(alertaId)) {
+                            // TRAVA A TELA E MOSTRA O AVISO
+                            let htmlMensagem = `
+                                <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                                    <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">
+                                        ⏰ ALERTA DE SLA DE LINK!
+                                    </div>
+                                    <div style="color: #1E293B; font-size: 14px; margin-bottom: 10px;">
+                                        O Host <strong>${log.form.host}</strong> (${log.form.cliente})
+                                    </div>
+                                    <div style="font-family: Consolas, monospace; font-size: 13px; color: #991B1B; font-weight: bold; background: #FEE2E2; padding: 8px; border-radius: 4px;">
+                                        Está sem atualização há ${Math.floor(diffMinutos)} minutos!
+                                    </div>
+                                </div>
+                            `;
+                            filaDeAlertas.push(htmlMensagem);
+                            
+                            // Som nativo de beep alto
+                            try {
+                                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                                const osc = audioCtx.createOscillator();
+                                const gainNode = audioCtx.createGain();
+                                osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+                                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+                                osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+                            } catch(e) {}
+
+                            if (!modalAberto) exibirProximoAlerta();
+
+                            chamadosAlertadosSLA.add(alertaId);
+                        }
+                    }
+                }
+            }
+        }, 60000); 
     }
 
     // ==========================================
@@ -662,9 +739,6 @@
         update();
     }
 
-    // ==========================================
-    // TRUQUE DO DATALIST E BUSCA
-    // ==========================================
     function abrirDatalist(element) {
         if (element.value === '') {
             try { element.showPicker(); } catch(e) {}
@@ -684,9 +758,6 @@
         }, { once: true });
     }
 
-    // ==========================================
-    // SISTEMA DE CLAIMING (AVISO RÁPIDO)
-    // ==========================================
     function enviarAvisoRapido() {
         if (!currentUser) return;
         const servico = document.getElementById('quick-item').value.trim();
@@ -709,16 +780,13 @@
             host: host || 'Não informado',
             hora: horaStr,
             timestamp: firebase.database.ServerValue.TIMESTAMP
-        }).catch(err => console.error("Erro no Firebase:", err));
+        });
 
         document.getElementById('quick-item').value = '';
         document.getElementById('quick-host').value = '';
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
-    // ==========================================
-    // HISTÓRICO LATERAL
-    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -737,15 +805,11 @@
                 });
             }
             renderizarListaLateral();
-        }, (error) => {
-            console.error("Falha ao ler histórico: ", error);
         });
     }
 
     function renderizarListaLateral() {
         const lista = document.getElementById('meus-chamados-lista');
-        if (!lista) return;
-
         window.chamadosExibidos = [];
         
         if (chamadosDoTurno.length === 0) {
@@ -754,7 +818,7 @@
         }
 
         if (visaoHistorico === 'meus') { 
-            window.chamadosExibidos = chamadosDoTurno.filter(c => currentUser && c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); 
+            window.chamadosExibidos = chamadosDoTurno.filter(c => c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); 
         } else { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
@@ -803,7 +867,7 @@
             const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
 
             let infoAnalista = '';
-            if (currentUser && visaoHistorico === 'equipe' && log.nome !== currentUser.nome) {
+            if (visaoHistorico === 'equipe' && log.nome !== currentUser.nome) {
                 infoAnalista = `<div style="font-size: 9px; color: var(--its-orange); margin-top: 4px; font-weight: bold; background: #FFF7ED; padding: 3px 6px; border-radius: 4px; display: inline-block;">👤 Criado por: ${log.nome}</div>`;
             }
 
@@ -855,20 +919,6 @@
         mostrarToast("✅ Formulário preenchido com sucesso!");
     }
 
-    // ==========================================
-    // ALERTAS E NUVEM
-    // ==========================================
-    function tocarAlertaSonoro() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-        } catch(e) {}
-    }
-
     let filaDeAlertas = [];
     let modalAberto = false;
 
@@ -878,29 +928,40 @@
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
             htmlMensagem = `
-                <div style="font-size: 14px; margin-bottom: 10px; color: var(--its-text);">
-                    👤 <strong style="color: var(--its-text);">${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
-                </div>
-                <div class="alert-box-aviso">
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; margin-bottom: 4px; color: var(--its-orange);">👀 Em Análise</div>
-                    Serviço: <strong>${mensagemObj.servico}</strong>${hostText}
+                <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
+                    </div>
+                    <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">
+                        👀 SERVIÇO: ${mensagemObj.servico}${hostText}
+                    </div>
                 </div>
             `;
         } else {
             const modoLabel = mensagemObj.form && mensagemObj.form.modo === 'infra' ? '🖥️ Infra / Aplicações' : '🌐 Gestão de Link/Ping';
             htmlMensagem = `
-                <div style="font-size: 14px; margin-bottom: 10px; color: var(--its-text);">
-                    👤 <strong style="color: var(--its-text);">${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de ${modoLabel} às ${mensagemObj.hora}:
-                </div>
-                <div class="alert-box-report">
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; margin-bottom: 6px; color: var(--its-blue); font-family: 'Segoe UI', sans-serif;">📋 Resumo do Informe</div>
-                    ${mensagemObj.assunto}
+                <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
+                    <div style="margin-bottom: 15px; color: #1E293B; font-size: 13px; text-align: center;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de <span style="color: #0284C7; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
+                    </div>
+                    <div style="font-family: Consolas, monospace; font-size: 12px; color: #0369A1; text-align: center; font-weight: bold; line-height: 1.5;">
+                        ${mensagemObj.assunto.replace(/ \| /g, ' | ')}
+                    </div>
                 </div>
             `;
         }
 
         filaDeAlertas.push(htmlMensagem);
-        tocarAlertaSonoro();
+        
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        } catch(e) {}
+
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -960,35 +1021,9 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
-    function registrarHistoricoNuvem(assunto) {
-        if(!currentUser) return;
-        const formData = {
-            modo: modoAtual,
-            cliente: document.getElementById('cliente').value, host: document.getElementById('host').value,
-            item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
-            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, 
-            status: document.getElementById('status').value, protocolo: document.getElementById('protocolo').value, 
-            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, 
-            termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
-            solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, 
-            evidencias: document.getElementById('evidencias').checked 
-        };
-        db.ref('historico_noc').push({
-            tipo: 'relatorio', 
-            nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
-            hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
-            timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
-        }).catch(err => console.error("Falha ao registrar histórico:", err));
-    }
-
     // ==========================================
-    // PROTEÇÃO CSV (ESCAPE DE ASPAS E VÍRGULAS)
+    // EXPORTAR E HISTORICO
     // ==========================================
-    function escapeCSV(str) {
-        if (str === null || str === undefined) return '-';
-        return str.toString().replace(/"/g, '""').replace(/\n/g, ' ');
-    }
-
     function exportarParaExcel() {
         const btn = document.getElementById('btn-exportar');
         const txtOriginal = btn.innerHTML;
@@ -1003,26 +1038,14 @@
                 
                 const p = log.assunto.split(' | ');
                 const dObj = new Date(log.timestamp);
-                
-                // Utilizando a função de escape para proteger o CSV
-                csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${escapeCSV(log.nome)}","${escapeCSV(log.turno)}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? escapeCSV(p[0].trim()) : '-'}","${p[1] ? escapeCSV(p[1].trim()) : '-'}","${p[2] ? escapeCSV(p[2].replace(/\n/g, ' ').trim()) : '-'}","${p[3] ? escapeCSV(p[3].trim()) : '-'}","${p[5] ? escapeCSV(p[5].trim()) : '-'}"\n`;
+                csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${log.nome}","${log.turno}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? p[0].trim() : '-'}","${p[1] ? p[1].trim() : '-'}","${p[2] ? p[2].replace(/\n/g, ' ').trim() : '-'}","${p[3] ? p[3].trim() : '-'}","${p[5] ? p[5].trim() : '-'}"\n`;
             });
-            
-            try {
-                const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
-                document.body.appendChild(link); link.click(); document.body.removeChild(link);
-            } catch(e) {
-                console.error("Erro na exportação CSV", e);
-                alert("Erro ao gerar o arquivo. Verifique seu navegador.");
-            }
-            
+            const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
             btn.innerHTML = '✅ Concluído!'; setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
-        }, (error) => {
-            alert("Erro ao buscar dados: " + error.message);
-            btn.innerHTML = txtOriginal;
         });
     }
 
@@ -1061,16 +1084,11 @@
                 }
             });
             listaHtml.innerHTML = html;
-        }, (error) => {
-            listaHtml.innerHTML = `<div style="text-align:center; padding: 20px; color: #DC2626;">Erro de conexão com o servidor.</div>`;
         });
     }
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
-    // ==========================================
-    // PREENCHIMENTO E LÓGICA DO CARD
-    // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
@@ -1295,32 +1313,33 @@
             document.getElementById('obs-container').style.display = 'none';
         }
 
-        salvarRascunho();
+        try { salvarRascunho(); } catch(e){}
+    }
+
+    function registrarHistoricoNuvem(assunto) {
+        if(!currentUser) return;
+        const formData = {
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, host: document.getElementById('host').value,
+            item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, 
+            status: document.getElementById('status').value, protocolo: document.getElementById('protocolo').value, 
+            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, 
+            termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
+            solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, 
+            evidencias: document.getElementById('evidencias').checked 
+        };
+        db.ref('historico_noc').push({
+            tipo: 'relatorio', 
+            nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
+            hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+            timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
+        }).catch(err => console.error("Falha ao registrar histórico:", err));
     }
 
     // ==========================================
-    // CÓPIA E ATALHOS NINJAS COM HOTKEYS (BLINDADOS)
+    // FUNÇÕES DE CÓPIA SILENCIOSAS (NÃO SALVAM HISTÓRICO)
     // ==========================================
-    document.addEventListener('keydown', function(e) {
-        // Ignora atalhos se o foco estiver em um input ou textarea, para não interferir na digitação
-        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) {
-            if (e.key !== 'Escape') return; // Libera apenas o ESC
-        }
-
-        if (e.key === 'Escape') {
-            if (modalAberto) fecharAlertaBloqueante();
-            fecharHistorico();
-        }
-        
-        if (e.ctrlKey && e.shiftKey) {
-            const key = e.key.toLowerCase();
-            if (key === 'a') { e.preventDefault(); copiarAssuntoAcao(); }
-            if (key === 'i') { e.preventDefault(); copyAsImage(); }
-            if (key === 'x') { e.preventDefault(); copyITSSM(); }
-        }
-    });
-
-    // Funções de cópia isoladas do histórico na nuvem, EXCETO A IMAGEM!
     function copyITSSM() {
         const vHost = document.getElementById('host').value || '---';
         const vInicio = document.getElementById('inicio').value || '---';
@@ -1408,6 +1427,9 @@
         }
     }
 
+    // ==========================================
+    // EXCLUSIVO: SOMENTE A IMAGEM SALVA NO RADAR
+    // ==========================================
     function copyAsImage() {
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
@@ -1419,7 +1441,6 @@
             return; 
         }
 
-        // ESSE É O ÚNICO QUE REGISTRA NO HISTÓRICO!
         const assinaturaAtual = obterAssinaturaFormulario();
         if (assinaturaAtual !== ultimaAssinaturaGerada) {
             if (!verificarDuplicidade()) return; 
@@ -1502,9 +1523,8 @@
                 document.getElementById('pressplay').value = rascunho.pressplay || ''; 
                 document.getElementById('evidencias').checked = rascunho.evidencias || false; 
             }
-        } catch (e) {
-            console.error("Erro ao carregar rascunho", e);
-            localStorage.removeItem('noc_rascunho_its');
+        } catch(e) {
+            console.error("Erro ao carregar rascunho.", e);
         }
     }
 
