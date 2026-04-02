@@ -20,8 +20,14 @@
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
         .tab-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        .search-box { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--its-border); border-radius: 8px; font-size: 12px; box-sizing: border-box; transition: 0.2s; background: #F8FAFC;}
+        .search-box { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--its-border); border-radius: 8px; font-size: 12px; box-sizing: border-box; transition: 0.2s; background: #F8FAFC;}
         .search-box:focus { border-color: var(--its-blue); outline: none; background: white; box-shadow: 0 0 0 3px rgba(0,45,91,0.1); }
+
+        /* Chips Filtros Rápidos */
+        .filter-chips { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap;}
+        .chip { flex: 1; padding: 6px 4px; border: 1px solid var(--its-border); border-radius: 8px; background: #F8FAFC; color: #475569; font-size: 9px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; text-align: center;}
+        .chip:hover { background: #E2E8F0; }
+        .chip.active { background: var(--its-blue); color: white; border-color: var(--its-blue); box-shadow: 0 2px 4px rgba(0,45,91,0.2); }
 
         .my-card { border: 1px solid var(--its-border); border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid var(--its-blue);}
         .my-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-color: #cbd5e1;}
@@ -60,10 +66,12 @@
         .time-critical { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5;}
 
         /* COLUNA 2: FORMULÁRIO */
-        .form-side { flex: 1.2; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; max-width: 600px; transition: all 0.3s; position: relative; }
+        /* Ajustado para ter position relative e permitir o sticky footer perfeitamente */
+        .form-side { flex: 1.2; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; max-width: 600px; transition: all 0.3s; position: relative; display: flex; flex-direction: column;}
         
         .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px; }
-        .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
+        /* Ajuste do tamanho da fonte para evitar quebra de layout */
+        .header-row h2 { color: var(--its-blue); margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; flex: 1;}
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
         .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase;}
@@ -88,9 +96,10 @@
         .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
-        .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; border-bottom: 2px solid var(--its-border); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        /* Section Titles Redesenhados */
+        .section-title { grid-column: span 2; font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; padding: 10px 15px; background: #F1F5F9; border-radius: 8px; border-left: 4px solid var(--its-blue); display: flex; align-items: center; gap: 8px; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 25px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 10px; flex: 1; }
         .full-width { grid-column: span 2; }
         
         .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
@@ -108,11 +117,16 @@
         input, select, textarea { padding: 12px; border: 1.5px solid var(--its-border); border-radius: 8px; font-size: 14px; transition: all 0.2s; background: #fff; color: var(--its-text); box-sizing: border-box; width: 100%;}
         input:focus, select:focus, textarea:focus { border-color: var(--its-blue); box-shadow: 0 0 0 4px rgba(0,45,91,0.1); outline: none; }
         
-        .erro-validacao { border-color: #991B1B !important; box-shadow: 0 0 0 4px rgba(153,27,27,0.1) !important; }
+        /* Animação Anti-Vacilo */
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+        .shake-error { animation: shake 0.4s ease-in-out; border-color: #DC2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important; }
+        
         textarea { height: 120px; resize: none; line-height: 1.5; font-family: inherit; }
         .textarea-sm { height: 50px !important; }
 
-        .button-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        /* Sticky Footer - Barra de ações presa ao fundo */
+        .action-footer { position: sticky; bottom: -30px; background: white; padding: 15px 30px 30px 30px; margin: 20px -30px -30px -30px; border-top: 1px solid var(--its-border); z-index: 10; display: flex; flex-direction: column; gap: 10px; transition: background-color 0.3s; }
+        .button-row { display: flex; gap: 8px; }
         .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
         .btn-copy-subject:hover { background-color: #E0F2FE; }
         .btn-copy { flex: 1.2; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
@@ -122,16 +136,16 @@
         .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
         .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
-        .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
-        .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
+        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
+        .btn-danger-its:hover { background: #991B1B; transform: translateY(-2px); }
+        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
+        .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
 
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
         .btn-theme:hover { background: #F1F5F9; }
-
-        /* ESTILO DO BOTÃO DE DESFAZER TOAST */
         .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
         .btn-undo:hover { background: rgba(0,0,0,0.2); }
 
@@ -157,6 +171,7 @@
         body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
         body.dark-mode .form-side h2, body.dark-mode .history-side h3 { color: #38bdf8; }
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
+        body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus { border-color: #38BDF8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); background: #1E293B;}
         body.dark-mode label { color: #94A3B8; }
         body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
         body.dark-mode .btn-theme:hover { background: #334155; }
@@ -173,7 +188,9 @@
         body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #38bdf8;}
         body.dark-mode .log-subject { color: #F8FAFC; }
         body.dark-mode .modal-content h3 { color: #38bdf8; }
-        body.dark-mode .section-title { color: #38bdf8; border-color: #334155; }
+        
+        body.dark-mode .section-title { color: #38bdf8; border-color: #334155; background: #0F172A; border-left-color: #38bdf8; }
+        body.dark-mode .action-footer { background: #1E293B; border-top-color: #334155; }
         
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
         body.dark-mode .tab-btn { color: #94A3B8; }
@@ -209,20 +226,18 @@
         body.dark-mode .sla-warning { background-color: #431407; border-left-color: #F97316 !important; }
         body.dark-mode .sla-critical { background-color: #450a0a; border-left-color: #DC2626 !important; }
 
+        body.dark-mode .chip { background: #0F172A; border-color: #334155; color: #94A3B8; }
+        body.dark-mode .chip:hover { background: #1E293B; }
+        body.dark-mode .chip.active { background: #0EA5E9; color: white; border-color: #0EA5E9; }
+
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
 
-        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
-        .btn-danger-its:hover { background: #991B1B; transform: translateY(-2px); }
-        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
-        .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
         .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
         .btn-login-its:hover { background-color: #991B1B; transform: translateY(-2px); }
         .btn-export { background-color: #10B981; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
         .btn-export:hover { background-color: #059669; }
 
-        body.dark-mode #pressplay-container td { background-color: #052e16 !important; border-color: #166534 !important; border-left-color: #22c55e !important; }
-        body.dark-mode #v-pressplay { color: #bbf7d0 !important; }
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
         
@@ -313,6 +328,12 @@
         </div>
         <input type="text" id="search-history" class="search-box" placeholder="🔍 Buscar cliente, host ou serviço..." oninput="renderizarListaLateral()">
         
+        <div class="filter-chips">
+            <button class="chip" onclick="aplicarFiltroRapido('aberto', this)">🔴 Em Aberto</button>
+            <button class="chip" onclick="aplicarFiltroRapido('follow', this)">🟡 Follow-up</button>
+            <button class="chip" onclick="aplicarFiltroRapido('critical', this)">🚨 Crítico</button>
+        </div>
+
         <div id="meus-chamados-lista">
             <div style="text-align: center; color: #94A3B8; font-size: 12px; margin-top: 30px;">Carregando histórico...</div>
         </div>
@@ -429,7 +450,7 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
-                    <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';">
+                    <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';" style="display: inline-block;">
                         <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
                         <option value="padrao">📋 Texto Padrão (Baseado no Status)</option>
                         <option value="fibra">✂️ Rompimento de Fibra</option>
@@ -449,16 +470,19 @@
 
         </div>
         
-        <div class="button-row">
-            <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-            <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
+        <div class="action-footer">
+            <div class="button-row">
+                <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
+                <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
+            </div>
+            <div class="button-row" style="margin-bottom: 0;">
+                <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+                <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
+                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM HD</button>
+                <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
+            </div>
         </div>
-        <div class="button-row" style="margin-bottom: 0;">
-            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
-            <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
-            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
-        </div>
+
     </div>
 
     <div class="preview-side" style="display: flex;">
@@ -471,40 +495,40 @@
                         
                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                             <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 13px; color: #0F172A; font-weight: 700; line-height: 1.4;">---</div></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div></td>
                                 <td width="4%"></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div id="v-label-host" style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 13px; color: #0F172A; font-weight: 700;">---</div></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800;">---</div></td>
                             </tr>
                             <tr height="12"><td></td></tr>
                             <tr>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 12px; color: #334155;">---</div></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 13px; color: #334155; font-weight: 500;">---</div></td>
                                 <td></td>
-                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 12px; color: #334155;">-</div></td>
+                                <td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 13px; color: #334155; font-weight: 500;">-</div></td>
                             </tr>
                             <tr height="12"><td></td></tr>
                             <tbody id="v-dynamic-grid"></tbody>
                         </table>
 
                         <div id="statusinfo-container" style="display: none; margin-top: 20px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F8FAFC" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #E2E8F0; border-left: 4px solid #002D5B;"><div style="font-size: 10px; color: #64748B; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Dados Técnicos (Centreon)</div><div id="v-statusinfo" style="font-family: Consolas, monospace; font-size: 12px; color: #0F172A; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#1E1E1E" style="padding: 15px; border-radius: 8px; border: 1px solid #333333; border-left: 4px solid #38BDF8;"><div style="font-size: 10px; color: #858585; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">>_ DADOS TÉCNICOS (CENTREON)</div><div id="v-statusinfo" style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #38BDF8; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
                         <div id="pressplay-container" style="display: none; margin-top: 20px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#F0FDF4" style="padding: 12px 15px; border-radius: 8px; border: 1px solid #BBF7D0; border-left: 4px solid #22C55E;"><div style="font-size: 10px; color: #166534; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">▶ Retorno PressPlay</div><div id="v-pressplay" style="font-family: Consolas, monospace; font-size: 12px; color: #14532D; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#1E1E1E" style="padding: 15px; border-radius: 8px; border: 1px solid #333333; border-left: 4px solid #22C55E;"><div style="font-size: 10px; color: #858585; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">>_ RETORNO PRESSPLAY</div><div id="v-pressplay" style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #22C55E; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
-                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 13px; color: #334155; font-weight: 500; border-radius: 0 8px 8px 0;"><span id="v-termino">-</span></td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 14px; color: #334155; font-weight: 700; border-radius: 0 8px 8px 0;"><span id="v-termino">-</span></td></tr></table>
                         
                         <div id="detalhamento-container">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-desc" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 13px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-desc" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 14px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
                         </div>
 
                         <div id="evidencias-container" style="display: none; margin-top: 25px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#EFF6FF" style="padding: 15px; border: 1px dashed #38BDF8; border-radius: 8px; font-size: 12px; color: #0369A1; line-height: 1.5;"><strong>📎 Evidências Técnicas:</strong> Gráficos e testes de conectividade foram anexados no corpo deste e-mail para análise.</td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#EFF6FF" style="padding: 15px; border: 1px dashed #38BDF8; border-radius: 8px; font-size: 13px; color: #0369A1; line-height: 1.5;"><strong>📎 Evidências Técnicas:</strong> Gráficos e testes de conectividade foram anexados no corpo deste e-mail para análise.</td></tr></table>
                         </div>
 
                         <div id="obs-container" style="display: none; margin-top: 25px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#FFFBEB" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 12px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;"><strong>Nota Adicional:</strong> <span id="v-obs"></span></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#FFFBEB" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 13px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;"><strong>Nota Adicional:</strong> <span id="v-obs"></span></td></tr></table>
                         </div>
                     </td>
                 </tr>
@@ -532,6 +556,7 @@
     const db = firebase.database();
 
     let visaoHistorico = 'meus';
+    let filtroAtivo = ''; // Para os botões Chips
     let chamadosDoTurno = []; 
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
@@ -829,6 +854,40 @@
     });
 
     // ==========================================
+    // VALIDAÇÃO ANTI-VACILO
+    // ==========================================
+    function validarCamposObrigatorios(exigeProtocolo = false) {
+        let valido = true;
+        const campos = ['cliente', 'host', 'item'];
+        
+        campos.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el.value.trim()) {
+                el.classList.add('shake-error');
+                setTimeout(() => el.classList.remove('shake-error'), 500);
+                valido = false;
+            }
+        });
+
+        if (exigeProtocolo) {
+            const status = document.getElementById('status').value;
+            const protocolo = document.getElementById('protocolo');
+            if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+                protocolo.classList.add('shake-error');
+                setTimeout(() => protocolo.classList.remove('shake-error'), 500);
+                mostrarToast("⚠️ Protocolo da operadora é obrigatório para este status.", "warning");
+                return false; 
+            }
+        }
+
+        if (!valido) {
+            mostrarToast("⚠️ Preencha os campos obrigatórios destacados em vermelho.", "warning");
+        }
+        
+        return valido;
+    }
+
+    // ==========================================
     // SELETOR DE MODO
     // ==========================================
     function trocarModo(novoModo) {
@@ -844,6 +903,7 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
+        document.getElementById('protocolo').classList.remove('shake-error');
         try{ localStorage.removeItem('noc_rascunho_its'); }catch(e){}
         ultimaAssinaturaGerada = ''; 
         setModo(novoModo);
@@ -859,11 +919,13 @@
             document.getElementById('label-host').innerText = "Host / Circuito"; document.getElementById('v-label-host').innerText = "Host";
             document.getElementById('host').placeholder = "Ex: FURACAO_FGT_BELO_HORIZONTE"; document.getElementById('item').placeholder = "Ex: Ping\nLINK APEX NET 50MB";
             document.getElementById('grupo-protocolo').style.display = 'flex'; document.getElementById('grupo-pressplay').style.display = 'none'; document.getElementById('grupo-solucionador').style.display = 'flex'; 
+            document.getElementById('macro-template').style.display = 'inline-block';
         } else {
             document.getElementById('titulo-form').innerText = "Infra / Aplicações"; document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
             document.getElementById('label-host').innerText = "Host / Servidor"; document.getElementById('v-label-host').innerText = "Host / Servidor";
             document.getElementById('host').placeholder = "Ex: Libbs-CO-DC-PM-01"; document.getElementById('item').placeholder = "Ex: CPU\nMemory\nServices-Auto";
             document.getElementById('grupo-protocolo').style.display = 'none'; document.getElementById('grupo-pressplay').style.display = 'flex'; document.getElementById('grupo-solucionador').style.display = 'none'; 
+            document.getElementById('macro-template').style.display = 'none';
         }
         
         renderizarListaLateral(); update();
@@ -895,12 +957,24 @@
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL E PASSAGEM DE PLANTÃO
+    // HISTÓRICO LATERAL, BUSCA E FILTROS (CHIPS)
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
         document.getElementById('tab-equipe').classList.toggle('active', visao === 'equipe');
+        renderizarListaLateral();
+    }
+
+    window.aplicarFiltroRapido = function(tipo, btnEl) {
+        if (filtroAtivo === tipo) {
+            filtroAtivo = ''; 
+            document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+        } else {
+            filtroAtivo = tipo;
+            document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+        }
         renderizarListaLateral();
     }
 
@@ -1004,7 +1078,19 @@
             });
         }
 
-        // Descobre quais hosts já foram resolvidos hoje para não deixar o card vermelho atoa
+        if (filtroAtivo !== '') {
+            window.chamadosExibidos = window.chamadosExibidos.filter(c => {
+                if (c.tipo === 'aviso_rapido') return false; 
+                const partesAssunto = c.assunto ? c.assunto.split(' | ') : [];
+                const acao = partesAssunto[5] ? partesAssunto[5].trim() : '';
+                
+                if (filtroAtivo === 'aberto') return acao.includes('ABERTURA');
+                if (filtroAtivo === 'follow') return acao.includes('FOLLOW');
+                if (filtroAtivo === 'critical') return c.form && c.form.severidade === 'CRITICAL';
+                return true;
+            });
+        }
+
         let hostsResolvidos = new Set();
         chamadosDoTurno.forEach(log => {
             if(log.form && log.form.status === 'RESOLVIDO') hostsResolvidos.add(`${log.form.cliente}-${log.form.host}`);
@@ -1013,7 +1099,7 @@
         window.chamadosExibidos.reverse(); 
 
         if(window.chamadosExibidos.length === 0) {
-            if(termoBusca !== '') { lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum resultado encontrado para a busca.</div>`; } 
+            if(termoBusca !== '' || filtroAtivo !== '') { lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum resultado encontrado para os filtros atuais.</div>`; } 
             else { const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura"; lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`; }
             return;
         }
@@ -1056,7 +1142,6 @@
             else if(log.form.severidade === 'INTERMITENTE') ledSeveridade = '🟠';
             else if(log.form.severidade === 'UNKNOWN') ledSeveridade = '🟣';
 
-            // Lógica do Termômetro Visual
             let ageClass = ''; let ageBadge = '';
             let isResolvidoHoje = hostsResolvidos.has(`${log.form.cliente}-${log.form.host}`);
             
@@ -1098,7 +1183,7 @@
         const dados = window.chamadosExibidos[index].form;
         if(!dados) return;
 
-        if(!confirm("Deseja substituir os dados atuais do formulário por este chamado histórico?")) return;
+        if(!confirm("Deseja substituir os dados actuais do formulário por este chamado histórico?")) return;
 
         if (dados.modo) { setModo(dados.modo); } else { setModo('link'); }
 
@@ -1216,12 +1301,11 @@
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
-    // ZERAR RADAR MANUALMENTE
     function limparHistoricoPlantao() {
-        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exatamente a palavra: CONFIRMAR");
+        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exactamente a palavra: CONFIRMAR");
         
         if (confirmacao !== "CONFIRMAR") {
-            if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada corretamente.");
+            if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada correctamente.");
             return;
         }
 
@@ -1267,7 +1351,7 @@
         }
         
         if (desc.value.trim() !== "") {
-            if(confirm("Substituir o texto atual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
+            if(confirm("Substituir o texto actual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
         } else { desc.value = texto; }
         update();
     }
@@ -1302,8 +1386,6 @@
         const vPressplay = document.getElementById('pressplay').value.trim(); const vDesc = document.getElementById('desc').value.trim(); const vObs = document.getElementById('obs').value.trim();
         const temEvidencias = document.getElementById('evidencias').checked;
 
-        if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
-
         let corSeveridade = '#64748B'; 
         if(severidade === 'CRITICAL') corSeveridade = '#DC2626'; if(severidade === 'WARNING') corSeveridade = '#D97706'; if(severidade === 'INTERMITENTE') corSeveridade = '#EA580C'; if(severidade === 'OK') corSeveridade = '#166534'; 
         let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
@@ -1313,10 +1395,10 @@
 
         if (modoAtual === 'infra') {
             labelTerminoForm = 'Término da Ocorrência'; tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA'; tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
-            document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais"; document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace"; document.getElementById('v-desc').style.fontSize = "12px";
+            document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais"; 
             headerBg.setAttribute('bgcolor', '#1E293B'); topBorder.style.borderTop = '8px solid #0284C7'; 
         } else {
-            document.getElementById('label-desc').innerText = "Ações / Diagnóstico"; document.getElementById('v-desc').style.fontFamily = "inherit"; document.getElementById('v-desc').style.fontSize = "13px";
+            document.getElementById('label-desc').innerText = "Ações / Diagnóstico";
             if (status === 'RESOLVIDO') { labelTerminoForm = 'Fim da Ocorrência'; tituloTerminoBox = 'FIM DA OCORRÊNCIA'; } else { labelTerminoForm = 'Previsão de Normalização (SLA)'; tituloTerminoBox = 'PREVISÃO DE NORMALIZAÇÃO (SLA)'; }
             headerBg.setAttribute('bgcolor', '#002D5B'); topBorder.style.borderTop = '8px solid #DC2626'; 
         }
@@ -1324,18 +1406,18 @@
         document.getElementById('label-termino').innerText = labelTerminoForm; document.getElementById('v-titulo-termino').innerText = tituloTerminoBox; document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
-        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
+        let bgColor, textColor, badgeTexto, tituloTexto;
         
-        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
-        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
-        else { bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
+        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
+        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
+        else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
-        if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); tituloForm.innerText = modoAtual === 'link' ? "🚨 Gestão de Link/Ping (CRITICAL)" : "🚨 Infra / Aplicações (CRITICAL)"; } 
-        else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); tituloForm.innerText = modoAtual === 'link' ? "⚠️ Gestão de Link/Ping (INTERMITENTE)" : "⚠️ Infra / Aplicações (INTERMITENTE)"; } 
-        else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); tituloForm.innerText = modoAtual === 'link' ? "✅ Gestão de Link/Ping (NORMALIZADO)" : "✅ Infra / Aplicações (NORMALIZADO)"; } 
+        if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); tituloForm.innerText = modoAtual === 'link' ? "🚨 Link/Ping (CRITICAL)" : "🚨 Infra (CRITICAL)"; } 
+        else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); tituloForm.innerText = modoAtual === 'link' ? "⚠️ Link/Ping (INTERMITENTE)" : "⚠️ Infra (INTERMITENTE)"; } 
+        else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); tituloForm.innerText = modoAtual === 'link' ? "✅ Link/Ping (NORMALIZADO)" : "✅ Infra (NORMALIZADO)"; } 
         else { tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link/Ping" : "Infra / Aplicações"; }
 
         const headerCell = document.getElementById('render-header-cell');
@@ -1350,9 +1432,9 @@
         const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
         
         if (modoAtual === 'link') {
-            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vProtocolo}</div></td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="12"><td></td></tr><tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;">${vSolucionador}</div></td><td></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
+            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="12"><td></td></tr><tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
         } else {
-            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 10px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 13px; color: #0F172A; font-weight: 700;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
+            dynamicGrid.innerHTML = `<tr><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="4%"></td><td width="48%" bgcolor="#F1F5F9" style="padding: 15px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">Severidade</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;"><span style="color: ${corSeveridade}; font-weight: 800;">${displaySeveridade}</span></div></td></tr>`;
         }
 
         if (vStatusInfo) { document.getElementById('statusinfo-container').style.display = 'block'; document.getElementById('v-statusinfo').innerHTML = formatarColchetes(vStatusInfo.replace(/\n/g, '<br>')); } 
@@ -1373,9 +1455,10 @@
     }
 
     // ==========================================
-    // FUNÇÕES DE EXPORTAÇÃO
+    // FUNÇÕES DE EXPORTAÇÃO E VALIDAÇÃO
     // ==========================================
     function copyITSSM() {
+        if (!validarCamposObrigatorios()) return;
         const vHost = document.getElementById('host').value || '---'; const vInicio = document.getElementById('inicio').value || '---'; const vFgrid = document.getElementById('f-grid').value || '-';
         const vTermino = document.getElementById('termino').value || '-'; const vCliente = document.getElementById('cliente').value || '---'; const vStatusInfo = document.getElementById('statusinfo').value.trim();
         let textoITSSM = `Host: ${vHost}\nInício da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\nCliente: ${vCliente}\n`;
@@ -1392,32 +1475,27 @@
     }
 
     function copiarAssuntoAcao() {
+        if (!validarCamposObrigatorios()) return;
         try { const assunto = obterAssuntoGerado(); const tempInput = document.createElement("input"); tempInput.value = assunto; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); } catch(e) {}
     }
 
     function copyHTML() {
-        const status = document.getElementById('status').value; const protocolo = document.getElementById('protocolo');
-        if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
-            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora para relatórios de Follow-Up e Encerramento no modo Link/Ping.'); protocolo.classList.add('erro-validacao'); protocolo.focus(); setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000); return; 
-        }
+        if (!validarCamposObrigatorios(true)) return; 
         try { const node = document.getElementById('render'); const range = document.createRange(); range.selectNode(node); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges(); mostrarToast("📋 HTML COPIADO COM SUCESSO!", "info"); } catch(e) {}
     }
 
     function copyAsImage() {
-        const status = document.getElementById('status').value; const protocolo = document.getElementById('protocolo');
-        if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
-            alert('⚠️ ATENÇÃO: É obrigatório informar o Protocolo da operadora.'); protocolo.classList.add('erro-validacao'); protocolo.focus(); setTimeout(() => { protocolo.classList.remove('erro-validacao'); }, 3000); return; 
-        }
+        if (!validarCamposObrigatorios(true)) return; 
 
         const assinaturaAtual = obterAssinaturaFormulario();
         if (assinaturaAtual !== ultimaAssinaturaGerada) { if (!verificarDuplicidade()) return; registrarHistoricoNuvem(obterAssuntoGerado()); ultimaAssinaturaGerada = assinaturaAtual; }
 
-        const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ GERANDO...';
+        const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ A GERAR...';
         const node = document.getElementById('render'); const clone = node.cloneNode(true); clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px'; clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
-        html2canvas(clone, { scale: 0.9, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+        html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             document.body.removeChild(clone);
-            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM COPIADA E SALVA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
+            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
@@ -1425,7 +1503,7 @@
         if(confirm("Deseja limpar todos os campos?")) {
             document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
             document.getElementById('status').value = 'EM ABERTO'; document.getElementById('severidade').value = 'WARNING'; document.getElementById('evidencias').checked = false; 
-            document.getElementById('protocolo').classList.remove('erro-validacao'); try { localStorage.removeItem('noc_rascunho_its'); } catch(e){} ultimaAssinaturaGerada = ''; update();
+            document.getElementById('protocolo').classList.remove('shake-error'); try { localStorage.removeItem('noc_rascunho_its'); } catch(e){} ultimaAssinaturaGerada = ''; update();
         }
     }
 
