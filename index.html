@@ -134,6 +134,7 @@
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
+        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* DARK MODE */
@@ -231,8 +232,7 @@
         <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;">
             </div>
 
-        <button onclick="fecharAlertaBloqueante()" style="padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
-    </div>
+        </div>
 </div>
 
 <div id="modal-login" class="modal-overlay">
@@ -413,9 +413,10 @@
                         <option value="">📚 Templates Rápidos...</option>
                         <option value="padrao">Padrão do Status Atual</option>
                         <option value="fibra">Rompimento de Fibra</option>
-                        <option value="energia">Falha Elétrica (Enel/Cemig)</option>
-                        <option value="tilocal">Aguardando TI Local</option>
-                        <option value="reboot">Reinício de Equipamento</option>
+                        <option value="energia">Falha Elétrica (Concessionária)</option>
+                        <option value="monitoramento">Acompanhamento Pós-Reparo</option>
+                        <option value="n2">Escalonado para Engenharia (N2)</option>
+                        <option value="confirmacao">Aguardando Validação do Cliente</option>
                     </select>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
@@ -515,7 +516,8 @@
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
     let ultimaAssinaturaGerada = ''; 
-    let chamadosAlertadosSLA = new Set(); 
+    let chamadosAlertadosSLA = new Set(); // Guarda quem já apitou
+    let chamadosSilenciadosSLA = new Set(); // Guarda quem o analista mutou!
 
     // Health Check Firebase
     db.ref('.info/connected').on('value', function(snap) {
@@ -587,6 +589,7 @@
             window.chamadosExibidos = [];
             ultimaAssinaturaGerada = '';
             chamadosAlertadosSLA.clear();
+            chamadosSilenciadosSLA.clear(); // Limpa o mute ao deslogar
         }
     }
 
@@ -610,7 +613,7 @@
     }
 
     // ==========================================
-    // SISTEMA DE SLA (TRAVA A TELA A CADA 30 MIN - SÓ LINK)
+    // SISTEMA DE SLA COM BOTÃO DE SILENCIAR (MUTE)
     // ==========================================
     function tocarSomSuaveSLA() {
         try {
@@ -639,9 +642,10 @@
             });
 
             for (let chave in estadoRecente) {
+                // SE O ANALISTA SILENCIOU ESTE HOST, PULA ELE!
+                if (chamadosSilenciadosSLA.has(chave)) continue;
+
                 let log = estadoRecente[chave];
-                
-                // REQUISITO: SLA APENAS PARA LINK/PING!
                 if (log.form.modo === 'infra') continue; 
                 
                 let acao = log.assunto.split(' | ')[5] || '';
@@ -653,7 +657,7 @@
                     if (cicloAtual >= 1) {
                         let alertaId = `${chave}-ciclo-${cicloAtual}`;
                         if (!chamadosAlertadosSLA.has(alertaId)) {
-                            dispararModalSLA(log, diffMinutos);
+                            dispararModalSLA(log, diffMinutos, chave);
                             chamadosAlertadosSLA.add(alertaId);
                         }
                     }
@@ -662,7 +666,7 @@
         }, 60000); 
     }
 
-    function dispararModalSLA(log, minutos) {
+    function dispararModalSLA(log, minutos, chave) {
         let minArredondado = Math.floor(minutos);
         let htmlMensagem = `
             <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
@@ -676,10 +680,22 @@
                     Está sem atualização há ${minArredondado} minutos!
                 </div>
             </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="fecharAlertaBloqueante()" style="flex: 1; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px;">CIENTE 👍</button>
+                <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 12px; background: white; color: var(--its-red); border: 1px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s;">🔕 SILENCIAR ESTE HOST</button>
+            </div>
         `;
         filaDeAlertas.push(htmlMensagem);
         tocarSomSuaveSLA();
         if (!modalAberto) exibirProximoAlerta();
+    }
+
+    // Função Global chamada pelo botão do Modal para mutar o Host
+    window.silenciarSLA = function(chave) {
+        chamadosSilenciadosSLA.add(chave);
+        fecharAlertaBloqueante();
+        mostrarToast("🔕 Alertas de SLA silenciados para este host.", "info");
     }
 
     // ==========================================
@@ -972,6 +988,7 @@
                         ${mensagemObj.servico}${hostText}
                     </div>
                 </div>
+                <button onclick="fecharAlertaBloqueante()" style="margin-top: 25px; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
             `;
         } else {
             const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
@@ -990,6 +1007,7 @@
                         ${mensagemObj.assunto}
                     </div>
                 </div>
+                <button onclick="fecharAlertaBloqueante()" style="margin-top: 25px; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
             `;
         }
 
@@ -1153,6 +1171,9 @@
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
+    // ==========================================
+    // BIBLIOTECA DE MACROS (TEMPLATES EXTERNOS)
+    // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
@@ -1160,10 +1181,11 @@
     };
 
     const macroLibrary = {
-        "fibra": "Atualização de Status: Em contato com a operadora, fomos informados de que houve um rompimento de fibra óptica na região.\n\nA equipe técnica de campo já foi acionada e está em deslocamento para o local para realizar o reparo (fusão). Continuamos acompanhando o SLA de perto.",
-        "energia": "Atualização de Status: Identificamos que a queda de comunicação ocorreu devido a uma falha no fornecimento de energia elétrica (Concessionária local) na região do cliente.\n\nOs equipamentos de rede do provedor estão sem alimentação no momento. Estamos aguardando o restabelecimento da energia para normalização do circuito.",
-        "tilocal": "Atualização de Status: Acionamos a equipe de TI local do cliente para verificações físicas.\n\nSolicitamos o reinício elétrico (reboot) do equipamento de borda (Modem/Roteador) e a verificação dos cabos de rede. Aguardamos o retorno da equipe local para dar sequência na tratativa.",
-        "reboot": "Ações e Diagnóstico: Solicitamos o reinício elétrico do equipamento para forçar uma nova sincronização com a rede.\n\nApós o procedimento de reboot físico, os serviços restabeleceram comunicação e no momento encontram-se estáveis. Incidente encerrado."
+        "fibra": "Atualização de Status: Informamos que nossa equipe técnica identificou um rompimento de fibra óptica na região.\n\nA equipe de campo da operadora já foi acionada e encontra-se em tratativa para realizar o reparo (fusão). Manteremos o acompanhamento rigoroso do SLA até a normalização.",
+        "energia": "Atualização de Status: Identificamos que a indisponibilidade é decorrente de uma falha massiva no fornecimento de energia elétrica (concessionária local) na região do site.\n\nOs equipamentos de rede encontram-se sem alimentação. Estamos monitorando e aguardamos o restabelecimento da energia para normalização do circuito.",
+        "monitoramento": "Atualização de Status: A operadora informou a conclusão das intervenções na região. Os serviços restabeleceram comunicação e respondem aos testes.\n\nNo momento, manteremos o circuito em período de observação e monitoramento contínuo para garantir a estabilidade antes do encerramento final do incidente.",
+        "n2": "Atualização de Status: O incidente foi escalonado internamente para a nossa equipe de Engenharia Avançada (N2) para uma análise mais aprofundada da falha.\n\nEstamos investigando logs e rotas para identificar a causa raiz. Enviaremos um novo parecer técnico assim que tivermos atualizações.",
+        "confirmacao": "Atualização de Status: Nossas ferramentas de monitoramento indicam o restabelecimento e a estabilização dos serviços no host supracitado.\n\nSolicitamos a gentileza de realizarem testes internos e confirmarem se o acesso foi devidamente normalizado do lado de vocês para procedermos com o encerramento."
     };
 
     function aplicarMacro(macroKey) {
