@@ -111,9 +111,6 @@
         .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
         .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
-        .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
-        .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
-
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
@@ -413,7 +410,14 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
-                    <button type="button" class="btn-action btn-template" id="btn-template-desc" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
+                    <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';">
+                        <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
+                        <option value="fibra">✂️ Rompimento de Fibra</option>
+                        <option value="eletrica">⚡ Falha Elétrica (Concessionária)</option>
+                        <option value="pos_reparo">👀 Acompanhamento Pós-Reparo</option>
+                        <option value="n2">🚀 Escalonado para Engenharia (N2)</option>
+                        <option value="validacao">⏳ Aguardando Validação do Cliente</option>
+                    </select>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
             </div>
@@ -514,7 +518,7 @@
     let ultimaAssinaturaGerada = ''; 
     let chamadosAlertadosSLA = new Set(); 
     let chamadosSilenciadosSLA = new Set(); 
-    let backupFormulario = null; 
+    let backupLimpeza = null; 
 
     // Módulo de Checagem Online nativo do Navegador (Sem travar F5)
     function atualizarStatusConexao() {
@@ -545,7 +549,7 @@
     // SISTEMA DE LOGIN E INICIALIZAÇÃO BLINDADOS
     // ==========================================
     let currentUser = null;
-    let timestampCarregamento = Date.now(); // Ponto de ancoragem para notificações futuras
+    let timestampCarregamento = Date.now(); 
 
     window.onload = function() {
         atualizarStatusConexao();
@@ -605,6 +609,7 @@
             ultimaAssinaturaGerada = '';
             chamadosAlertadosSLA.clear();
             chamadosSilenciadosSLA.clear(); 
+            atualizarDashboard();
         }
     }
 
@@ -633,31 +638,57 @@
         }, time); 
     }
 
+    // SONOPLASTIA INTELIGENTE
     function tocarSom(tipo) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
+            gainNode.connect(audioCtx.destination);
+
             if (tipo === 'aviso') {
-                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+                // Toque amigável estilo Slack (Claiming)
+                const osc1 = audioCtx.createOscillator();
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                osc1.connect(gainNode);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc1.start(audioCtx.currentTime); osc1.stop(audioCtx.currentTime + 0.1);
+                
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'sine'; osc2.frequency.setValueAtTime(1108.73, audioCtx.currentTime + 0.15); 
+                osc2.connect(gainNode);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime + 0.15);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc2.start(audioCtx.currentTime + 0.15); osc2.stop(audioCtx.currentTime + 0.4);
+
             } else if (tipo === 'sla') {
-                osc.type = 'square'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(500, audioCtx.currentTime + 0.2);
-                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+                // Bip duplo insistente (SLA)
+                const osc = audioCtx.createOscillator();
+                osc.type = 'square'; 
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+                osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.15); 
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.25);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); 
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+
             } else if (tipo === 'critical') {
-                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.5);
-                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+                // Sirene (CRITICAL)
+                const osc = audioCtx.createOscillator();
+                osc.type = 'sawtooth'; 
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime); 
+                osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.4);
+                osc.frequency.linearRampToValueAtTime(400, audioCtx.currentTime + 0.8);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); 
+                gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.7);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.8);
             } else {
+                const osc = audioCtx.createOscillator();
                 osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             }
-            
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination); 
         } catch(e) {}
     }
 
@@ -812,10 +843,9 @@
         exibirProximoAlerta(); 
     }
 
-    // Listener de Alertas blindado para capturar apenas eventos NOVOS após a página carregar
     db.ref('historico_noc').orderByChild('timestamp').startAt(timestampCarregamento).on('child_added', (snapshot) => {
         const data = snapshot.val();
-        if (data.timestamp <= timestampCarregamento) return; // Garante que não apite os velhos
+        if (data.timestamp <= timestampCarregamento) return; 
         if (currentUser && data.nome !== currentUser.nome) { 
             mostrarAlertaBloqueante(data); 
         }
@@ -931,7 +961,7 @@
     }
 
     // ==========================================
-    // HISTÓRICO LATERAL E BARRA DE BUSCA CORRIGIDA
+    // HISTÓRICO LATERAL, BUSCA E DASHBOARD
     // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
@@ -951,7 +981,34 @@
                 });
             }
             renderizarListaLateral();
+            atualizarDashboard();
         });
+    }
+
+    // DASHBOARD GERENCIAL
+    function atualizarDashboard() {
+        let estadoRecente = {};
+        
+        chamadosDoTurno.forEach(log => {
+            if (log.form) {
+                let chave = `${log.form.cliente}-${log.form.host}`;
+                if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                    estadoRecente[chave] = log;
+                }
+            }
+        });
+
+        let qtdAbertos = 0, qtdFollow = 0, qtdOk = 0;
+        for (let chave in estadoRecente) {
+            const acao = estadoRecente[chave].assunto.split(' | ')[5] || '';
+            if (acao.includes('ABERTURA')) qtdAbertos++;
+            else if (acao.includes('FOLLOW')) qtdFollow++;
+            else if (acao.includes('ENCERRAMENTO')) qtdOk++;
+        }
+
+        document.getElementById('dash-abertos').innerText = `🔴 ${qtdAbertos}`;
+        document.getElementById('dash-follow').innerText = `🟡 ${qtdFollow}`;
+        document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
     }
 
     function renderizarListaLateral() {
@@ -1032,6 +1089,13 @@
             const hostNome = log.form.host || 'Host/Circuito Não Informado';
             const servicoNome = log.form.item ? log.form.item.replace(/\n/g, ' | ') : 'Serviço Não Informado';
 
+            // RAIO-X DE SEVERIDADE
+            let ledSeveridade = '🟢';
+            if(log.form.severidade === 'CRITICAL') ledSeveridade = '🔴';
+            else if(log.form.severidade === 'WARNING') ledSeveridade = '🟡';
+            else if(log.form.severidade === 'INTERMITENTE') ledSeveridade = '🟠';
+            else if(log.form.severidade === 'UNKNOWN') ledSeveridade = '🟣';
+
             let infoAnalista = '';
             if (visaoHistorico === 'equipe' && currentUser && log.nome !== currentUser.nome) {
                 infoAnalista = `<div style="font-size: 9px; color: var(--its-orange); margin-top: 4px; font-weight: bold; background: #FFF7ED; padding: 3px 6px; border-radius: 4px; display: inline-block;">👤 Criado por: ${log.nome}</div>`;
@@ -1043,7 +1107,7 @@
                     <span class="my-card-client">${modoIcon} ${clienteNome}</span>
                     <span class="my-card-badge ${classeBadge}">${acao}</span>
                 </div>
-                <div class="my-card-host">${hostNome}</div>
+                <div class="my-card-host">${ledSeveridade} ${hostNome}</div>
                 <div class="my-card-service">🔖 ${servicoNome}</div>
                 ${infoAnalista}
                 <div class="my-card-bottom">
@@ -1122,7 +1186,6 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
-    // Apenas a IMAGEM aciona esta função
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
@@ -1185,22 +1248,27 @@
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
     // ==========================================
-    // PREENCHIMENTO E LÓGICA DO CARD
+    // PREENCHIMENTO E MACROS CLIENT-FACING
     // ==========================================
-    const templates = {
-        "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
-        "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
-        "RESOLVIDO": "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."
-    };
-
-    function inserirTemplate() {
-        const s = document.getElementById('status').value;
-        const sev = document.getElementById('severidade').value;
+    
+    window.inserirMacro = function(valor) {
+        if(!valor) return;
         const desc = document.getElementById('desc');
-        if (desc.value.trim() !== "" && !confirm("Substituir o texto atual?")) return;
-        let final = templates[s];
-        if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
-        desc.value = final; update();
+        if (desc.value.trim() !== "" && !confirm("Adicionar este texto ao que já está escrito? (Cancelar irá substituir o texto atual)")) {
+            desc.value = "";
+        }
+        
+        let texto = "";
+        switch(valor) {
+            case 'fibra': texto = "Identificamos indícios de rompimento de fibra ótica na região. A equipe técnica de campo da operadora já foi acionada e encontra-se em deslocamento para realizar o mapeamento e reparo físico no trecho afetado."; break;
+            case 'eletrica': texto = "Identificamos que o equipamento encontra-se indisponível devido a uma provável falha massiva no fornecimento de energia elétrica na região (incidente com a concessionária local). Aguardamos o restabelecimento da energia comercial para normalização do serviço."; break;
+            case 'pos_reparo': texto = "Informamos que o serviço de comunicação foi restabelecido. Contudo, o NOC manterá o circuito em acompanhamento de estabilidade e verificação de métricas antes do encerramento definitivo do incidente."; break;
+            case 'n2': texto = "O incidente foi escalonado para a equipe de Engenharia (N2) da operadora, que está realizando análises aprofundadas no backbone e em rotas alternativas para identificar a causa raiz da instabilidade."; break;
+            case 'validacao': texto = "A operadora informa que os testes apontam normalidade no circuito. Solicitamos, por gentileza, que a equipe local valide a disponibilidade dos serviços e acesso às aplicações internas para seguirmos com o encerramento."; break;
+        }
+        
+        desc.value = desc.value ? desc.value + "\n\n" + texto : texto;
+        update();
     }
 
     function mudarStatus() {
@@ -1280,7 +1348,7 @@
             labelTerminoForm = 'Término da Ocorrência';
             tituloTerminoBox = 'TÉRMINO DA OCORRÊNCIA';
             tituloDescBox = 'LOGS DO SISTEMA / EVIDÊNCIAS';
-            document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais <strong>(Bloco Cinza)</strong>";
+            document.getElementById('label-desc').innerHTML = "Logs / Evidências Adicionais";
             document.getElementById('v-desc').style.fontFamily = "Consolas, 'Courier New', monospace";
             document.getElementById('v-desc').style.fontSize = "12px";
             
@@ -1415,7 +1483,7 @@
     }
 
     // ==========================================
-    // FUNÇÕES DE CÓPIA - (SOMENTE IMAGEM SALVA HISTÓRICO)
+    // FUNÇÕES DE CÓPIA E BOTÃO DESFAZER LIMPEZA
     // ==========================================
     function copyITSSM() {
         const vHost = document.getElementById('host').value || '---';
@@ -1498,7 +1566,6 @@
         } catch(e) {}
     }
 
-    // O ÚNICO QUE REGISTRA NA NUVEM!
     function copyAsImage() {
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
@@ -1543,16 +1610,51 @@
     }
 
     function limparFormulario() {
-        if(confirm("Deseja limpar todos os campos?")) {
-            document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-            document.getElementById('status').value = 'EM ABERTO';
-            document.getElementById('severidade').value = 'WARNING';
-            document.getElementById('evidencias').checked = false; 
-            document.getElementById('protocolo').classList.remove('erro-validacao');
-            try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
-            ultimaAssinaturaGerada = ''; 
-            update();
-        }
+        backupLimpeza = {
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value,
+            host: document.getElementById('host').value, status: document.getElementById('status').value,
+            item: document.getElementById('item').value, protocolo: document.getElementById('protocolo').value,
+            solucionador: document.getElementById('solucionador').value, inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+            desc: document.getElementById('desc').value, obs: document.getElementById('obs').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value,
+            evidencias: document.getElementById('evidencias').checked 
+        };
+
+        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+        document.getElementById('status').value = 'EM ABERTO';
+        document.getElementById('severidade').value = 'WARNING';
+        document.getElementById('evidencias').checked = false; 
+        document.getElementById('protocolo').classList.remove('erro-validacao');
+        try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
+        ultimaAssinaturaGerada = ''; 
+        update();
+
+        mostrarToast('Formulário limpo. <span class="btn-undo" onclick="desfazerLimpeza()">DESFAZER ↩️</span>', 'warning', 10000);
+    }
+
+    window.desfazerLimpeza = function() {
+        if(!backupLimpeza) return;
+        if (backupLimpeza.modo) setModo(backupLimpeza.modo);
+        document.getElementById('cliente').value = backupLimpeza.cliente;
+        document.getElementById('severidade').value = backupLimpeza.severidade;
+        document.getElementById('host').value = backupLimpeza.host;
+        document.getElementById('status').value = backupLimpeza.status;
+        document.getElementById('item').value = backupLimpeza.item;
+        document.getElementById('protocolo').value = backupLimpeza.protocolo;
+        document.getElementById('solucionador').value = backupLimpeza.solucionador;
+        document.getElementById('inicio').value = backupLimpeza.inicio;
+        document.getElementById('f-grid').value = backupLimpeza.fgrid;
+        document.getElementById('termino').value = backupLimpeza.termino;
+        document.getElementById('desc').value = backupLimpeza.desc;
+        document.getElementById('obs').value = backupLimpeza.obs;
+        document.getElementById('statusinfo').value = backupLimpeza.statusinfo;
+        document.getElementById('pressplay').value = backupLimpeza.pressplay;
+        document.getElementById('evidencias').checked = backupLimpeza.evidencias;
+        update();
+        mostrarToast("✅ Dados restaurados com sucesso!", "success");
+        backupLimpeza = null;
     }
 
     function salvarRascunho() {
