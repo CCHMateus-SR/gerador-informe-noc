@@ -55,6 +55,10 @@
         .header-row h2 { color: var(--its-blue); margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; }
         .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
 
+        .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase;}
+        .conn-online { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
+        .conn-offline { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+
         .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
         .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
         .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
@@ -110,15 +114,14 @@
         .btn-secondary { flex: 1; background-color: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; }
         .btn-secondary:hover { background-color: #cbd5e1; color: #1e293b; }
 
-        .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase;}
-        .conn-online { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
-        .conn-offline { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
-
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
         .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
         .btn-theme:hover { background: #F1F5F9; }
+        
+        .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
+        .btn-undo:hover { background: rgba(0,0,0,0.2); }
 
         /* COLUNA 3: PREVIEW DO E-MAIL */
         .preview-side { flex: 1.4; background: #CBD5E1; padding: 40px; border-radius: 16px; position: sticky; top: 20px; border: 1px solid #94A3B8; overflow-y: auto; max-height: 92vh; display: flex; justify-content: center; transition: background-color 0.3s; min-width: 650px;}
@@ -133,7 +136,7 @@
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
+        .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 450px; font-weight: bold; line-height: 1.4;}
         .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -228,11 +231,9 @@
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
     <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
         <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
-        
-        <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;">
+        <div id="texto-alerta" style="margin-bottom: 0; text-align: left;">
             </div>
-
-        </div>
+    </div>
 </div>
 
 <div id="modal-login" class="modal-overlay">
@@ -305,6 +306,7 @@
             <div class="top-controls">
                 <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
+                <button class="btn-theme" title="Copiar Passagem de Turno" onclick="gerarPassagemTurno()">📋</button>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="toggleTheme()">🌙</button>
             </div>
@@ -437,7 +439,7 @@
             <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
             <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
-            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
+            <button class="btn-copy-itssm" id="btn-copiar-itssm" title="Atalho: Ctrl+Shift+X" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
 
@@ -516,8 +518,9 @@
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
     let ultimaAssinaturaGerada = ''; 
-    let chamadosAlertadosSLA = new Set(); // Guarda quem já apitou
-    let chamadosSilenciadosSLA = new Set(); // Guarda quem o analista mutou!
+    let chamadosAlertadosSLA = new Set(); 
+    let chamadosSilenciadosSLA = new Set(); 
+    let backupFormulario = null; 
 
     // Health Check Firebase
     db.ref('.info/connected').on('value', function(snap) {
@@ -589,11 +592,11 @@
             window.chamadosExibidos = [];
             ultimaAssinaturaGerada = '';
             chamadosAlertadosSLA.clear();
-            chamadosSilenciadosSLA.clear(); // Limpa o mute ao deslogar
+            chamadosSilenciadosSLA.clear(); 
         }
     }
 
-    function mostrarToast(mensagem, tipo = 'success') {
+    function mostrarToast(mensagem, tipo = 'success', duracao = null) {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = 'toast';
@@ -602,30 +605,71 @@
             toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
         } else if (tipo === 'warning') {
             toast.classList.add('toast-warning');
+            toast.style.pointerEvents = 'auto'; 
+        } else {
+            toast.style.pointerEvents = 'none';
         }
+        
         toast.innerHTML = mensagem;
         container.appendChild(toast);
+        
+        let time = duracao || (tipo === 'success' ? 3000 : 5000);
+        
         setTimeout(() => {
             toast.style.opacity = '0';
             toast.style.transform = 'translateX(-100%)';
             setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
-        }, tipo === 'success' ? 3000 : 5000); 
+        }, time); 
     }
 
     // ==========================================
-    // SISTEMA DE SLA COM BOTÃO DE SILENCIAR (MUTE)
+    // SISTEMA DE SONS (AVANÇADO)
     // ==========================================
-    function tocarSomSuaveSLA() {
+    function tocarSom(tipo) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const osc = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            osc.type = 'sine'; osc.frequency.setValueAtTime(440, audioCtx.currentTime); osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
-            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            
+            if (tipo === 'aviso') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (tipo === 'sla') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4);
+            } else if (tipo === 'critical') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.5);
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6);
+            } else {
+                osc.type = 'triangle'; 
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); 
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            }
+            
+            osc.connect(gainNode); 
+            gainNode.connect(audioCtx.destination); 
         } catch(e) {}
     }
 
+    // ==========================================
+    // SISTEMA DE SLA E SILENCIAMENTO
+    // ==========================================
     function iniciarMonitoramentoSLA() {
         setInterval(() => {
             if (!currentUser || chamadosDoTurno.length === 0) return;
@@ -642,7 +686,6 @@
             });
 
             for (let chave in estadoRecente) {
-                // SE O ANALISTA SILENCIOU ESTE HOST, PULA ELE!
                 if (chamadosSilenciadosSLA.has(chave)) continue;
 
                 let log = estadoRecente[chave];
@@ -687,11 +730,10 @@
             </div>
         `;
         filaDeAlertas.push(htmlMensagem);
-        tocarSomSuaveSLA();
+        tocarSom('sla');
         if (!modalAberto) exibirProximoAlerta();
     }
 
-    // Função Global chamada pelo botão do Modal para mutar o Host
     window.silenciarSLA = function(chave) {
         chamadosSilenciadosSLA.add(chave);
         fecharAlertaBloqueante();
@@ -762,9 +804,6 @@
         update();
     }
 
-    // ==========================================
-    // TRUQUE DO DATALIST E BUSCA
-    // ==========================================
     function abrirDatalist(element) {
         if (element.value === '') {
             try { element.showPicker(); } catch(e) {}
@@ -903,6 +942,13 @@
             let classeBadge = 'badge-aberto';
             if(acao.includes('FOLLOW')) classeBadge = 'badge-follow';
             if(acao.includes('ENCERRAMENTO')) classeBadge = 'badge-ok';
+            
+            let dotSev = '⚪';
+            if (log.form.severidade === 'CRITICAL') dotSev = '🔴';
+            else if (log.form.severidade === 'WARNING') dotSev = '🟡';
+            else if (log.form.severidade === 'INTERMITENTE') dotSev = '🟠';
+            else if (log.form.severidade === 'OK') dotSev = '🟢';
+            else if (log.form.severidade === 'UNKNOWN') dotSev = '🟣';
 
             const clienteNome = log.form.cliente || 'CLIENTE NÃO INFORMADO';
             const hostNome = log.form.host || 'Host/Circuito Não Informado';
@@ -919,7 +965,7 @@
                     <span class="my-card-client">${modoIcon} ${clienteNome}</span>
                     <span class="my-card-badge ${classeBadge}">${acao}</span>
                 </div>
-                <div class="my-card-host">${hostNome}</div>
+                <div class="my-card-host">${dotSev} ${hostNome}</div>
                 <div class="my-card-service">🔖 ${servicoNome}</div>
                 ${infoAnalista}
                 <div class="my-card-bottom">
@@ -961,16 +1007,8 @@
         mostrarToast("✅ Formulário preenchido com sucesso!");
     }
 
-    function tocarAlertaSonoroGeral() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-            gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-        } catch(e) {}
-    }
+    let filaDeAlertas = [];
+    let modalAberto = false;
 
     function mostrarAlertaBloqueante(mensagemObj) {
         let htmlMensagem = '';
@@ -978,41 +1016,39 @@
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
             htmlMensagem = `
-                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe assumiu uma análise:</p>
-                <div style="background: #FFF7ED; border-left: 4px solid var(--its-orange); padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
-                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> às ${mensagemObj.hora}
+                <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu uma análise às ${mensagemObj.hora}:
                     </div>
-                    <div style="font-size: 11px; text-transform: uppercase; font-weight: 800; color: var(--its-orange); margin-bottom: 5px;">👀 Serviço em Análise</div>
-                    <div style="font-family: Consolas, monospace; font-size: 14px; color: #9A3412; font-weight: bold;">
-                        ${mensagemObj.servico}${hostText}
+                    <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">
+                        👀 SERVIÇO: ${mensagemObj.servico}${hostText}
                     </div>
                 </div>
                 <button onclick="fecharAlertaBloqueante()" style="margin-top: 25px; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
             `;
+            tocarSom('aviso');
         } else {
             const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
-            const modoLabel = isInfra ? '🖥️ Infra / Aplicações' : '🌐 Link / Ping';
-            const corBorda = isInfra ? '#0EA5E9' : 'var(--its-red)'; 
-            const corFundo = isInfra ? '#F0F9FF' : '#FEF2F2';
-            const corTexto = isInfra ? '#0369A1' : '#991B1B';
-
+            const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
+            const modoLabel = isInfra ? '🖥️ Infra' : '🌐 Link';
+            
             htmlMensagem = `
-                <p style="font-size: 13px; color: #64748B; margin-bottom: 15px; text-align: center; margin-top: 0;">Um colega da equipe registrou uma ação:</p>
-                <div style="background: ${corFundo}; border-left: 4px solid ${corBorda}; padding: 15px; border-radius: 8px; text-align: center;">
-                    <div style="margin-bottom: 10px; color: #1E293B; font-size: 14px;">
-                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um informe de <span style="color: ${corBorda}; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
+                <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
+                    <div style="margin-bottom: 15px; color: #1E293B; font-size: 13px; text-align: center;">
+                        👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> gerou um novo informe de <span style="color: #0284C7; font-weight: bold;">${modoLabel}</span> às ${mensagemObj.hora}:
                     </div>
-                    <div style="font-family: Consolas, monospace; font-size: 13px; color: ${corTexto}; font-weight: bold; line-height: 1.5; padding: 5px;">
-                        ${mensagemObj.assunto}
+                    <div style="font-family: Consolas, monospace; font-size: 12px; color: #0369A1; text-align: center; font-weight: bold; line-height: 1.5;">
+                        ${mensagemObj.assunto.replace(/ \| /g, ' | ')}
                     </div>
                 </div>
                 <button onclick="fecharAlertaBloqueante()" style="margin-top: 25px; padding: 12px; background: #0EA5E9; color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);">CIENTE 👍</button>
             `;
+            
+            if (isCritical) tocarSom('critical');
+            else tocarSom('default');
         }
 
         filaDeAlertas.push(htmlMensagem);
-        tocarAlertaSonoroGeral();
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -1025,12 +1061,11 @@
 
     function fecharAlertaBloqueante() { filaDeAlertas.shift(); exibirProximoAlerta(); }
 
+    let isInitialLoad = true;
     db.ref('historico_noc').orderByChild('timestamp').limitToLast(1).on('child_added', (snapshot) => {
         if (isInitialLoad) { isInitialLoad = false; return; }
         const data = snapshot.val();
-        if(currentUser && data.nome !== currentUser.nome) { 
-            mostrarAlertaBloqueante(data); 
-        }
+        if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
     });
 
     let ultimosLogsFirebase = [];
@@ -1091,6 +1126,9 @@
         });
     }
 
+    // ==========================================
+    // EXCEL, DASHBOARD E PASSAGEM DE TURNO
+    // ==========================================
     function exportarParaExcel() {
         const btn = document.getElementById('btn-exportar');
         const txtOriginal = btn.innerHTML;
@@ -1171,9 +1209,71 @@
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
+    function gerarPassagemTurno() {
+        if (chamadosDoTurno.length === 0) {
+            alert("Nenhum chamado no plantão para gerar passagem.");
+            return;
+        }
+        
+        let estadoRecente = {};
+        chamadosDoTurno.forEach(log => {
+            if (log.form) {
+                let chave = `${log.form.cliente}-${log.form.host}`;
+                if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                    estadoRecente[chave] = log;
+                }
+            }
+        });
+
+        let textoPassagem = `📋 *PASSAGEM DE TURNO - ITS NOC*\nData: ${new Date().toLocaleDateString('pt-BR')}\n\n`;
+        let temPendencia = false;
+
+        for (let chave in estadoRecente) {
+            let log = estadoRecente[chave];
+            let acao = log.assunto.split(' | ')[5] || '';
+            
+            if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
+                temPendencia = true;
+                let icone = '🔴';
+                if (log.form.status === 'FOLLOW-UP') icone = '🟡';
+                
+                textoPassagem += `${icone} *[${log.form.status}]* ${log.form.cliente} - ${log.form.host}\n`;
+                if (log.form.termino) { textoPassagem += `   SLA: ${log.form.termino}\n`; }
+                textoPassagem += `   Serviço: ${log.form.item.replace(/\n/g, ' ')}\n\n`;
+            }
+        }
+
+        if (!temPendencia) { textoPassagem += "✅ Nenhuma pendência em aberto ou follow-up no momento.\n"; }
+
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = textoPassagem;
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempTextarea);
+        
+        mostrarToast("📋 Passagem de turno copiada para a área de transferência!", "info");
+    }
+
     // ==========================================
-    // BIBLIOTECA DE MACROS (TEMPLATES EXTERNOS)
+    // CÓPIAS, HOTKEYS E LIMPEZA
     // ==========================================
+    document.addEventListener('keydown', function(e) {
+        // ESC fecha os modais da tela
+        if (e.key === 'Escape') {
+            if (modalAberto) fecharAlertaBloqueante();
+            fecharHistorico();
+        }
+        
+        // Hotkeys Ninjas
+        if (e.ctrlKey && e.shiftKey) {
+            const key = e.key.toLowerCase();
+            if (key === 'a') { e.preventDefault(); copiarAssuntoAcao(); }
+            if (key === 'i') { e.preventDefault(); copyAsImage(); }
+            if (key === 'x') { e.preventDefault(); copyITSSM(); } // Alt. Segura para não abrir abas
+        }
+    });
+
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
@@ -1211,9 +1311,7 @@
         update();
     }
 
-    function inserirTemplate() {
-        aplicarMacro('padrao');
-    }
+    function inserirTemplate() { aplicarMacro('padrao'); }
 
     function mudarStatus() {
         if (document.getElementById('status').value === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; }
@@ -1221,6 +1319,7 @@
     }
 
     function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
+    
     function inserirDataPicker(idTexto, valor) {
         if (!valor) return;
         const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`;
@@ -1228,6 +1327,7 @@
         input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt;
         update();
     }
+    
     function preencherAgoraText(idTexto) {
         const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
         const input = document.getElementById(idTexto);
@@ -1426,15 +1526,10 @@
         salvarRascunho();
     }
 
+    // ==========================================
+    // CÓPIAS - APENAS IMAGEM REGISTRA NO HISTÓRICO
+    // ==========================================
     function copyITSSM() {
-        const assinaturaAtual = obterAssinaturaFormulario();
-        
-        if (assinaturaAtual !== ultimaAssinaturaGerada) {
-            if (!verificarDuplicidade()) return;
-            registrarHistoricoNuvem(obterAssuntoGerado());
-            ultimaAssinaturaGerada = assinaturaAtual;
-        }
-
         const vHost = document.getElementById('host').value || '---';
         const vInicio = document.getElementById('inicio').value || '---';
         const vFgrid = document.getElementById('f-grid').value || '-';
@@ -1491,14 +1586,6 @@
     }
 
     function copiarAssuntoAcao() {
-        const assinaturaAtual = obterAssinaturaFormulario();
-        
-        if (assinaturaAtual !== ultimaAssinaturaGerada) {
-            if (!verificarDuplicidade()) return; 
-            registrarHistoricoNuvem(obterAssuntoGerado()); 
-            ultimaAssinaturaGerada = assinaturaAtual;
-        }
-
         const assunto = obterAssuntoGerado();
         const tempInput = document.createElement("input");
         tempInput.value = assunto; document.body.appendChild(tempInput);
@@ -1522,13 +1609,6 @@
             return; 
         }
 
-        const assinaturaAtual = obterAssinaturaFormulario();
-        if (assinaturaAtual !== ultimaAssinaturaGerada) {
-            if (!verificarDuplicidade()) return; 
-            registrarHistoricoNuvem(obterAssuntoGerado()); 
-            ultimaAssinaturaGerada = assinaturaAtual;
-        }
-
         const node = document.getElementById('render');
         const range = document.createRange(); range.selectNode(node);
         window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
@@ -1539,6 +1619,7 @@
         setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
     }
 
+    // O ÚNICO GATILHO QUE SALVA O HISTÓRICO PARA A EQUIPE!
     function copyAsImage() {
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
@@ -1582,56 +1663,62 @@
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
+    // ==========================================
+    // FUNÇÃO DESFAZER LIMPEZA 
+    // ==========================================
     function limparFormulario() {
-        if(confirm("Deseja limpar todos os campos?")) {
-            document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-            document.getElementById('status').value = 'EM ABERTO';
-            document.getElementById('severidade').value = 'WARNING';
-            document.getElementById('evidencias').checked = false; 
-            document.getElementById('protocolo').classList.remove('erro-validacao');
-            document.getElementById('macro-select').value = '';
-            localStorage.removeItem('noc_rascunho_its'); 
-            ultimaAssinaturaGerada = ''; 
-            update();
-        }
-    }
-
-    function salvarRascunho() {
-        const rascunho = {
-            modo: modoAtual,
-            cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value,
-            host: document.getElementById('host').value, status: document.getElementById('status').value,
-            item: document.getElementById('item').value, protocolo: document.getElementById('protocolo').value,
-            solucionador: document.getElementById('solucionador').value, inicio: document.getElementById('inicio').value,
-            fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
-            desc: document.getElementById('desc').value, obs: document.getElementById('obs').value,
-            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value,
-            evidencias: document.getElementById('evidencias').checked 
+        backupFormulario = {
+            cliente: document.getElementById('cliente').value,
+            host: document.getElementById('host').value,
+            item: document.getElementById('item').value,
+            severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value,
+            pressplay: document.getElementById('pressplay').value,
+            status: document.getElementById('status').value,
+            protocolo: document.getElementById('protocolo').value,
+            inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value,
+            termino: document.getElementById('termino').value,
+            solucionador: document.getElementById('solucionador').value,
+            obs: document.getElementById('obs').value,
+            desc: document.getElementById('desc').value,
+            evidencias: document.getElementById('evidencias').checked
         };
-        localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho));
+
+        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+        document.getElementById('status').value = 'EM ABERTO';
+        document.getElementById('severidade').value = 'WARNING';
+        document.getElementById('evidencias').checked = false; 
+        document.getElementById('protocolo').classList.remove('erro-validacao');
+        document.getElementById('macro-select').value = '';
+        localStorage.removeItem('noc_rascunho_its'); 
+        ultimaAssinaturaGerada = ''; 
+        update();
+        
+        mostrarToast(`🗑️ Formulário limpo. <span class="btn-undo" onclick="desfazerLimpeza()">DESFAZER</span>`, 'warning', 10000);
     }
 
-    function carregarRascunho() {
-        const salvo = localStorage.getItem('noc_rascunho_its');
-        if (salvo) {
-            const rascunho = JSON.parse(salvo);
-            if (rascunho.modo) modoAtual = rascunho.modo; 
-            document.getElementById('cliente').value = rascunho.cliente || '';
-            document.getElementById('severidade').value = rascunho.severidade || 'WARNING';
-            document.getElementById('host').value = rascunho.host || '';
-            document.getElementById('status').value = rascunho.status || 'EM ABERTO';
-            document.getElementById('item').value = rascunho.item || '';
-            document.getElementById('protocolo').value = rascunho.protocolo || '';
-            document.getElementById('solucionador').value = rascunho.solucionador || '';
-            document.getElementById('inicio').value = rascunho.inicio || '';
-            document.getElementById('f-grid').value = rascunho.fgrid || '';
-            document.getElementById('termino').value = rascunho.termino || '';
-            document.getElementById('desc').value = rascunho.desc || '';
-            document.getElementById('obs').value = rascunho.obs || '';
-            document.getElementById('statusinfo').value = rascunho.statusinfo || '';
-            document.getElementById('pressplay').value = rascunho.pressplay || ''; 
-            document.getElementById('evidencias').checked = rascunho.evidencias || false; 
-        }
+    window.desfazerLimpeza = function() {
+        if (!backupFormulario) return;
+        document.getElementById('cliente').value = backupFormulario.cliente;
+        document.getElementById('host').value = backupFormulario.host;
+        document.getElementById('item').value = backupFormulario.item;
+        document.getElementById('severidade').value = backupFormulario.severidade;
+        document.getElementById('statusinfo').value = backupFormulario.statusinfo;
+        document.getElementById('pressplay').value = backupFormulario.pressplay;
+        document.getElementById('status').value = backupFormulario.status;
+        document.getElementById('protocolo').value = backupFormulario.protocolo;
+        document.getElementById('inicio').value = backupFormulario.inicio;
+        document.getElementById('f-grid').value = backupFormulario.fgrid;
+        document.getElementById('termino').value = backupFormulario.termino;
+        document.getElementById('solucionador').value = backupFormulario.solucionador;
+        document.getElementById('obs').value = backupFormulario.obs;
+        document.getElementById('desc').value = backupFormulario.desc;
+        document.getElementById('evidencias').checked = backupFormulario.evidencias;
+        
+        backupFormulario = null;
+        update();
+        mostrarToast("✅ Ação desfeita! Dados restaurados.", "success");
     }
 
     function toggleTheme() {
