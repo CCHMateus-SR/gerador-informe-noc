@@ -138,15 +138,8 @@
         
         #toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { background: #10B981; color: white; padding: 15px 20px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 13px; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.4s ease-out forwards; max-width: 400px; font-weight: bold;}
-        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; pointer-events: auto;}
+        .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        /* BOTÕES DOS ALERTAS (VERMELHOS) */
-        .botoes-alerta-container { display: flex; gap: 10px; margin-top: 25px; width: 100%; }
-        .btn-ciente { flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); letter-spacing: 0.5px;}
-        .btn-ciente:hover { background: #991B1B; transform: translateY(-2px); }
-        .btn-ignorar { flex: 1; padding: 14px; background: #991B1B; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2); letter-spacing: 0.5px;}
-        .btn-ignorar:hover { background: #7f1d1d; transform: translateY(-2px); }
 
         /* DARK MODE */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
@@ -223,11 +216,6 @@
         .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
         .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
         .dash-ok { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
-
-        body.dark-mode .btn-ciente { background: var(--its-red); color: white; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); }
-        body.dark-mode .btn-ciente:hover { background: #991B1B; }
-        body.dark-mode .btn-ignorar { background: #450a0a; color: white; border-color: #7f1d1d; }
-        body.dark-mode .btn-ignorar:hover { background: #7f1d1d; }
     </style>
 </head>
 <body>
@@ -245,10 +233,7 @@
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
     <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
         <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
-        
         <div id="texto-alerta" style="margin-bottom: 0; text-align: left;"></div>
-
-        <div id="botoes-alerta" class="botoes-alerta-container"></div>
     </div>
 </div>
 
@@ -427,15 +412,7 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
-                    <select id="macro-select" class="select-macro" onchange="aplicarMacro(this.value)">
-                        <option value="">📚 Templates Rápidos...</option>
-                        <option value="padrao">Padrão do Status Atual</option>
-                        <option value="fibra">Rompimento de Fibra</option>
-                        <option value="energia">Falha Elétrica (Concessionária)</option>
-                        <option value="monitoramento">Acompanhamento Pós-Reparo</option>
-                        <option value="n2">Escalonado para Engenharia (N2)</option>
-                        <option value="confirmacao">Aguardando Validação do Cliente</option>
-                    </select>
+                    <button type="button" class="btn-action btn-template" id="btn-template-desc" onclick="inserirTemplate()">📝 Inserir Texto Padrão</button>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
             </div>
@@ -452,10 +429,10 @@
             <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
         </div>
         <div class="button-row" style="margin-bottom: 0;">
-            <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+            <button class="btn-copy-subject" id="btn-assunto" title="Atalho: Ctrl+Shift+A" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
             <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-            <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
-            <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
+            <button class="btn-copy-img" id="btn-copiar-img" title="Atalho: Ctrl+Shift+I" onclick="copyAsImage()">📸 IMAGEM</button>
+            <button class="btn-copy-itssm" id="btn-copiar-itssm" title="Atalho: Ctrl+Shift+X" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
         </div>
     </div>
 
@@ -538,6 +515,7 @@
     let chamadosSilenciadosSLA = new Set(); 
     let backupFormulario = null; 
 
+    // Health Check
     function atualizarStatusConexao() {
         const statusEl = document.getElementById('conexao-status');
         if (!statusEl) return;
@@ -562,23 +540,26 @@
         return inicioPlantao.getTime();
     }
 
+    // ==========================================
+    // SISTEMA DE LOGIN COM BLINDAGEM ANTI-CRASH
+    // ==========================================
     let currentUser = null;
     try {
-        const storedUser = localStorage.getItem('noc_user_info');
-        if (storedUser && storedUser !== "undefined" && storedUser !== "null") {
-            currentUser = JSON.parse(storedUser);
+        const rawUser = localStorage.getItem('noc_user_info');
+        if (rawUser && rawUser !== "undefined" && rawUser !== "null") {
+            currentUser = JSON.parse(rawUser);
         }
-    } catch(e) {
+    } catch (e) {
         localStorage.removeItem('noc_user_info');
     }
 
     window.onload = function() {
         atualizarStatusConexao();
-        try { document.getElementById('severidade').value = 'WARNING'; } catch(e) {}
-        try { carregarRascunho(); } catch(e) {}
-        try { setModo(modoAtual); } catch(e) {}
-        
         try {
+            document.getElementById('severidade').value = 'WARNING'; 
+            carregarRascunho();
+            setModo(modoAtual); 
+            
             if (!currentUser) {
                 document.getElementById('modal-login').style.display = 'flex';
             } else {
@@ -587,9 +568,7 @@
                 iniciarListenerHistorico();
                 iniciarMonitoramentoSLA();
             }
-        } catch(e) {
-            console.error("Erro na inicialização", e);
-        }
+        } catch(e) {}
     };
 
     function salvarLogin() {
@@ -599,7 +578,7 @@
         if(!nome || nome === "") { alert("Por favor, selecione seu nome na lista oficial!"); return; }
         
         currentUser = { nome, turno };
-        try { localStorage.setItem('noc_user_info', JSON.stringify(currentUser)); } catch(e) {}
+        try { localStorage.setItem('noc_user_info', JSON.stringify(currentUser)); } catch(e){}
         
         document.getElementById('modal-login').style.display = 'none';
         document.getElementById('user-display').innerHTML = `👤 ${currentUser.nome} (${currentUser.turno})`;
@@ -610,7 +589,7 @@
 
     function fazerLogout() {
         if(confirm("Deseja sair do seu usuário atual?")) {
-            try { localStorage.removeItem('noc_user_info'); } catch(e) {}
+            try { localStorage.removeItem('noc_user_info'); } catch(e){}
             currentUser = null;
             document.getElementById('modal-login').style.display = 'flex';
             document.getElementById('user-display').innerText = `👤 Entrando...`;
@@ -658,39 +637,42 @@
             const gainNode = audioCtx.createGain();
             
             if (tipo === 'aviso') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.2);
             } else if (tipo === 'sla') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.1);
-                osc.frequency.setValueAtTime(500, audioCtx.currentTime + 0.2);
-                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.type = 'square'; osc.frequency.setValueAtTime(500, audioCtx.currentTime); osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.1); osc.frequency.setValueAtTime(500, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.4);
             } else if (tipo === 'critical') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.5);
-                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + 0.5);
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.6);
             } else {
-                osc.type = 'triangle'; 
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
-                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); 
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.2); 
+                gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
             }
             
-            osc.connect(gainNode); 
-            gainNode.connect(audioCtx.destination); 
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination); 
         } catch(e) {}
+    }
+
+    // ==========================================
+    // SISTEMA DE SLA (SÓ LINK) E SILENCIAR
+    // ==========================================
+    function formatarTempoSLA(minutosTotais) {
+        let mins = Math.floor(minutosTotais);
+        if (mins < 60) return `${mins} minutos`;
+        
+        let horas = Math.floor(mins / 60);
+        let minsRestantes = mins % 60;
+        
+        let textoHoras = horas === 1 ? '1 hora' : `${horas} horas`;
+        let textoMins = minsRestantes === 1 ? '1 minuto' : `${minsRestantes} minutos`;
+        
+        if (minsRestantes === 0) return textoHoras;
+        return `${textoHoras} e ${textoMins}`;
     }
 
     function iniciarMonitoramentoSLA() {
@@ -732,12 +714,15 @@
         }, 60000); 
     }
 
+    // ==========================================
+    // GERENCIADOR DE ALERTAS E MODAIS
+    // ==========================================
     let filaDeAlertas = [];
     let modalAberto = false;
 
     function mostrarAlertaBloqueante(mensagemObj) {
         let htmlMensagem = '';
-        let botoes = `<button class="btn-ciente" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
+        let botoesHTML = `<button style="padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
 
         if (mensagemObj.tipo === 'aviso_rapido') {
             const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
@@ -751,11 +736,8 @@
                     </div>
                 </div>
             `;
-            filaDeAlertas.push({ html: htmlMensagem, botoes: botoes });
-            tocarSom('aviso');
         } else {
             const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
-            const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
             const modoLabel = isInfra ? '🖥️ Infra' : '🌐 Link';
             
             htmlMensagem = `
@@ -768,16 +750,16 @@
                     </div>
                 </div>
             `;
-            filaDeAlertas.push({ html: htmlMensagem, botoes: botoes });
-            if (isCritical) tocarSom('critical');
-            else tocarSom('default');
         }
 
+        filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: mensagemObj.tipo, form: mensagemObj.form });
+        tocarSom(mensagemObj.tipo === 'aviso_rapido' ? 'aviso' : (mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL' ? 'critical' : 'default'));
         if (!modalAberto) exibirProximoAlerta();
     }
 
     function dispararModalSLA(log, minutos, chave) {
-        let minArredondado = Math.floor(minutos);
+        let tempoFormatado = formatarTempoSLA(minutos);
+        
         let htmlMensagem = `
             <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                 <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">
@@ -787,16 +769,16 @@
                     O Host <strong>${log.form.host}</strong> (${log.form.cliente})
                 </div>
                 <div style="font-family: Consolas, monospace; font-size: 13px; color: #991B1B; font-weight: bold; background: #FEE2E2; padding: 8px; border-radius: 4px;">
-                    Está sem atualização há ${minArredondado} minutos!
+                    Está sem atualização há ${tempoFormatado}!
                 </div>
             </div>
         `;
-        let botoes = `
-            <button class="btn-ignorar" onclick="silenciarSLA('${chave}')">🔕 SILENCIAR HOST</button>
-            <button class="btn-ciente" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
+        let botoesHTML = `
+            <button style="flex: 1; padding: 14px; background: #991B1B; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(153, 27, 27, 0.2);" onclick="silenciarSLA('${chave}')">🔕 SILENCIAR HOST</button>
+            <button style="flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>
         `;
         
-        filaDeAlertas.push({ html: htmlMensagem, botoes: botoes });
+        filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'sla' });
         tocarSom('sla');
         if (!modalAberto) exibirProximoAlerta();
     }
@@ -804,7 +786,7 @@
     window.silenciarSLA = function(chave) {
         chamadosSilenciadosSLA.add(chave);
         fecharAlertaBloqueante();
-        mostrarToast("🔕 Alertas de SLA silenciados para este host.", "info");
+        mostrarToast("🔕 Alertas silenciados para este host.", "info");
     }
 
     function exibirProximoAlerta() {
@@ -832,6 +814,9 @@
         if(currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
     });
 
+    // ==========================================
+    // SELETOR DE MODO
+    // ==========================================
     function trocarModo(novoModo) {
         if (modoAtual === novoModo) return; 
 
@@ -850,8 +835,7 @@
         document.getElementById('severidade').value = 'WARNING';
         document.getElementById('evidencias').checked = false;
         document.getElementById('protocolo').classList.remove('erro-validacao');
-        document.getElementById('macro-select').value = '';
-        try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
+        try{ localStorage.removeItem('noc_rascunho_its'); }catch(e){}
         ultimaAssinaturaGerada = ''; 
 
         setModo(novoModo);
@@ -939,6 +923,9 @@
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
+    // ==========================================
+    // HISTÓRICO LATERAL E BARRA DE BUSCA CORRIGIDA
+    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -977,6 +964,7 @@
             window.chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual)); 
         }
 
+        // LÓGICA DE BUSCA BLINDADA
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
@@ -1128,6 +1116,7 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
+    // Apenas a IMAGEM aciona esta função
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
@@ -1149,6 +1138,14 @@
         });
     }
 
+    // ==========================================
+    // EXCEL E HISTORICO (TELA CHEIA)
+    // ==========================================
+    function sanearCSV(str) {
+        if (!str) return '-';
+        return str.toString().replace(/"/g, '""').replace(/\n/g, ' ');
+    }
+
     function exportarParaExcel() {
         const btn = document.getElementById('btn-exportar');
         const txtOriginal = btn.innerHTML;
@@ -1163,13 +1160,15 @@
                 
                 const p = log.assunto.split(' | ');
                 const dObj = new Date(log.timestamp);
-                csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${log.nome}","${log.turno}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? p[0].trim() : '-'}","${p[1] ? p[1].trim() : '-'}","${p[2] ? p[2].replace(/\n/g, ' ').trim() : '-'}","${p[3] ? p[3].trim() : '-'}","${p[5] ? p[5].trim() : '-'}"\n`;
+                csvContent += `"${dObj.toLocaleDateString('pt-BR')}","${dObj.toLocaleTimeString('pt-BR')}","${sanearCSV(log.nome)}","${sanearCSV(log.turno)}","${log.form && log.form.modo === 'infra' ? 'Infra' : 'Link'}","${p[0] ? sanearCSV(p[0].trim()) : '-'}","${p[1] ? sanearCSV(p[1].trim()) : '-'}","${p[2] ? sanearCSV(p[2].replace(/\n/g, ' ').trim()) : '-'}","${p[3] ? sanearCSV(p[3].trim()) : '-'}","${p[5] ? sanearCSV(p[5].trim()) : '-'}"\n`;
             });
-            const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            try {
+                const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' }); 
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `Relatorio_NOC_ITS_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            } catch(e) {}
             btn.innerHTML = '✅ Concluído!'; setTimeout(() => { btn.innerHTML = txtOriginal; }, 3000);
         });
     }
@@ -1178,12 +1177,8 @@
         document.getElementById('modal-historico').style.display = 'flex';
         const listaHtml = document.getElementById('lista-historico');
         listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar do plantão...</div>';
-        
         db.ref('historico_noc').orderByChild('timestamp').startAt(getInicioDoPlantaoTimestamp()).once('value', (snapshot) => {
-            if(!snapshot.exists()) { 
-                listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; 
-                return; 
-            }
+            if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; return; }
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             
@@ -1220,15 +1215,18 @@
                 }
             });
             listaHtml.innerHTML = html;
-
-            document.getElementById('dash-abertos').innerText = `🔴 ${abertos}`;
-            document.getElementById('dash-follow').innerText = `🟡 ${follow}`;
-            document.getElementById('dash-ok').innerText = `🟢 ${resolvidos}`;
+            
+            if(document.getElementById('dash-abertos')) document.getElementById('dash-abertos').innerText = `🔴 ${abertos}`;
+            if(document.getElementById('dash-follow')) document.getElementById('dash-follow').innerText = `🟡 ${follow}`;
+            if(document.getElementById('dash-ok')) document.getElementById('dash-ok').innerText = `🟢 ${resolvidos}`;
         });
     }
 
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
+    // ==========================================
+    // PASSAGEM DE TURNO E HOTKEYS
+    // ==========================================
     function gerarPassagemTurno() {
         if (chamadosDoTurno.length === 0) {
             alert("Nenhum chamado no plantão para gerar passagem.");
@@ -1265,14 +1263,15 @@
 
         if (!temPendencia) { textoPassagem += "✅ Nenhuma pendência em aberto ou follow-up no momento.\n"; }
 
-        const tempTextarea = document.createElement("textarea");
-        tempTextarea.value = textoPassagem;
-        document.body.appendChild(tempTextarea);
-        tempTextarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempTextarea);
-        
-        mostrarToast("📋 Passagem de turno copiada para a área de transferência!", "info");
+        try {
+            const tempTextarea = document.createElement("textarea");
+            tempTextarea.value = textoPassagem;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextarea);
+            mostrarToast("📋 Passagem de turno copiada para a área de transferência!", "info");
+        } catch(e) {}
     }
 
     document.addEventListener('keydown', function(e) {
@@ -1293,45 +1292,23 @@
         }
     });
 
+    // ==========================================
+    // PREENCHIMENTO E LÓGICA DO CARD
+    // ==========================================
     const templates = {
         "EM ABERTO": "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades.",
         "FOLLOW-UP": "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa.",
         "RESOLVIDO": "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."
     };
 
-    const macroLibrary = {
-        "fibra": "Atualização de Status: Informamos que nossa equipe técnica identificou um rompimento de fibra óptica na região.\n\nA equipe de campo da operadora já foi acionada e encontra-se em tratativa para realizar o reparo (fusão). Manteremos o acompanhamento rigoroso do SLA até a normalização.",
-        "energia": "Atualização de Status: Identificamos que a indisponibilidade é decorrente de uma falha massiva no fornecimento de energia elétrica (concessionária local) na região do site.\n\nOs equipamentos de rede encontram-se sem alimentação. Estamos monitorando e aguardamos o restabelecimento da energia para normalização do circuito.",
-        "monitoramento": "Atualização de Status: A operadora informou a conclusão das intervenções na região. Os serviços restabeleceram comunicação e respondem aos testes.\n\nNo momento, manteremos o circuito em período de observação e monitoramento contínuo para garantir a estabilidade antes do encerramento final do incidente.",
-        "n2": "Atualização de Status: O incidente foi escalonado internamente para a nossa equipe de Engenharia Avançada (N2) para uma análise mais aprofundada da falha.\n\nEstamos investigando logs e rotas para identificar a causa raiz. Enviaremos um novo parecer técnico assim que tivermos atualizações.",
-        "confirmacao": "Atualização de Status: Nossas ferramentas de monitoramento indicam o restabelecimento e a estabilização dos serviços no host supracitado.\n\nSolicitamos a gentileza de realizarem testes internos e confirmarem se o acesso foi devidamente normalizado do lado de vocês para procedermos com o encerramento."
-    };
-
-    function aplicarMacro(macroKey) {
-        if (!macroKey) return; 
-
-        const desc = document.getElementById('desc');
-        if (desc.value.trim() !== "" && !confirm("Deseja substituir o texto atual por este Template?")) {
-            document.getElementById('macro-select').value = ""; 
-            return;
-        }
-
-        if (macroKey === 'padrao') {
-            const s = document.getElementById('status').value;
-            const sev = document.getElementById('severidade').value;
-            let final = templates[s];
-            if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
-            desc.value = final;
-        } else {
-            desc.value = macroLibrary[macroKey];
-        }
-        
-        document.getElementById('macro-select').value = ""; 
-        update();
-    }
-
     function inserirTemplate() {
-        aplicarMacro('padrao');
+        const s = document.getElementById('status').value;
+        const sev = document.getElementById('severidade').value;
+        const desc = document.getElementById('desc');
+        if (desc.value.trim() !== "" && !confirm("Substituir o texto atual?")) return;
+        let final = templates[s];
+        if (sev === 'INTERMITENTE') { final = final.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
+        desc.value = final; update();
     }
 
     function mudarStatus() {
@@ -1545,6 +1522,9 @@
         try { salvarRascunho(); } catch(e){}
     }
 
+    // ==========================================
+    // FUNÇÕES DE CÓPIA - (NÃO SALVAM HISTÓRICO)
+    // ==========================================
     function copyITSSM() {
         const vHost = document.getElementById('host').value || '---';
         const vInicio = document.getElementById('inicio').value || '---';
@@ -1592,6 +1572,7 @@
             tempTextarea.select();
             document.execCommand("copy");
             document.body.removeChild(tempTextarea);
+
             mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info");
         } catch(e) {}
     }
@@ -1602,6 +1583,7 @@
             const tempInput = document.createElement("input");
             tempInput.value = assunto; document.body.appendChild(tempInput);
             tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput);
+
             mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info");
         } catch(e){}
     }
@@ -1622,10 +1604,12 @@
             const range = document.createRange(); range.selectNode(node);
             window.getSelection().removeAllRanges(); window.getSelection().addRange(range);
             document.execCommand('copy'); window.getSelection().removeAllRanges();
+
             mostrarToast("📋 HTML COPIADO COM SUCESSO!", "info");
         } catch(e){}
     }
 
+    // A ÚNICA FUNÇÃO QUE MANDA PARA O HISTÓRICO
     function copyAsImage() {
         const status = document.getElementById('status').value;
         const protocolo = document.getElementById('protocolo');
@@ -1670,61 +1654,59 @@
     }
 
     function limparFormulario() {
-        backupFormulario = {
-            cliente: document.getElementById('cliente').value,
-            host: document.getElementById('host').value,
-            item: document.getElementById('item').value,
-            severidade: document.getElementById('severidade').value,
-            statusinfo: document.getElementById('statusinfo').value,
-            pressplay: document.getElementById('pressplay').value,
-            status: document.getElementById('status').value,
-            protocolo: document.getElementById('protocolo').value,
-            inicio: document.getElementById('inicio').value,
-            fgrid: document.getElementById('f-grid').value,
-            termino: document.getElementById('termino').value,
-            solucionador: document.getElementById('solucionador').value,
-            obs: document.getElementById('obs').value,
-            desc: document.getElementById('desc').value,
-            evidencias: document.getElementById('evidencias').checked
-        };
-
-        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-        document.getElementById('status').value = 'EM ABERTO';
-        document.getElementById('severidade').value = 'WARNING';
-        document.getElementById('evidencias').checked = false; 
-        document.getElementById('protocolo').classList.remove('erro-validacao');
-        
-        const macroSel = document.getElementById('macro-select');
-        if (macroSel) macroSel.value = '';
-        
-        try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
-        ultimaAssinaturaGerada = ''; 
-        update();
-        
-        mostrarToast(`🗑️ Formulário limpo. <span class="btn-undo" onclick="desfazerLimpeza()">DESFAZER</span>`, 'warning', 10000);
+        if(confirm("Deseja limpar todos os campos?")) {
+            document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+            document.getElementById('status').value = 'EM ABERTO';
+            document.getElementById('severidade').value = 'WARNING';
+            document.getElementById('evidencias').checked = false; 
+            document.getElementById('protocolo').classList.remove('erro-validacao');
+            try { localStorage.removeItem('noc_rascunho_its'); } catch(e){}
+            ultimaAssinaturaGerada = ''; 
+            update();
+        }
     }
 
-    window.desfazerLimpeza = function() {
-        if (!backupFormulario) return;
-        document.getElementById('cliente').value = backupFormulario.cliente;
-        document.getElementById('host').value = backupFormulario.host;
-        document.getElementById('item').value = backupFormulario.item;
-        document.getElementById('severidade').value = backupFormulario.severidade;
-        document.getElementById('statusinfo').value = backupFormulario.statusinfo;
-        document.getElementById('pressplay').value = backupFormulario.pressplay;
-        document.getElementById('status').value = backupFormulario.status;
-        document.getElementById('protocolo').value = backupFormulario.protocolo;
-        document.getElementById('inicio').value = backupFormulario.inicio;
-        document.getElementById('f-grid').value = backupFormulario.fgrid;
-        document.getElementById('termino').value = backupFormulario.termino;
-        document.getElementById('solucionador').value = backupFormulario.solucionador;
-        document.getElementById('obs').value = backupFormulario.obs;
-        document.getElementById('desc').value = backupFormulario.desc;
-        document.getElementById('evidencias').checked = backupFormulario.evidencias;
-        
-        backupFormulario = null;
-        update();
-        mostrarToast("✅ Ação desfeita! Dados restaurados.", "success");
+    function salvarRascunho() {
+        const rascunho = {
+            modo: modoAtual,
+            cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value,
+            host: document.getElementById('host').value, status: document.getElementById('status').value,
+            item: document.getElementById('item').value, protocolo: document.getElementById('protocolo').value,
+            solucionador: document.getElementById('solucionador').value, inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+            desc: document.getElementById('desc').value, obs: document.getElementById('obs').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value,
+            evidencias: document.getElementById('evidencias').checked 
+        };
+        try { localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho)); } catch(e){}
+    }
+
+    function carregarRascunho() {
+        try {
+            const salvo = localStorage.getItem('noc_rascunho_its');
+            if (salvo) {
+                const rascunho = JSON.parse(salvo);
+                if (rascunho.modo) modoAtual = rascunho.modo; 
+                document.getElementById('cliente').value = rascunho.cliente || '';
+                document.getElementById('severidade').value = rascunho.severidade || 'WARNING';
+                document.getElementById('host').value = rascunho.host || '';
+                document.getElementById('status').value = rascunho.status || 'EM ABERTO';
+                document.getElementById('item').value = rascunho.item || '';
+                document.getElementById('protocolo').value = rascunho.protocolo || '';
+                document.getElementById('solucionador').value = rascunho.solucionador || '';
+                document.getElementById('inicio').value = rascunho.inicio || '';
+                document.getElementById('f-grid').value = rascunho.fgrid || '';
+                document.getElementById('termino').value = rascunho.termino || '';
+                document.getElementById('desc').value = rascunho.desc || '';
+                document.getElementById('obs').value = rascunho.obs || '';
+                document.getElementById('statusinfo').value = rascunho.statusinfo || '';
+                document.getElementById('pressplay').value = rascunho.pressplay || ''; 
+                document.getElementById('evidencias').checked = rascunho.evidencias || false; 
+            }
+        } catch(e) {
+            console.error("Erro ao carregar rascunho.", e);
+            localStorage.removeItem('noc_rascunho_its');
+        }
     }
 
     function toggleTheme() {
