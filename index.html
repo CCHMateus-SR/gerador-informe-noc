@@ -305,7 +305,7 @@
         body.pro-mode .quick-claim-bar button:hover { background: #555; transform: none;}
         body.pro-mode .search-box { background: #1e1e1e; border-color: #444; color: #E0E0E0; }
         body.pro-mode .search-box:focus { background: #252525; border-color: #2D8CEB; }
-        body.pro-mode .select-macro { background: #1E1E1E; border-color: #444; color: #AAA; }
+        body.pro-mode .select-macro { background: #1e1e1e; border-color: #444; color: #AAA; }
         body.pro-mode .copyable:hover { background-color: #444; color: #2D8CEB; border-bottom-color: #2D8CEB;}
         body.pro-mode .sla-warning { background-color: #383020; border-left-color: #A07030 !important; }
         body.pro-mode .sla-critical { background-color: #402020; border-left-color: #A04040 !important; }
@@ -322,14 +322,6 @@
     </style>
 </head>
 <body>
-
-<datalist id="lista-clientes">
-    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S TECNOLOGIA"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
-</datalist>
-
-<datalist id="lista-operadoras">
-    <option value="Algar"></option><option value="AmericaNet"></option><option value="American Tower"></option><option value="Apex Net"></option><option value="Ascenty"></option><option value="Claro"></option><option value="Embratel"></option><option value="GIGA+"></option><option value="HostFiber"></option><option value="JacomeliNET"></option><option value="Ligga Telecom"></option><option value="MAXCOMM"></option><option value="Mega Telecom"></option><option value="Mundivox"></option><option value="Net"></option><option value="Noroeste Net"></option><option value="ProntoFibra"></option><option value="Texnet"></option><option value="Ultracom"></option><option value="UP Telecom"></option><option value="Vero"></option><option value="Vivo"></option><option value="VSX Networks"></option>
-</datalist>
 
 <div id="toast-container"></div>
 
@@ -424,7 +416,7 @@
                 <div id="header-sev-badge" class="meta-sev-badge">🟡 WARNING</div>
             </div>
             <div class="meta-right">
-                <div id="user-display" class="user-badge" style="background: white;">👤 Entrando...</div>
+                <div id="user-display" class="user-badge">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="cycleTheme()" title="Mudar Tema">☀️</button>
             </div>
@@ -636,6 +628,14 @@
         </div>
     </div>
 </div>
+
+<datalist id="lista-clientes">
+    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S TECNOLOGIA"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
+</datalist>
+
+<datalist id="lista-operadoras">
+    <option value="Algar"></option><option value="AmericaNet"></option><option value="American Tower"></option><option value="Apex Net"></option><option value="Ascenty"></option><option value="Claro"></option><option value="Embratel"></option><option value="GIGA+"></option><option value="HostFiber"></option><option value="JacomeliNET"></option><option value="Ligga Telecom"></option><option value="MAXCOMM"></option><option value="Mega Telecom"></option><option value="Mundivox"></option><option value="Net"></option><option value="Noroeste Net"></option><option value="ProntoFibra"></option><option value="Texnet"></option><option value="Ultracom"></option><option value="UP Telecom"></option><option value="Vero"></option><option value="Vivo"></option><option value="VSX Networks"></option>
+</datalist>
 
 <script>
     // ==========================================
@@ -1655,6 +1655,68 @@
         });
     }
 
+    window.mudarStatus = function() { 
+        const status = document.getElementById('status').value; 
+        
+        const d = new Date(); 
+        const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        
+        if (status === 'RESOLVIDO') { 
+            document.getElementById('severidade').value = 'OK'; 
+            document.getElementById('termino').value = pt;
+        } else if (status === 'FOLLOW-UP') {
+            document.getElementById('f-grid').value = pt;
+        }
+        
+        update(); 
+    }
+
+    window.inserirMacro = function(valor) {
+        if(!valor) return;
+        const desc = document.getElementById('desc'); const statusAtual = document.getElementById('status').value; const severidadeAtual = document.getElementById('severidade').value;
+        let texto = "";
+        
+        switch(valor) {
+            case 'padrao':
+                if (statusAtual === 'EM ABERTO') { texto = "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades."; } 
+                else if (statusAtual === 'FOLLOW-UP') { texto = "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa."; } 
+                else if (statusAtual === 'RESOLVIDO') { texto = "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."; }
+                if (severidadeAtual === 'INTERMITENTE') { texto = texto.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
+                break;
+            case 'fibra': texto = "Identificamos indícios de rompimento de fibra ótica na região. A equipe técnica de campo da operadora já foi acionada e encontra-se em deslocamento para realizar o mapeamento e reparo físico no trecho afetado."; break;
+            case 'eletrica': texto = "Identificamos que o equipamento encontra-se indisponível devido a uma provável falha massiva no fornecimento de energia elétrica na região (incidente com a concessionária local). Aguardamos o restabelecimento da energia comercial para normalização do serviço."; break;
+            case 'pos_reparo': texto = "Informamos que o serviço de comunicação foi restabelecido. Contudo, o NOC manterá o circuito em acompanhamento de estabilidade e verificação de métricas antes do encerramento definitivo do incidente."; break;
+            case 'n2': texto = "O incidente foi escalonado para a equipe de Engenharia (N2) da operadora, que está realizando análises aprofundadas no backbone e em rotas alternativas para identificar a causa raiz da instabilidade."; break;
+            case 'validacao': texto = "A operadora informa que os testes apontam normalidade no circuito. Solicitamos, por gentileza, que a equipe local valide a disponibilidade dos serviços e acesso às aplicações internas para seguirmos com o encerramento."; break;
+        }
+        
+        if (desc.value.trim() !== "") {
+            if(confirm("Substituir o texto actual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
+        } else { desc.value = texto; }
+        update();
+    }
+
+    function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
+    function inserirDataPicker(idTexto, valor) {
+        if (!valor) return; const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; const input = document.getElementById(idTexto);
+        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update();
+    }
+    function preencherAgoraText(idTexto) {
+        const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; const input = document.getElementById(idTexto);
+        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update();
+    }
+    function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
+
+    function obterAssuntoGerado() {
+        const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE'; const host = document.getElementById('host').value.toUpperCase() || 'HOST';
+        let itemRaw = document.getElementById('item').value.toUpperCase().trim(); const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+        const severidade = document.getElementById('severidade').value; const statusSelect = document.getElementById('status').value;
+        let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+        const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        const timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
+        return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
+    }
+
     function update() {
         const severidade = document.getElementById('severidade').value; 
         const status = document.getElementById('status').value;
@@ -1724,6 +1786,7 @@
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
+        // Formata o fundo se não tivermos removido a logica do titulo 
         if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); } 
         else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); } 
         else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); } 
@@ -1732,7 +1795,7 @@
         tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
 
         const headerCell = document.getElementById('render-header-cell');
-        if (logosClientes[vCliente]) { 
+        if (logosClientes && logosClientes[vCliente]) { 
             headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 100px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td></tr></table>`; 
         } else { 
             headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" style="height: 90px; max-width: 300px; width: auto; display: block; margin: 0 auto;">`; 
