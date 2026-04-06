@@ -227,6 +227,9 @@
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
+        
+        /* Tema Relógio */
+        body.dark-mode #relogio-noc { background: #1E293B; color: #F8FAFC; border-color: #334155; }
 
         /* ======================================================== */
         /* TEMA PRO (Monocromático Estilo Blender/Photoshop/AutoCAD)*/
@@ -299,6 +302,10 @@
         body.pro-mode .chip.active { background: #444; color: #E0E0E0; border-color: #666; box-shadow: none;}
         body.pro-mode select optgroup { background-color: #323232; color: #AAA; font-weight: bold; }
         body.pro-mode select option { background-color: #1E1E1E; color: #E0E0E0; font-weight: normal; }
+        
+        /* Tema Relógio */
+        body.pro-mode #relogio-noc { background: #282828; color: #E0E0E0; border-color: #444; }
+
     </style>
 </head>
 <body>
@@ -363,7 +370,8 @@
                 <div id="dash-abertos" class="dash-badge dash-aberto">🔴 0</div>
                 <div id="dash-follow" class="dash-badge dash-follow">🟡 0</div>
                 <div id="dash-ok" class="dash-badge dash-ok">🟢 0</div>
-                <button class="btn-export" style="background-color: #0284C7; margin-left: 10px;" onclick="gerarPassagemPlantao()">📋 RESUMO PENDÊNCIAS</button>
+                <button class="btn-export" style="background-color: #10B981; margin-left: 10px;" onclick="exportarParaExcel()">📊 EXPORTAR</button>
+                <button class="btn-export" style="background-color: #0284C7; margin-left: 5px;" onclick="gerarPassagemPlantao()">📋 RESUMO PENDÊNCIAS</button>
                 <button class="btn-export" style="background-color: #DC2626; margin-left: 5px;" onmouseover="this.style.backgroundColor='#991B1B'" onmouseout="this.style.backgroundColor='#DC2626'" onclick="limparHistoricoPlantao()">🗑️ ZERAR RADAR</button>
             </div>
         </div>
@@ -397,6 +405,7 @@
         <div class="header-row">
             <h2 id="titulo-form">Central de Despacho</h2>
             <div class="top-controls">
+                <span id="relogio-noc" class="user-badge" style="font-family: Consolas, monospace; font-size: 13px; font-weight: bold; background: #E2E8F0; color: #1E293B; border-color: #CBD5E1;">--:--:--</span>
                 <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
@@ -444,12 +453,18 @@
             </div>
 
             <div class="input-group full-width">
-                <label>Dados Técnicos (Status Information do Centreon)</label>
+                <div class="label-flex">
+                    <label>Dados Técnicos (Status Information do Centreon)</label>
+                    <button type="button" class="btn-action" onclick="limparLogs('statusinfo')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
+                </div>
                 <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui..." oninput="update()"></textarea>
             </div>
 
             <div class="input-group full-width" id="grupo-pressplay" style="display: none;">
-                <label>Retorno / Logs do PressPlay (Opcional)</label>
+                <div class="label-flex">
+                    <label>Retorno / Logs do PressPlay (Opcional)</label>
+                    <button type="button" class="btn-action" onclick="limparLogs('pressplay')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
+                </div>
                 <textarea id="pressplay" class="textarea-sm" placeholder="Cole o retorno da execução do PressPlay aqui..." oninput="update()"></textarea>
             </div>
         </div>
@@ -626,6 +641,38 @@
     let chamadosSilenciadosSLA = new Set(); 
     let backupFormulario = null; 
     let themeAtual = 'light'; // Nova variável de Tema
+    let blinkInterval = null; // Tab Blinking
+    let isBlinking = false;
+    const originalTitle = "NOC ITS - Central de Despacho";
+
+    // Módulo de Relógio em Tempo Real
+    setInterval(() => {
+        const now = new Date();
+        const relogio = document.getElementById('relogio-noc');
+        if (relogio) relogio.innerText = now.toLocaleTimeString('pt-BR');
+    }, 1000);
+
+    // Módulo Tab Blinking (Aba Piscando)
+    function startTabBlink(msg) {
+        if (!document.hidden) return;
+        if (isBlinking) return;
+        isBlinking = true;
+        let showMsg = true;
+        blinkInterval = setInterval(() => {
+            document.title = showMsg ? msg : originalTitle;
+            showMsg = !showMsg;
+        }, 1000);
+    }
+
+    function stopTabBlink() {
+        clearInterval(blinkInterval);
+        isBlinking = false;
+        document.title = originalTitle;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) stopTabBlink();
+    });
 
     // Função para as Seções Sanfonadas (Collapsible)
     window.toggleSecao = function(secaoId, iconId) {
@@ -638,6 +685,18 @@
             secao.style.display = 'none';
             icon.style.transform = 'rotate(-90deg)';
         }
+    }
+
+    // Função Vassoura de Logs
+    window.limparLogs = function(id) {
+        let el = document.getElementById(id);
+        let val = el.value;
+        if(val.trim() === "") return;
+        // Remove linhas em branco múltiplas e espaços no começo/fim
+        val = val.replace(/^\s*[\r\n]/gm, '').replace(/\s+$/gm, '').trim();
+        el.value = val;
+        update();
+        mostrarToast("🧹 Log limpo com sucesso!", "info", 2000);
     }
 
     // Módulo de Checagem Online nativo do Navegador (Sem travar F5)
@@ -883,10 +942,8 @@
 
             for (let chave in estadoRecente) {
                 if (chamadosSilenciadosSLA.has(chave)) continue;
-
                 let log = estadoRecente[chave];
                 if (log.form.modo === 'infra') continue; 
-                
                 let acao = log.assunto.split(' | ')[5] || '';
                 
                 if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
@@ -947,6 +1004,7 @@
             filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: isCritical ? 'critical' : 'default' });
         }
         
+        startTabBlink('🚨 ALERTA NOC!');
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -974,6 +1032,7 @@
         `;
         
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'sla' });
+        startTabBlink('⏰ ALERTA SLA!');
         if (!modalAberto) exibirProximoAlerta();
     }
 
@@ -988,6 +1047,7 @@
         if (filaDeAlertas.length === 0) { 
             document.getElementById('modal-alerta').style.display = 'none'; 
             modalAberto = false; 
+            stopTabBlink();
             return; 
         }
         modalAberto = true;
@@ -1003,47 +1063,14 @@
         exibirProximoAlerta(); 
     }
 
+    // Listener de Alertas blindado para capturar apenas eventos NOVOS após a página carregar
     db.ref('historico_noc').orderByChild('timestamp').startAt(timestampCarregamento).on('child_added', (snapshot) => {
         const data = snapshot.val();
-        if (data.timestamp <= timestampCarregamento) return; 
+        if (data.timestamp <= timestampCarregamento) return; // Garante que não apite os velhos
         if (currentUser && data.nome !== currentUser.nome) { 
             mostrarAlertaBloqueante(data); 
         }
     });
-
-    // ==========================================
-    // VALIDAÇÃO ANTI-VACILO
-    // ==========================================
-    function validarCamposObrigatorios(exigeProtocolo = false) {
-        let valido = true;
-        const campos = ['cliente', 'host', 'item'];
-        
-        campos.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el.value.trim()) {
-                el.classList.add('shake-error');
-                setTimeout(() => el.classList.remove('shake-error'), 500);
-                valido = false;
-            }
-        });
-
-        if (exigeProtocolo) {
-            const status = document.getElementById('status').value;
-            const protocolo = document.getElementById('protocolo');
-            if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
-                protocolo.classList.add('shake-error');
-                setTimeout(() => protocolo.classList.remove('shake-error'), 500);
-                mostrarToast("⚠️ Protocolo da operadora é obrigatório para este status.", "warning");
-                return false; 
-            }
-        }
-
-        if (!valido) {
-            mostrarToast("⚠️ Preencha os campos obrigatórios destacados em vermelho.", "warning");
-        }
-        
-        return valido;
-    }
 
     // ==========================================
     // SELETOR DE MODO
@@ -1218,6 +1245,54 @@
         document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
     }
 
+    // EXPORTAR PARA EXCEL (CSV)
+    window.exportarParaExcel = function() {
+        if (chamadosDoTurno.length === 0) {
+            mostrarToast("Não há dados neste plantão para exportar.", "warning");
+            return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        // Cabeçalho
+        csvContent += "Data/Hora,Analista,Turno,Modulo,Acao,Cliente,Host,Servico,Severidade,Status,Protocolo,SLA Previsto\n";
+        
+        chamadosDoTurno.forEach(log => {
+            if (log.tipo === 'aviso_rapido') return; // Ignora avisos rápidos no excel
+            if (!log.form) return;
+            
+            const partesAssunto = log.assunto ? log.assunto.split(' | ') : [];
+            const acao = partesAssunto[5] ? partesAssunto[5].trim() : '';
+            const servicoLimpo = log.form.item ? log.form.item.split('\n')[0] : ''; // Pega só a primeira linha do serviço
+            
+            // Monta a linha
+            let row = [
+                log.hora,
+                log.nome,
+                log.turno,
+                log.form.modo === 'infra' ? 'Infra' : 'Link',
+                acao,
+                log.form.cliente || '-',
+                log.form.host || '-',
+                servicoLimpo,
+                log.form.severidade || '-',
+                log.form.status || '-',
+                log.form.protocolo || '-',
+                log.form.termino || '-'
+            ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(","); // Escapa aspas e vírgulas dentro do texto
+            
+            csvContent += row + "\n";
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `relatorio_noc_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        mostrarToast("📊 Relatório exportado com sucesso!", "success");
+    }
+
     window.gerarPassagemPlantao = function() {
         if (chamadosDoTurno.length === 0) { mostrarToast("Não há chamados neste plantão.", "warning"); return; }
 
@@ -1235,7 +1310,7 @@
         for (let chave in estadoRecente) {
             let log = estadoRecente[chave];
             let status = log.form.status;
-            if (status === 'RESOLVIDO') continue; 
+            if (status === 'RESOLVIDO') continue; // Ignora encerrados
 
             let modo = log.form.modo || 'link';
             let cliente = log.form.cliente || 'N/A';
@@ -1470,6 +1545,7 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
+    // Apenas a IMAGEM aciona esta função
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
