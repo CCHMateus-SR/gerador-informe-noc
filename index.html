@@ -76,7 +76,7 @@
         .conn-online { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
         .conn-offline { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
 
-        .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box;}
+        .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box; transition: background 0.3s, border-color 0.3s;}
         .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
         .quick-claim-bar input { flex: 1; min-width: 100px; padding: 8px 12px; border: 1px solid #bae6fd; border-radius: 6px; font-size: 12px; box-sizing: border-box; }
         .quick-claim-bar button { background: #0284C7; color: white; border: none; padding: 8px 15px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; white-space: nowrap; flex-shrink: 0; }
@@ -90,7 +90,7 @@
         .alerta-verde h2 { color: var(--its-green) !important; }
 
         /* CHAVEADOR DE MODOS */
-        .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; }
+        .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; transition: background 0.3s;}
         .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
@@ -153,9 +153,9 @@
 
         /* Modais e Toasts */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 650px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 650px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transition: background-color 0.3s;}
         .modal-login-content { width: 400px; text-align: center; }
-        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid #0EA5E9;}
+        .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid #0EA5E9; transition: background-color 0.3s;}
         .log-time { font-size: 11px; color: #64748B; font-weight: bold; display: flex; justify-content: space-between;}
         .log-subject { font-size: 13px; color: #1E293B; font-family: monospace; font-weight: bold;}
         .btn-close-modal { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 20px; cursor: pointer; color: #64748B; }
@@ -165,7 +165,9 @@
         .toast.toast-warning { background: #F59E0B; color: #FFFBEB; }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* DARK MODE */
+        /* ======================================================== */
+        /* TEMA DARK (Noturno Padrão - Alto Contraste)              */
+        /* ======================================================== */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
         body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
         body.dark-mode .form-side h2, body.dark-mode .history-side h3 { color: #38bdf8; }
@@ -187,33 +189,27 @@
         body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #38bdf8;}
         body.dark-mode .log-subject { color: #F8FAFC; }
         body.dark-mode .modal-content h3 { color: #38bdf8; }
-        
         body.dark-mode .section-title { color: #38bdf8; border-color: #334155; background: #0F172A; border-left-color: #38bdf8; }
         body.dark-mode .section-title:hover { background: #1E293B; }
         body.dark-mode .action-footer { background: #1E293B; border-top-color: #334155; }
-        
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
         body.dark-mode .tab-btn { color: #94A3B8; }
         body.dark-mode .tab-btn.active { background: #1E293B; color: #38bdf8; }
         body.dark-mode .mode-switch-container { background: #0F172A; }
         body.dark-mode .mode-btn { color: #94A3B8; }
         body.dark-mode .mode-btn.active { background: #1E293B; color: #38bdf8; }
-
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
         body.dark-mode .my-card.card-link { border-left-color: #f87171; } 
         body.dark-mode .my-card.card-infra { border-left-color: #38bdf8; } 
-        
         body.dark-mode .my-card.card-aviso { background: #0f172a; border-left-color: #3b82f6; border: 1px solid #1e3a8a;}
         body.dark-mode .my-card.card-aviso .my-card-client { color: #60a5fa; }
         body.dark-mode .my-card.card-aviso .my-card-host { color: #bfdbfe; }
         body.dark-mode .my-card.card-aviso .my-card-service { color: #93c5fd; }
-
         body.dark-mode .my-card-client { color: #38bdf8; }
         body.dark-mode .my-card-host { color: #F8FAFC; }
         body.dark-mode .my-card-service { color: #94A3B8; }
         body.dark-mode .btn-pull { background: #0c4a6e; color: #38bdf8; }
         body.dark-mode .btn-pull:hover { background: #075985; }
-
         body.dark-mode .quick-claim-bar { background: #0f172a; border-color: #0c4a6e; }
         body.dark-mode .quick-claim-title { color: #38bdf8; }
         body.dark-mode .quick-claim-bar input { background: #1e293b; border-color: #0c4a6e; color: #f8fafc; }
@@ -221,31 +217,88 @@
         body.dark-mode .search-box { background: #0f172a; border-color: #334155; color: #f8fafc; }
         body.dark-mode .search-box:focus { background: #1e293b; border-color: #38bdf8; }
         body.dark-mode .select-macro { background: #1e293b; border-color: #334155; color: #38bdf8; }
-        
         body.dark-mode .copyable:hover { background-color: #334155; color: #38bdf8; border-bottom-color: #38bdf8;}
         body.dark-mode .sla-warning { background-color: #431407; border-left-color: #F97316 !important; }
         body.dark-mode .sla-critical { background-color: #450a0a; border-left-color: #DC2626 !important; }
-
         body.dark-mode .chip { background: #0F172A; border-color: #334155; color: #94A3B8; }
         body.dark-mode .chip:hover { background: #1E293B; }
         body.dark-mode .chip.active { background: #0EA5E9; color: white; border-color: #0EA5E9; }
-
         body.dark-mode select optgroup { background-color: #1E293B; color: #94A3B8; font-weight: bold; }
         body.dark-mode select option { background-color: #0F172A; color: #F8FAFC; font-weight: normal; }
-
-        .btn-login-its { background-color: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; text-transform: uppercase; transition: 0.2s; padding: 15px; width: 90%; }
-        .btn-login-its:hover { background-color: #991B1B; transform: translateY(-2px); }
-        .btn-export { background-color: #10B981; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s; display: flex; align-items: center; gap: 6px;}
-        .btn-export:hover { background-color: #059669; }
-
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
+
+        /* ======================================================== */
+        /* TEMA PRO (Monocromático Estilo Blender/Photoshop/AutoCAD)*/
+        /* ======================================================== */
+        body.pro-mode { background-color: #232323; color: #D4D4D4; }
+        body.pro-mode .form-side, body.pro-mode .history-side { background: #323232; border-color: #444; border-top-color: #555; box-shadow: none; border: 1px solid #444; border-top: 4px solid #555;}
+        body.pro-mode .form-side h2, body.pro-mode .history-side h3 { color: #CCCCCC; letter-spacing: 0; }
+        body.pro-mode input, body.pro-mode select, body.pro-mode textarea { background: #1E1E1E; color: #E0E0E0; border: 1px solid #444; box-shadow: none !important; }
+        body.pro-mode input:focus, body.pro-mode select:focus, body.pro-mode textarea:focus { border-color: #2D8CEB; background: #252525;}
+        body.pro-mode label { color: #AAAAAA; }
+        body.pro-mode .btn-theme { border-color: #444; color: #AAA; }
+        body.pro-mode .btn-theme:hover { background: #444; color: #FFF; }
+        body.pro-mode .user-badge { background: #282828; border-color: #444; color: #AAA; }
+        body.pro-mode .status-conn { background: #282828; border-color: #444;}
+        body.pro-mode .conn-online { color: #55A055; border-color: #333; }
+        body.pro-mode .conn-offline { color: #A05555; border-color: #333; }
+        body.pro-mode .btn-sair { background: #282828; border-color: #444; color: #A05050; }
+        body.pro-mode .btn-sair:hover { background: #5A2A2A; color: #E0E0E0; }
         
-        /* DashBoard Badges */
-        .dash-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px;}
-        .dash-aberto { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
-        .dash-follow { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
-        .dash-ok { background: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+        /* Botões Estilo Toolbar (Flat Grey) */
+        body.pro-mode .btn-copy, body.pro-mode .btn-copy-img, body.pro-mode .btn-copy-subject, body.pro-mode .btn-copy-itssm, body.pro-mode .btn-its-history {
+            background-color: #444; border: 1px solid #555; color: #E0E0E0; box-shadow: none; border-radius: 4px; padding: 12px 5px;
+        }
+        body.pro-mode .btn-copy:hover, body.pro-mode .btn-copy-img:hover, body.pro-mode .btn-copy-subject:hover, body.pro-mode .btn-copy-itssm:hover, body.pro-mode .btn-its-history:hover {
+            background-color: #555; border-color: #666; transform: none; color: #FFF;
+        }
+        body.pro-mode .btn-danger-its { background-color: #5A2A2A; color: #E0E0E0; box-shadow: none; border: 1px solid #703030; border-radius: 4px; padding: 12px; }
+        body.pro-mode .btn-danger-its:hover { background-color: #7A3030; transform: none; }
+        
+        body.pro-mode .preview-side { background: #282828; border-color: #444; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        body.pro-mode .modal-content { background: #323232; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
+        body.pro-mode .log-item { background: #282828; border-color: #444; border-left-color: #555;}
+        body.pro-mode .log-subject { color: #E0E0E0; }
+        body.pro-mode .modal-content h3 { color: #CCC; }
+        body.pro-mode .section-title { color: #CCC; border-color: #444; background: #282828; border-left-color: #555; }
+        body.pro-mode .section-title:hover { background: #383838; }
+        body.pro-mode .action-footer { background: #323232; border-top-color: #444; }
+        body.pro-mode .tabs-container { background: #232323; border-color: #444; }
+        body.pro-mode .tab-btn { color: #888; }
+        body.pro-mode .tab-btn.active { background: #444; color: #E0E0E0; box-shadow: none; }
+        body.pro-mode .mode-switch-container { background: #232323; border: 1px solid #444;}
+        body.pro-mode .mode-btn { color: #888; }
+        body.pro-mode .mode-btn.active { background: #444; color: #E0E0E0; box-shadow: none; border-radius: 4px;}
+        body.pro-mode .my-card { background: #282828; border-color: #444; border-left-width: 2px; }
+        body.pro-mode .my-card:hover { border-color: #666; transform: none; background: #303030;}
+        body.pro-mode .my-card.card-link { border-left-color: #703030; } 
+        body.pro-mode .my-card.card-infra { border-left-color: #2D8CEB; } 
+        body.pro-mode .my-card.card-aviso { background: #232323; border-left-color: #555; border: 1px solid #444;}
+        body.pro-mode .my-card.card-aviso .my-card-client { color: #888; }
+        body.pro-mode .my-card.card-aviso .my-card-host { color: #CCC; }
+        body.pro-mode .my-card.card-aviso .my-card-service { color: #888; }
+        body.pro-mode .my-card-client { color: #AAA; }
+        body.pro-mode .my-card-host { color: #E0E0E0; }
+        body.pro-mode .my-card-service { color: #888; }
+        body.pro-mode .btn-pull { background: #444; color: #CCC; border-radius: 4px;}
+        body.pro-mode .btn-pull:hover { background: #555; color: #FFF; }
+        body.pro-mode .quick-claim-bar { background: #282828; border-color: #444; }
+        body.pro-mode .quick-claim-title { color: #AAA; }
+        body.pro-mode .quick-claim-bar input { background: #1e1e1e; border-color: #444; color: #E0E0E0; }
+        body.pro-mode .quick-claim-bar button { background: #444; border: 1px solid #555; color: #E0E0E0;}
+        body.pro-mode .quick-claim-bar button:hover { background: #555; transform: none;}
+        body.pro-mode .search-box { background: #1e1e1e; border-color: #444; color: #E0E0E0; }
+        body.pro-mode .search-box:focus { background: #252525; border-color: #2D8CEB; }
+        body.pro-mode .select-macro { background: #1E1E1E; border-color: #444; color: #AAA; }
+        body.pro-mode .copyable:hover { background-color: #444; color: #2D8CEB; border-bottom-color: #2D8CEB;}
+        body.pro-mode .sla-warning { background-color: #383020; border-left-color: #A07030 !important; }
+        body.pro-mode .sla-critical { background-color: #402020; border-left-color: #A04040 !important; }
+        body.pro-mode .chip { background: #282828; border-color: #444; color: #888; border-radius: 4px; }
+        body.pro-mode .chip:hover { background: #383838; }
+        body.pro-mode .chip.active { background: #444; color: #E0E0E0; border-color: #666; box-shadow: none;}
+        body.pro-mode select optgroup { background-color: #323232; color: #AAA; font-weight: bold; }
+        body.pro-mode select option { background-color: #1E1E1E; color: #E0E0E0; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -347,7 +400,7 @@
                 <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
                 <div id="user-display" class="user-badge">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
-                <button class="btn-theme" onclick="toggleTheme()">🌙</button>
+                <button class="btn-theme" onclick="cycleTheme()">☀️</button>
             </div>
         </div>
 
@@ -486,7 +539,7 @@
             <div class="button-row" style="margin-bottom: 0;">
                 <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
                 <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
-                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM</button>
+                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM HD</button>
                 <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
             </div>
         </div>
@@ -572,6 +625,7 @@
     let chamadosAlertadosSLA = new Set(); 
     let chamadosSilenciadosSLA = new Set(); 
     let backupFormulario = null; 
+    let themeAtual = 'light'; // Nova variável de Tema
 
     // Função para as Seções Sanfonadas (Collapsible)
     window.toggleSecao = function(secaoId, iconId) {
@@ -620,13 +674,50 @@
     }
 
     // ==========================================
-    // SISTEMA DE LOGIN E INICIALIZAÇÃO BLINDADOS
+    // SISTEMA DE SALVAMENTO DO SLA NO LOCALSTORAGE (ANTI-F5 BUG)
+    // ==========================================
+    function salvarEstadoSLA() {
+        const estadoSLA = {
+            alertados: Array.from(chamadosAlertadosSLA),
+            silenciados: Array.from(chamadosSilenciadosSLA),
+            data: new Date().toDateString()
+        };
+        localStorage.setItem('noc_sla_state', JSON.stringify(estadoSLA));
+    }
+
+    function carregarEstadoSLA() {
+        try {
+            const salvo = localStorage.getItem('noc_sla_state');
+            if (salvo) {
+                const estado = JSON.parse(salvo);
+                if (estado.data === new Date().toDateString()) {
+                    chamadosAlertadosSLA = new Set(estado.alertados || []);
+                    chamadosSilenciadosSLA = new Set(estado.silenciados || []);
+                } else {
+                    localStorage.removeItem('noc_sla_state');
+                }
+            }
+        } catch(e) {
+            console.error("Erro ao carregar estado do SLA.", e);
+        }
+    }
+
+    // ==========================================
+    // SISTEMA DE TEMAS E INICIALIZAÇÃO
     // ==========================================
     let currentUser = null;
     let timestampCarregamento = Date.now(); 
 
     window.onload = function() {
         atualizarStatusConexao();
+        carregarEstadoSLA(); 
+        
+        // Carregar Tema Salvo
+        const savedTheme = localStorage.getItem('noc_theme_its');
+        if (savedTheme) {
+            themeAtual = savedTheme;
+        }
+        aplicarTema(themeAtual);
         
         try {
             const salvo = localStorage.getItem('noc_user_info');
@@ -652,6 +743,31 @@
             iniciarMonitoramentoSLA();
         }
     };
+
+    function aplicarTema(tema) {
+        document.body.classList.remove('dark-mode', 'pro-mode');
+        let icon = '☀️';
+        if (tema === 'dark') {
+            document.body.classList.add('dark-mode');
+            icon = '🌙';
+        } else if (tema === 'pro') {
+            document.body.classList.add('pro-mode');
+            icon = '⚙️';
+        }
+        document.querySelector('.btn-theme').innerText = icon;
+    }
+
+    window.cycleTheme = function() {
+        if (themeAtual === 'light') {
+            themeAtual = 'dark';
+        } else if (themeAtual === 'dark') {
+            themeAtual = 'pro';
+        } else {
+            themeAtual = 'light';
+        }
+        try { localStorage.setItem('noc_theme_its', themeAtual); } catch(e){}
+        aplicarTema(themeAtual);
+    }
 
     function salvarLogin() {
         const nomeEl = document.getElementById('login-nome');
@@ -683,6 +799,7 @@
             ultimaAssinaturaGerada = '';
             chamadosAlertadosSLA.clear();
             chamadosSilenciadosSLA.clear(); 
+            localStorage.removeItem('noc_sla_state'); 
             atualizarDashboard();
         }
     }
@@ -712,7 +829,6 @@
         }, time); 
     }
 
-    // SONOPLASTIA INTELIGENTE
     function tocarSom(tipo) {
         try {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -767,8 +883,10 @@
 
             for (let chave in estadoRecente) {
                 if (chamadosSilenciadosSLA.has(chave)) continue;
+
                 let log = estadoRecente[chave];
                 if (log.form.modo === 'infra') continue; 
+                
                 let acao = log.assunto.split(' | ')[5] || '';
                 
                 if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
@@ -780,6 +898,7 @@
                         if (!chamadosAlertadosSLA.has(alertaId)) {
                             dispararModalSLA(log, diffMinutos, chave);
                             chamadosAlertadosSLA.add(alertaId);
+                            salvarEstadoSLA(); 
                         }
                     }
                 }
@@ -833,11 +952,18 @@
 
     function dispararModalSLA(log, minutos, chave) {
         let tempoFormatado = formatarTempoSLA(minutos);
+        
         let htmlMensagem = `
             <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">⏰ ALERTA DE SLA DE LINK!</div>
-                <div style="color: #1E293B; font-size: 14px; margin-bottom: 10px;">O Host <strong>${log.form.host}</strong> (${log.form.cliente})</div>
-                <div style="font-family: Consolas, monospace; font-size: 13px; color: #991B1B; font-weight: bold; background: #FEE2E2; padding: 8px; border-radius: 4px;">Está sem atualização há ${tempoFormatado}!</div>
+                <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">
+                    ⏰ ALERTA DE SLA DE LINK!
+                </div>
+                <div style="color: #1E293B; font-size: 14px; margin-bottom: 10px;">
+                    O Host <strong>${log.form.host}</strong> (${log.form.cliente})
+                </div>
+                <div style="font-family: Consolas, monospace; font-size: 13px; color: #991B1B; font-weight: bold; background: #FEE2E2; padding: 8px; border-radius: 4px;">
+                    Está sem atualização há ${tempoFormatado}!
+                </div>
             </div>
         `;
         let botoesHTML = `
@@ -846,12 +972,14 @@
                 <button onclick="fecharAlertaBloqueante()" style="flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); letter-spacing: 0.5px;">CIENTE 👍</button>
             </div>
         `;
+        
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'sla' });
         if (!modalAberto) exibirProximoAlerta();
     }
 
     window.silenciarSLA = function(chave) {
         chamadosSilenciadosSLA.add(chave);
+        salvarEstadoSLA(); 
         fecharAlertaBloqueante();
         mostrarToast("🔕 Alertas silenciados para este host.", "info");
     }
@@ -859,19 +987,28 @@
     function exibirProximoAlerta() {
         if (filaDeAlertas.length === 0) { 
             document.getElementById('modal-alerta').style.display = 'none'; 
-            modalAberto = false; return; 
+            modalAberto = false; 
+            return; 
         }
-        modalAberto = true; let proximo = filaDeAlertas[0];
-        document.getElementById('texto-alerta').innerHTML = proximo.html; document.getElementById('botoes-alerta').innerHTML = proximo.botoes;
-        tocarSom(proximo.tipo); document.getElementById('modal-alerta').style.display = 'flex';
+        modalAberto = true;
+        let proximo = filaDeAlertas[0];
+        document.getElementById('texto-alerta').innerHTML = proximo.html;
+        document.getElementById('botoes-alerta').innerHTML = proximo.botoes;
+        tocarSom(proximo.tipo);
+        document.getElementById('modal-alerta').style.display = 'flex';
     }
 
-    function fecharAlertaBloqueante() { filaDeAlertas.shift(); exibirProximoAlerta(); }
+    function fecharAlertaBloqueante() { 
+        filaDeAlertas.shift(); 
+        exibirProximoAlerta(); 
+    }
 
     db.ref('historico_noc').orderByChild('timestamp').startAt(timestampCarregamento).on('child_added', (snapshot) => {
         const data = snapshot.val();
         if (data.timestamp <= timestampCarregamento) return; 
-        if (currentUser && data.nome !== currentUser.nome) { mostrarAlertaBloqueante(data); }
+        if (currentUser && data.nome !== currentUser.nome) { 
+            mostrarAlertaBloqueante(data); 
+        }
     });
 
     // ==========================================
@@ -913,10 +1050,15 @@
     // ==========================================
     function trocarModo(novoModo) {
         if (modoAtual === novoModo) return; 
-        const temDado = document.getElementById('cliente').value.trim() !== '' || document.getElementById('host').value.trim() !== '' || document.getElementById('item').value.trim() !== '';
+
+        const temDado = document.getElementById('cliente').value.trim() !== '' ||
+                        document.getElementById('host').value.trim() !== '' ||
+                        document.getElementById('item').value.trim() !== '';
 
         if (temDado) {
-            if(!confirm("Alternar de módulo irá limpar os dados atuais do formulário. Deseja continuar?")) { return; }
+            if(!confirm("Alternar de módulo irá limpar os dados atuais do formulário. Deseja continuar?")) {
+                return; 
+            }
         }
 
         document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
@@ -927,53 +1069,91 @@
         document.getElementById('protocolo').classList.remove('shake-error');
         try{ localStorage.removeItem('noc_rascunho_its'); }catch(e){}
         ultimaAssinaturaGerada = ''; 
+
         setModo(novoModo);
     }
 
     function setModo(modo) {
         modoAtual = modo;
+        
         document.getElementById('btn-modo-link').classList.toggle('active', modo === 'link');
         document.getElementById('btn-modo-infra').classList.toggle('active', modo === 'infra');
 
         if (modo === 'link') {
-            document.getElementById('titulo-form').innerText = "Gestão de Link/Ping"; document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Alarme";
-            document.getElementById('label-host').innerText = "Host / Circuito"; document.getElementById('v-label-host').innerText = "Host";
-            document.getElementById('host').placeholder = "Ex: FURACAO_FGT_BELO_HORIZONTE"; document.getElementById('item').placeholder = "Ex: Ping\nLINK APEX NET 50MB";
-            document.getElementById('grupo-protocolo').style.display = 'flex'; document.getElementById('grupo-pressplay').style.display = 'none'; document.getElementById('grupo-solucionador').style.display = 'flex'; 
+            document.getElementById('titulo-form').innerText = "Gestão de Link/Ping";
+            document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Alarme";
+            document.getElementById('label-host').innerText = "Host / Circuito";
+            document.getElementById('v-label-host').innerText = "Host";
+            
+            document.getElementById('host').placeholder = "Ex: FURACAO_FGT_BELO_HORIZONTE";
+            document.getElementById('item').placeholder = "Ex: Ping\nLINK APEX NET 50MB";
+            
+            document.getElementById('grupo-protocolo').style.display = 'flex';
+            document.getElementById('grupo-pressplay').style.display = 'none'; 
+            document.getElementById('grupo-solucionador').style.display = 'flex'; 
             document.getElementById('macro-template').style.display = 'inline-block';
         } else {
-            document.getElementById('titulo-form').innerText = "Infra / Aplicações"; document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
-            document.getElementById('label-host').innerText = "Host / Servidor"; document.getElementById('v-label-host').innerText = "Host / Servidor";
-            document.getElementById('host').placeholder = "Ex: Libbs-CO-DC-PM-01"; document.getElementById('item').placeholder = "Ex: CPU\nMemory\nServices-Auto";
-            document.getElementById('grupo-protocolo').style.display = 'none'; document.getElementById('grupo-pressplay').style.display = 'flex'; document.getElementById('grupo-solucionador').style.display = 'none'; 
+            document.getElementById('titulo-form').innerText = "Infra / Aplicações";
+            document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
+            document.getElementById('label-host').innerText = "Host / Servidor";
+            document.getElementById('v-label-host').innerText = "Host / Servidor";
+            
+            document.getElementById('host').placeholder = "Ex: Libbs-CO-DC-PM-01";
+            document.getElementById('item').placeholder = "Ex: CPU\nMemory\nServices-Auto";
+
+            document.getElementById('grupo-protocolo').style.display = 'none';
+            document.getElementById('grupo-pressplay').style.display = 'flex'; 
+            document.getElementById('grupo-solucionador').style.display = 'none'; 
             document.getElementById('macro-template').style.display = 'none';
         }
         
-        renderizarListaLateral(); update();
+        renderizarListaLateral();
+        update();
     }
 
     function abrirDatalist(element) {
-        if (element.value === '') { try { element.showPicker(); } catch(e) {} return; }
-        const valorSalvo = element.value; element.value = '';
+        if (element.value === '') {
+            try { element.showPicker(); } catch(e) {}
+            return;
+        }
+        const valorSalvo = element.value;
+        element.value = '';
         try { element.showPicker(); } catch(e) {}
         element.addEventListener('focusout', function handler() {
-            if (element.value === '') { element.value = valorSalvo; update(); }
+            if (element.value === '') {
+                element.value = valorSalvo;
+                update();
+            }
             element.removeEventListener('focusout', handler);
         }, { once: true });
     }
 
     function enviarAvisoRapido() {
         if (!currentUser) return;
-        const servico = document.getElementById('quick-item').value.trim(); const host = document.getElementById('quick-host').value.trim();
+        const servico = document.getElementById('quick-item').value.trim();
+        const host = document.getElementById('quick-host').value.trim();
 
-        if (!servico) { alert("Para avisar a equipe, preencha pelo menos o Serviço (Item Monitorado) que você está analisando!"); document.getElementById('quick-item').focus(); return; }
-        const agora = new Date(); const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        if (!servico) {
+            alert("Para avisar a equipe, preencha pelo menos o Serviço (Item Monitorado) que você está analisando!");
+            document.getElementById('quick-item').focus();
+            return;
+        }
+
+        const agora = new Date();
+        const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
         db.ref('historico_noc').push({
-            tipo: 'aviso_rapido', nome: currentUser.nome, turno: currentUser.turno, servico: servico, host: host || 'Não informado', hora: horaStr, timestamp: firebase.database.ServerValue.TIMESTAMP
+            tipo: 'aviso_rapido',
+            nome: currentUser.nome,
+            turno: currentUser.turno,
+            servico: servico,
+            host: host || 'Não informado',
+            hora: horaStr,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
         });
 
-        document.getElementById('quick-item').value = ''; document.getElementById('quick-host').value = '';
+        document.getElementById('quick-item').value = '';
+        document.getElementById('quick-host').value = '';
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
@@ -1004,8 +1184,13 @@
         const inicioTurno = getInicioDoPlantaoTimestamp(); 
         db.ref('historico_noc').orderByChild('timestamp').startAt(inicioTurno).on('value', (snapshot) => {
             chamadosDoTurno = [];
-            if(snapshot.exists()) { snapshot.forEach(child => { chamadosDoTurno.push(child.val()); }); }
-            renderizarListaLateral(); atualizarDashboard();
+            if(snapshot.exists()) {
+                snapshot.forEach(child => { 
+                    chamadosDoTurno.push(child.val());
+                });
+            }
+            renderizarListaLateral();
+            atualizarDashboard();
         });
     }
 
@@ -1014,7 +1199,9 @@
         chamadosDoTurno.forEach(log => {
             if (log.form) {
                 let chave = `${log.form.cliente}-${log.form.host}`;
-                if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) { estadoRecente[chave] = log; }
+                if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                    estadoRecente[chave] = log;
+                }
             }
         });
 
@@ -1079,7 +1266,10 @@
         const termoBusca = searchEl ? searchEl.value.toLowerCase().trim() : '';
         window.chamadosExibidos = [];
         
-        if (chamadosDoTurno.length === 0) { lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>'; return; }
+        if (chamadosDoTurno.length === 0) {
+            lista.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado neste plantão ainda.</div>';
+            return;
+        }
 
         if (visaoHistorico === 'meus') { 
             window.chamadosExibidos = chamadosDoTurno.filter(c => currentUser && c.nome === currentUser.nome && (c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual))); 
@@ -1090,9 +1280,14 @@
         if (termoBusca !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') {
-                    return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || (c.host && String(c.host).toLowerCase().includes(termoBusca)) || (c.nome && String(c.nome).toLowerCase().includes(termoBusca));
+                    return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || 
+                           (c.host && String(c.host).toLowerCase().includes(termoBusca)) ||
+                           (c.nome && String(c.nome).toLowerCase().includes(termoBusca));
                 } else if (c.form) {
-                    return (c.form.cliente && String(c.form.cliente).toLowerCase().includes(termoBusca)) || (c.form.host && String(c.form.host).toLowerCase().includes(termoBusca)) || (c.form.item && String(c.form.item).toLowerCase().includes(termoBusca)) || (c.nome && String(c.nome).toLowerCase().includes(termoBusca));
+                    return (c.form.cliente && String(c.form.cliente).toLowerCase().includes(termoBusca)) ||
+                           (c.form.host && String(c.form.host).toLowerCase().includes(termoBusca)) ||
+                           (c.form.item && String(c.form.item).toLowerCase().includes(termoBusca)) ||
+                           (c.nome && String(c.nome).toLowerCase().includes(termoBusca));
                 }
                 return false;
             });
@@ -1101,6 +1296,7 @@
         if (filtroAtivo !== '') {
             window.chamadosExibidos = window.chamadosExibidos.filter(c => {
                 if (c.tipo === 'aviso_rapido') return false; 
+                
                 const partesAssunto = c.assunto ? c.assunto.split(' | ') : [];
                 const acao = partesAssunto[5] ? partesAssunto[5].trim() : '';
                 
@@ -1119,8 +1315,12 @@
         window.chamadosExibidos.reverse(); 
 
         if(window.chamadosExibidos.length === 0) {
-            if(termoBusca !== '' || filtroAtivo !== '') { lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum resultado encontrado para os filtros atuais.</div>`; } 
-            else { const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura"; lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`; }
+            if(termoBusca !== '' || filtroAtivo !== '') {
+                lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum resultado encontrado para os filtros atuais.</div>`;
+            } else {
+                const textoAba = modoAtual === 'link' ? "de Link/Ping" : "de Infraestrutura";
+                lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum evento ${textoAba} encontrado nesta visão.</div>`;
+            }
             return;
         }
 
@@ -1135,7 +1335,9 @@
                     </div>
                     <div class="my-card-host">🔖 ${log.servico}</div>
                     <div class="my-card-service">🖥️ <span class="copyable" onclick="copiarTextoInline(event, '${(log.host||'').replace(/'/g, "\\'")}')" title="Clique para copiar">${log.host}</span></div>
-                    <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div>
+                    <div class="my-card-bottom">
+                        <span class="my-card-time">🕒 ${log.hora}</span>
+                    </div>
                 </div>`;
                 return; 
             }
@@ -1168,9 +1370,11 @@
             if (!isResolvidoHoje && acao !== 'ENCERRAMENTO') {
                 const diffMinutos = (Date.now() - log.timestamp) / (1000 * 60);
                 if (diffMinutos > 240) { // +4 horas
-                    ageClass = 'sla-critical'; ageBadge = `<span class="time-badge time-critical">⏳ +${Math.floor(diffMinutos/60)}h</span>`;
+                    ageClass = 'sla-critical';
+                    ageBadge = `<span class="time-badge time-critical">⏳ +${Math.floor(diffMinutos/60)}h</span>`;
                 } else if (diffMinutos > 120) { // +2 horas
-                    ageClass = 'sla-warning'; ageBadge = `<span class="time-badge time-warning">⏳ +${Math.floor(diffMinutos/60)}h</span>`;
+                    ageClass = 'sla-warning';
+                    ageBadge = `<span class="time-badge time-warning">⏳ +${Math.floor(diffMinutos/60)}h</span>`;
                 }
             }
 
@@ -1340,7 +1544,9 @@
                 
                 db.ref('historico_noc').update(updates).then(() => {
                     mostrarToast("🗑️ O radar do plantão foi completamente zerado.", "warning", 5000);
-                    chamadosAlertadosSLA.clear(); chamadosSilenciadosSLA.clear(); fecharHistorico();
+                    chamadosAlertadosSLA.clear(); chamadosSilenciadosSLA.clear(); 
+                    localStorage.removeItem('noc_sla_state'); // Limpa memória local SLA
+                    fecharHistorico();
                 }).catch((error) => { alert("Erro ao limpar histórico: " + error); });
             } else {
                 mostrarToast("O histórico já está vazio.", "info");
@@ -1423,16 +1629,6 @@
 
         if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
 
-        // Configurando as cores da Severidade para o novo Badge Sólido
-        let bgSeveridade = '#64748B'; 
-        if(severidade === 'CRITICAL') bgSeveridade = '#DC2626'; 
-        if(severidade === 'WARNING') bgSeveridade = '#D97706'; 
-        if(severidade === 'INTERMITENTE') bgSeveridade = '#EA580C'; 
-        if(severidade === 'OK') bgSeveridade = '#166534'; 
-        
-        let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
-        let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
-
         let labelTerminoForm = ''; let tituloTerminoBox = ''; let tituloDescBox = 'DETALHAMENTO';
         const headerBg = document.getElementById('v-header-bg'); const topBorder = document.getElementById('render-header-cell');
 
@@ -1455,11 +1651,11 @@
         document.getElementById('label-termino').innerText = labelTerminoForm; document.getElementById('v-titulo-termino').innerText = tituloTerminoBox; document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
-        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
+        let bgColor, textColor, badgeTexto, tituloTexto;
         
-        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
-        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
-        else { bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
+        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
+        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
+        else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
@@ -1483,6 +1679,14 @@
         const dynamicGrid = document.getElementById('v-dynamic-grid');
         const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
         
+        let bgSeveridade = '#64748B'; 
+        if(severidade === 'CRITICAL') bgSeveridade = '#DC2626'; 
+        if(severidade === 'WARNING') bgSeveridade = '#D97706'; 
+        if(severidade === 'INTERMITENTE') bgSeveridade = '#EA580C'; 
+        if(severidade === 'OK') bgSeveridade = '#166534'; 
+        let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
+        let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
+
         if (modoAtual === 'link') {
             dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="15"><td></td></tr><tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
         } else {
@@ -1545,9 +1749,9 @@
         const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ A GERAR...';
         const node = document.getElementById('render'); const clone = node.cloneNode(true); clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px'; clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
-        html2canvas(clone, { scale: 1, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+        html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             document.body.removeChild(clone);
-            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
+            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
     }
 
@@ -1579,8 +1783,6 @@
             }
         } catch(e) { console.error("Erro ao carregar rascunho.", e); localStorage.removeItem('noc_rascunho_its'); }
     }
-
-    function toggleTheme() { document.body.classList.toggle('dark-mode'); document.querySelector('.btn-theme').innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙'; }
 
     const itsLogoUrl = "Logos/logo-its.png"; 
     const logosClientes = {
