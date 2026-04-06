@@ -120,8 +120,9 @@
         @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
         .shake-error { animation: shake 0.4s ease-in-out; border-color: #DC2626 !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2) !important; }
         
-        textarea { height: 120px; resize: none; line-height: 1.5; font-family: inherit; }
-        .textarea-sm { height: 50px !important; }
+        /* Textareas Redimensionáveis Verticalmente */
+        textarea { height: 120px; resize: vertical; line-height: 1.5; font-family: inherit; min-height: 60px; }
+        .textarea-sm { height: 60px; min-height: 60px; }
 
         /* Sticky Footer */
         .action-footer { position: sticky; bottom: -30px; background: white; padding: 15px 30px 30px 30px; margin: 20px -30px -30px -30px; border-top: 1px solid var(--its-border); z-index: 10; display: flex; flex-direction: column; gap: 10px; transition: background-color 0.3s; }
@@ -527,15 +528,18 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
-                    <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';" style="display: inline-block;">
-                        <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
-                        <option value="padrao">📋 Texto Padrão (Baseado no Status)</option>
-                        <option value="fibra">✂️ Rompimento de Fibra</option>
-                        <option value="eletrica">⚡ Falha Elétrica (Concessionária)</option>
-                        <option value="pos_reparo">👀 Acompanhamento Pós-Reparo</option>
-                        <option value="n2">🚀 Escalonado para Engenharia (N2)</option>
-                        <option value="validacao">⏳ Aguardando Validação do Cliente</option>
-                    </select>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button type="button" class="btn-action" onclick="limparLogs('desc')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
+                        <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';" style="display: inline-block;">
+                            <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
+                            <option value="padrao">📋 Texto Padrão (Baseado no Status)</option>
+                            <option value="fibra">✂️ Rompimento de Fibra</option>
+                            <option value="eletrica">⚡ Falha Elétrica (Concessionária)</option>
+                            <option value="pos_reparo">👀 Acompanhamento Pós-Reparo</option>
+                            <option value="n2">🚀 Escalonado para Engenharia (N2)</option>
+                            <option value="validacao">⏳ Aguardando Validação do Cliente</option>
+                        </select>
+                    </div>
                 </div>
                 <textarea id="desc" oninput="update()"></textarea>
             </div>
@@ -942,8 +946,10 @@
 
             for (let chave in estadoRecente) {
                 if (chamadosSilenciadosSLA.has(chave)) continue;
+
                 let log = estadoRecente[chave];
                 if (log.form.modo === 'infra') continue; 
+                
                 let acao = log.assunto.split(' | ')[5] || '';
                 
                 if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
@@ -1063,14 +1069,47 @@
         exibirProximoAlerta(); 
     }
 
-    // Listener de Alertas blindado para capturar apenas eventos NOVOS após a página carregar
     db.ref('historico_noc').orderByChild('timestamp').startAt(timestampCarregamento).on('child_added', (snapshot) => {
         const data = snapshot.val();
-        if (data.timestamp <= timestampCarregamento) return; // Garante que não apite os velhos
+        if (data.timestamp <= timestampCarregamento) return; 
         if (currentUser && data.nome !== currentUser.nome) { 
             mostrarAlertaBloqueante(data); 
         }
     });
+
+    // ==========================================
+    // VALIDAÇÃO ANTI-VACILO
+    // ==========================================
+    function validarCamposObrigatorios(exigeProtocolo = false) {
+        let valido = true;
+        const campos = ['cliente', 'host', 'item'];
+        
+        campos.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el.value.trim()) {
+                el.classList.add('shake-error');
+                setTimeout(() => el.classList.remove('shake-error'), 500);
+                valido = false;
+            }
+        });
+
+        if (exigeProtocolo) {
+            const status = document.getElementById('status').value;
+            const protocolo = document.getElementById('protocolo');
+            if (modoAtual === 'link' && (status === 'FOLLOW-UP' || status === 'RESOLVIDO') && protocolo.value.trim() === '') {
+                protocolo.classList.add('shake-error');
+                setTimeout(() => protocolo.classList.remove('shake-error'), 500);
+                mostrarToast("⚠️ Protocolo da operadora é obrigatório para este status.", "warning");
+                return false; 
+            }
+        }
+
+        if (!valido) {
+            mostrarToast("⚠️ Preencha os campos obrigatórios destacados em vermelho.", "warning");
+        }
+        
+        return valido;
+    }
 
     // ==========================================
     // SELETOR DE MODO
@@ -1257,14 +1296,13 @@
         csvContent += "Data/Hora,Analista,Turno,Modulo,Acao,Cliente,Host,Servico,Severidade,Status,Protocolo,SLA Previsto\n";
         
         chamadosDoTurno.forEach(log => {
-            if (log.tipo === 'aviso_rapido') return; // Ignora avisos rápidos no excel
+            if (log.tipo === 'aviso_rapido') return; 
             if (!log.form) return;
             
             const partesAssunto = log.assunto ? log.assunto.split(' | ') : [];
             const acao = partesAssunto[5] ? partesAssunto[5].trim() : '';
-            const servicoLimpo = log.form.item ? log.form.item.split('\n')[0] : ''; // Pega só a primeira linha do serviço
+            const servicoLimpo = log.form.item ? log.form.item.split('\n')[0] : ''; 
             
-            // Monta a linha
             let row = [
                 log.hora,
                 log.nome,
@@ -1278,7 +1316,7 @@
                 log.form.status || '-',
                 log.form.protocolo || '-',
                 log.form.termino || '-'
-            ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(","); // Escapa aspas e vírgulas dentro do texto
+            ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(","); 
             
             csvContent += row + "\n";
         });
@@ -1310,7 +1348,7 @@
         for (let chave in estadoRecente) {
             let log = estadoRecente[chave];
             let status = log.form.status;
-            if (status === 'RESOLVIDO') continue; // Ignora encerrados
+            if (status === 'RESOLVIDO') continue; 
 
             let modo = log.form.modo || 'link';
             let cliente = log.form.cliente || 'N/A';
@@ -1727,11 +1765,11 @@
         document.getElementById('label-termino').innerText = labelTerminoForm; document.getElementById('v-titulo-termino').innerText = tituloTerminoBox; document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
-        let bgColor, textColor, badgeTexto, tituloTexto;
+        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
         
-        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
-        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
-        else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
+        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
+        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
+        else { bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
