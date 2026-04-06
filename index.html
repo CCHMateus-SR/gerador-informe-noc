@@ -323,6 +323,14 @@
 </head>
 <body>
 
+<datalist id="lista-clientes">
+    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S TECNOLOGIA"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
+</datalist>
+
+<datalist id="lista-operadoras">
+    <option value="Algar"></option><option value="AmericaNet"></option><option value="American Tower"></option><option value="Apex Net"></option><option value="Ascenty"></option><option value="Claro"></option><option value="Embratel"></option><option value="GIGA+"></option><option value="HostFiber"></option><option value="JacomeliNET"></option><option value="Ligga Telecom"></option><option value="MAXCOMM"></option><option value="Mega Telecom"></option><option value="Mundivox"></option><option value="Net"></option><option value="Noroeste Net"></option><option value="ProntoFibra"></option><option value="Texnet"></option><option value="Ultracom"></option><option value="UP Telecom"></option><option value="Vero"></option><option value="Vivo"></option><option value="VSX Networks"></option>
+</datalist>
+
 <div id="toast-container"></div>
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
@@ -646,7 +654,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // RESTAURANDO AS LOGOS (AQUI ESTAVA O ERRO!)
+    // RESTAURANDO AS LOGOS
     const itsLogoUrl = "Logos/logo-its.png"; 
     const logosClientes = {
         "838 SOLUÇÕES": "Logos/logo-838-solucoes.png", "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png", "ATMOSPHERE": "Logos/logo-atmosphere.png",
@@ -1799,7 +1807,6 @@
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
-        // Formata o fundo se não tivermos removido a logica do titulo 
         if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); } 
         else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); } 
         else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); } 
