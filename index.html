@@ -1889,10 +1889,39 @@
         const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ A GERAR...';
         const node = document.getElementById('render'); const clone = node.cloneNode(true); clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px'; clone.style.width = '550px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
-        html2canvas(clone, { scale: 1.3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-            document.body.removeChild(clone);
-            canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
-        }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
+      html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+  .then(canvas => {
+    document.body.removeChild(clone);
+
+    // --- Estágio 2: downsample com alta qualidade ---
+    const fatorReducao = 0.6; // 60% das dimensões finais
+    const smallCanvas = document.createElement('canvas');
+    smallCanvas.width  = Math.floor(canvas.width  * fatorReducao);
+    smallCanvas.height = Math.floor(canvas.height * fatorReducao);
+
+    const ctx = smallCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high'; // interpolação bicúbica [web:12]
+    ctx.drawImage(canvas, 0, 0, smallCanvas.width, smallCanvas.height);
+
+    smallCanvas.toBlob(blob => {
+      try {
+        const item = new ClipboardItem({ "image/png": blob });
+        navigator.clipboard.write([item]).then(() => {
+          btn.innerHTML = originalText;
+          mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success");
+        });
+      } catch (err) {
+        alert("A cópia automática de imagem não é suportada por este navegador.");
+        btn.innerHTML = originalText;
+      }
+    }, 'image/png');
+  })
+  .catch(err => {
+    document.body.removeChild(clone);
+    alert("Erro ao gerar a imagem.");
+    btn.innerHTML = originalText;
+  });
     }
 
     function limparFormulario() {
