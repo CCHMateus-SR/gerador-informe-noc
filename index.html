@@ -68,13 +68,25 @@
         /* COLUNA 2: FORMULÁRIO */
         .form-side { flex: 1.2; background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); min-width: 530px; max-width: 600px; transition: all 0.3s; position: relative; display: flex; flex-direction: column;}
         
-        .header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; gap: 15px; }
-        .header-row h2 { color: var(--its-blue); margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; line-height: 1.2; flex: 1;}
-        .top-controls { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+        /* ========================================= */
+        /* NOVO LAYOUT DO CABEÇALHO (BARRA SUPERIOR) */
+        /* ========================================= */
+        .top-meta-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #F1F5F9; padding: 12px 18px; border-radius: 12px;
+            margin-bottom: 20px; border: 1px solid #E2E8F0; flex-wrap: wrap; gap: 15px;
+        }
+        .meta-left, .meta-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .meta-clock { font-family: Consolas, monospace; font-size: 14px; font-weight: bold; color: #475569; letter-spacing: 1px; background: white; padding: 6px 12px; border-radius: 8px; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
+        .meta-divider { width: 1px; height: 24px; background: #CBD5E1; }
+        .meta-sev-badge { font-size: 11px; font-weight: 900; padding: 6px 12px; border-radius: 8px; text-transform: uppercase; color: white; background: #D97706; transition: background 0.3s, transform 0.2s; letter-spacing: 0.05em; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
 
-        .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase;}
-        .conn-online { background: #DCFCE7; color: #166534; border-color: #BBF7D0; }
-        .conn-offline { background: #FEE2E2; color: #991B1B; border-color: #FECACA; }
+        .header-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 15px; flex-wrap: wrap; }
+        .header-title-row h2 { color: var(--its-blue); margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; transition: color 0.3s; flex: 1; min-width: 250px;}
+
+        .status-conn { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; border: 1px solid #E2E8F0; transition: 0.3s; text-transform: uppercase; background: white;}
+        .conn-online { color: #166534; border-color: #BBF7D0; }
+        .conn-offline { color: #991B1B; border-color: #FECACA; }
 
         .quick-claim-bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: #E0F2FE; border: 1px solid #BAE6FD; padding: 12px; border-radius: 10px; margin-bottom: 25px; width: 100%; box-sizing: border-box; transition: background 0.3s, border-color 0.3s;}
         .quick-claim-title { font-size: 11px; font-weight: 800; color: #0284C7; white-space: nowrap; flex-shrink: 0; }
@@ -83,16 +95,13 @@
         .quick-claim-bar button:hover { background: #0369A1; transform: scale(1.02); }
         
         .fogo-no-parquinho { border-top: 8px solid var(--its-red) !important; box-shadow: 0 0 25px rgba(220, 38, 38, 0.25) !important; }
-        .fogo-no-parquinho h2 { color: var(--its-red) !important; }
         .alerta-laranja { border-top: 8px solid var(--its-orange) !important; box-shadow: 0 0 25px rgba(234, 88, 12, 0.25) !important; }
-        .alerta-laranja h2 { color: var(--its-orange) !important; }
         .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
-        .alerta-verde h2 { color: var(--its-green) !important; }
 
-        /* CHAVEADOR DE MODOS */
-        .mode-switch-container { display: flex; gap: 10px; margin-bottom: 25px; background: #E2E8F0; padding: 6px; border-radius: 10px; transition: background 0.3s;}
-        .mode-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 8px;}
-        .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* CHAVEADOR DE MODOS (Agora no Header) */
+        .mode-switch-container { display: flex; gap: 8px; background: #E2E8F0; padding: 5px; border-radius: 8px; transition: background 0.3s;}
+        .mode-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 6px;}
+        .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
         /* Section Titles Sanfonados */
         .section-title { font-size: 11px; font-weight: 800; color: var(--its-blue); text-transform: uppercase; letter-spacing: 0.1em; margin: 15px 0 5px 0; padding: 10px 15px; background: #F1F5F9; border-radius: 8px; border-left: 4px solid var(--its-blue); display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; user-select: none; transition: background 0.2s;}
@@ -141,10 +150,10 @@
         .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
 
-        .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: #E0F2FE; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; }
+        .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: white; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
         .btn-sair { background: #FEF2F2; border: 1px solid #FECACA; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #DC2626; transition: 0.2s; }
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
-        .btn-theme { background: none; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; }
+        .btn-theme { background: white; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
         .btn-theme:hover { background: #F1F5F9; }
         .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
         .btn-undo:hover { background: rgba(0,0,0,0.2); }
@@ -171,18 +180,18 @@
         /* ======================================================== */
         body.dark-mode { background-color: #0F172A; color: #F8FAFC; }
         body.dark-mode .form-side, body.dark-mode .history-side { background: #1E293B; border-color: #334155; border-top-color: #38bdf8; }
-        body.dark-mode .form-side h2, body.dark-mode .history-side h3 { color: #38bdf8; }
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
         body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus { border-color: #38BDF8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); background: #1E293B;}
         body.dark-mode label { color: #94A3B8; }
-        body.dark-mode .btn-theme { border-color: #475569; color: #94A3B8; }
-        body.dark-mode .btn-theme:hover { background: #334155; }
         body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
-        body.dark-mode .status-conn { background: #0F172A;}
+        body.dark-mode .status-conn { background: #0F172A; border-color: #334155; color: #94A3B8;}
         body.dark-mode .conn-online { color: #22C55E; border-color: #166534; }
         body.dark-mode .conn-offline { color: #F87171; border-color: #991B1B; }
         body.dark-mode .btn-sair { background: #450a0a; border-color: #7f1d1d; color: #f87171; }
         body.dark-mode .btn-sair:hover { background: #7f1d1d; color: white; }
+        body.dark-mode .btn-theme { background: #1E293B; border-color: #475569; color: #94A3B8; }
+        body.dark-mode .btn-theme:hover { background: #334155; }
+        body.dark-mode .header-title-row h2 { color: #38bdf8; }
         body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
         body.dark-mode .btn-copy-subject:hover { background-color: #0F172A; }
         body.dark-mode .preview-side { background: #1E293B; border-color: #334155; }
@@ -196,7 +205,7 @@
         body.dark-mode .tabs-container { background: #0F172A; border-color: #334155; }
         body.dark-mode .tab-btn { color: #94A3B8; }
         body.dark-mode .tab-btn.active { background: #1E293B; color: #38bdf8; }
-        body.dark-mode .mode-switch-container { background: #0F172A; }
+        body.dark-mode .mode-switch-container { background: #0F172A; border-color: #334155; }
         body.dark-mode .mode-btn { color: #94A3B8; }
         body.dark-mode .mode-btn.active { background: #1E293B; color: #38bdf8; }
         body.dark-mode .my-card { background: #0F172A; border-color: #334155; }
@@ -229,22 +238,24 @@
         body.dark-mode .btn-copy-itssm { background-color: #334155; color: #F8FAFC; }
         body.dark-mode .btn-copy-itssm:hover { background-color: #1E293B; }
         
-        /* Tema Relógio */
-        body.dark-mode #relogio-noc { background: #1E293B; color: #F8FAFC; border-color: #334155; }
+        /* Dark Mode Meta Bar Overrides */
+        body.dark-mode .top-meta-bar { background: #0F172A; border-color: #334155; }
+        body.dark-mode .meta-clock { background: #1E293B; border-color: #334155; color: #94A3B8; }
+        body.dark-mode .meta-divider { background: #334155; }
 
         /* ======================================================== */
         /* TEMA PRO (Monocromático Estilo Blender/Photoshop/AutoCAD)*/
         /* ======================================================== */
         body.pro-mode { background-color: #232323; color: #D4D4D4; }
         body.pro-mode .form-side, body.pro-mode .history-side { background: #323232; border-color: #444; border-top-color: #555; box-shadow: none; border: 1px solid #444; border-top: 4px solid #555;}
-        body.pro-mode .form-side h2, body.pro-mode .history-side h3 { color: #CCCCCC; letter-spacing: 0; }
         body.pro-mode input, body.pro-mode select, body.pro-mode textarea { background: #1E1E1E; color: #E0E0E0; border: 1px solid #444; box-shadow: none !important; }
         body.pro-mode input:focus, body.pro-mode select:focus, body.pro-mode textarea:focus { border-color: #2D8CEB; background: #252525;}
         body.pro-mode label { color: #AAAAAA; }
-        body.pro-mode .btn-theme { border-color: #444; color: #AAA; }
+        body.pro-mode .header-title-row h2 { color: #CCCCCC; letter-spacing: 0; }
+        body.pro-mode .btn-theme { background: #282828; border-color: #444; color: #AAA; }
         body.pro-mode .btn-theme:hover { background: #444; color: #FFF; }
         body.pro-mode .user-badge { background: #282828; border-color: #444; color: #AAA; }
-        body.pro-mode .status-conn { background: #282828; border-color: #444;}
+        body.pro-mode .status-conn { background: #282828; border-color: #444; color: #AAA;}
         body.pro-mode .conn-online { color: #55A055; border-color: #333; }
         body.pro-mode .conn-offline { color: #A05555; border-color: #333; }
         body.pro-mode .btn-sair { background: #282828; border-color: #444; color: #A05050; }
@@ -304,9 +315,10 @@
         body.pro-mode select optgroup { background-color: #323232; color: #AAA; font-weight: bold; }
         body.pro-mode select option { background-color: #1E1E1E; color: #E0E0E0; font-weight: normal; }
         
-        /* Tema Relógio */
-        body.pro-mode #relogio-noc { background: #282828; color: #E0E0E0; border-color: #444; }
-
+        /* Pro Mode Meta Bar Overrides */
+        body.pro-mode .top-meta-bar { background: #1E1E1E; border-color: #444; }
+        body.pro-mode .meta-clock { background: #282828; border-color: #444; color: #AAA; box-shadow: none;}
+        body.pro-mode .meta-divider { background: #444; }
     </style>
 </head>
 <body>
@@ -403,20 +415,27 @@
 
     <div class="form-side" id="form-container">
         
-        <div class="header-row">
-            <h2 id="titulo-form">Central de Despacho</h2>
-            <div class="top-controls">
-                <span id="relogio-noc" class="user-badge" style="font-family: Consolas, monospace; font-size: 13px; font-weight: bold; background: #E2E8F0; color: #1E293B; border-color: #CBD5E1;">--:--:--</span>
+        <div class="top-meta-bar">
+            <div class="meta-left">
+                <span id="relogio-noc" class="meta-clock">--:--:--</span>
+                <div class="meta-divider"></div>
                 <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
-                <div id="user-display" class="user-badge">👤 Entrando...</div>
+                <div class="meta-divider"></div>
+                <div id="header-sev-badge" class="meta-sev-badge">🟡 WARNING</div>
+            </div>
+            <div class="meta-right">
+                <div id="user-display" class="user-badge" style="background: white;">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
-                <button class="btn-theme" onclick="cycleTheme()">☀️</button>
+                <button class="btn-theme" onclick="cycleTheme()" title="Mudar Tema">☀️</button>
             </div>
         </div>
 
-        <div class="mode-switch-container">
-            <button id="btn-modo-link" class="mode-btn active" onclick="trocarModo('link')">🌐 Link / Ping</button>
-            <button id="btn-modo-infra" class="mode-btn" onclick="trocarModo('infra')">🖥️ Infra / Aplicações</button>
+        <div class="header-title-row">
+            <h2 id="titulo-form">Gestão de Link / Ping</h2>
+            <div class="mode-switch-container" style="margin-bottom: 0;">
+                <button id="btn-modo-link" class="mode-btn active" onclick="trocarModo('link')">🌐 Link / Ping</button>
+                <button id="btn-modo-infra" class="mode-btn" onclick="trocarModo('infra')">🖥️ Infra / Aplicações</button>
+            </div>
         </div>
         
         <div class="quick-claim-bar">
@@ -636,7 +655,7 @@
     const db = firebase.database();
 
     let visaoHistorico = 'meus';
-    let filtroAtivo = ''; // Para os botões Chips
+    let filtroAtivo = ''; 
     let chamadosDoTurno = []; 
     window.chamadosExibidos = []; 
     let modoAtual = 'link'; 
@@ -644,8 +663,8 @@
     let chamadosAlertadosSLA = new Set(); 
     let chamadosSilenciadosSLA = new Set(); 
     let backupFormulario = null; 
-    let themeAtual = 'light'; // Nova variável de Tema
-    let blinkInterval = null; // Tab Blinking
+    let themeAtual = 'light'; 
+    let blinkInterval = null; 
     let isBlinking = false;
     const originalTitle = "NOC ITS - Central de Despacho";
 
@@ -696,14 +715,13 @@
         let el = document.getElementById(id);
         let val = el.value;
         if(val.trim() === "") return;
-        // Remove linhas em branco múltiplas e espaços no começo/fim
         val = val.replace(/^\s*[\r\n]/gm, '').replace(/\s+$/gm, '').trim();
         el.value = val;
         update();
         mostrarToast("🧹 Log limpo com sucesso!", "info", 2000);
     }
 
-    // Módulo de Checagem Online nativo do Navegador (Sem travar F5)
+    // Módulo de Checagem Online nativo do Navegador
     function atualizarStatusConexao() {
         const statusEl = document.getElementById('conexao-status');
         if (!statusEl) return;
@@ -768,14 +786,10 @@
     // ==========================================
     // SISTEMA DE TEMAS E INICIALIZAÇÃO
     // ==========================================
-    let currentUser = null;
-    let timestampCarregamento = Date.now(); 
-
     window.onload = function() {
         atualizarStatusConexao();
         carregarEstadoSLA(); 
         
-        // Carregar Tema Salvo
         const savedTheme = localStorage.getItem('noc_theme_its');
         if (savedTheme) {
             themeAtual = savedTheme;
@@ -917,18 +931,6 @@
         } catch(e) {}
     }
 
-    // ==========================================
-    // SISTEMA DE SLA E CONVERSÃO DE MINUTOS
-    // ==========================================
-    function formatarTempoSLA(minutosTotais) {
-        let mins = Math.floor(minutosTotais);
-        if (mins < 60) return `${mins} minuto${mins !== 1 ? 's' : ''}`;
-        let horas = Math.floor(mins / 60); let minsRestantes = mins % 60;
-        let textoHoras = horas === 1 ? '1 hora' : `${horas} horas`;
-        let textoMins = minsRestantes === 0 ? '' : (minsRestantes === 1 ? ' e 1 minuto' : ` e ${minsRestantes} minutos`);
-        return `${textoHoras}${textoMins}`;
-    }
-
     function iniciarMonitoramentoSLA() {
         setInterval(() => {
             if (!currentUser || chamadosDoTurno.length === 0) return;
@@ -969,9 +971,6 @@
         }, 60000); 
     }
 
-    // ==========================================
-    // GERENCIADOR DE ALERTAS E MODAIS
-    // ==========================================
     let filaDeAlertas = [];
     let modalAberto = false;
 
@@ -1077,9 +1076,6 @@
         }
     });
 
-    // ==========================================
-    // VALIDAÇÃO ANTI-VACILO
-    // ==========================================
     function validarCamposObrigatorios(exigeProtocolo = false) {
         let valido = true;
         const campos = ['cliente', 'host', 'item'];
@@ -1111,9 +1107,6 @@
         return valido;
     }
 
-    // ==========================================
-    // SELETOR DE MODO
-    // ==========================================
     function trocarModo(novoModo) {
         if (modoAtual === novoModo) return; 
 
@@ -1146,7 +1139,7 @@
         document.getElementById('btn-modo-infra').classList.toggle('active', modo === 'infra');
 
         if (modo === 'link') {
-            document.getElementById('titulo-form').innerText = "Gestão de Link/Ping";
+            document.getElementById('titulo-form').innerText = "Gestão de Link / Ping";
             document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Alarme";
             document.getElementById('label-host').innerText = "Host / Circuito";
             document.getElementById('v-label-host').innerText = "Host";
@@ -1159,7 +1152,7 @@
             document.getElementById('grupo-solucionador').style.display = 'flex'; 
             document.getElementById('macro-template').style.display = 'inline-block';
         } else {
-            document.getElementById('titulo-form').innerText = "Infra / Aplicações";
+            document.getElementById('titulo-form').innerText = "Infraestrutura / Aplicações";
             document.getElementById('label-secao-1').innerHTML = "📍 1. Identificação do Incidente";
             document.getElementById('label-host').innerText = "Host / Servidor";
             document.getElementById('v-label-host').innerText = "Host / Servidor";
@@ -1223,9 +1216,6 @@
         mostrarToast("✅ Equipe notificada com sucesso!", "success");
     }
 
-    // ==========================================
-    // HISTÓRICO LATERAL, BUSCA E FILTROS (CHIPS)
-    // ==========================================
     function setVisaoHistorico(visao) {
         visaoHistorico = visao;
         document.getElementById('tab-meus').classList.toggle('active', visao === 'meus');
@@ -1284,7 +1274,6 @@
         document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
     }
 
-    // EXPORTAR PARA EXCEL (CSV)
     window.exportarParaExcel = function() {
         if (chamadosDoTurno.length === 0) {
             mostrarToast("Não há dados neste plantão para exportar.", "warning");
@@ -1292,7 +1281,6 @@
         }
 
         let csvContent = "data:text/csv;charset=utf-8,";
-        // Cabeçalho
         csvContent += "Data/Hora,Analista,Turno,Modulo,Acao,Cliente,Host,Servico,Severidade,Status,Protocolo,SLA Previsto\n";
         
         chamadosDoTurno.forEach(log => {
@@ -1583,7 +1571,6 @@
         return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
-    // Apenas a IMAGEM aciona esta função
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
         const formData = {
@@ -1668,84 +1655,47 @@
         });
     }
 
-    // ==========================================
-    // PREENCHIMENTO INTELIGENTE E AUTO-RELOGIO
-    // ==========================================
-    window.mudarStatus = function() { 
-        const status = document.getElementById('status').value; 
-        
-        const d = new Date(); 
-        const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-        
-        if (status === 'RESOLVIDO') { 
-            document.getElementById('severidade').value = 'OK'; 
-            document.getElementById('termino').value = pt;
-        } else if (status === 'FOLLOW-UP') {
-            document.getElementById('f-grid').value = pt;
-        }
-        
-        update(); 
-    }
-
-    window.inserirMacro = function(valor) {
-        if(!valor) return;
-        const desc = document.getElementById('desc'); const statusAtual = document.getElementById('status').value; const severidadeAtual = document.getElementById('severidade').value;
-        let texto = "";
-        
-        switch(valor) {
-            case 'padrao':
-                if (statusAtual === 'EM ABERTO') { texto = "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades."; } 
-                else if (statusAtual === 'FOLLOW-UP') { texto = "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa."; } 
-                else if (statusAtual === 'RESOLVIDO') { texto = "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."; }
-                if (severidadeAtual === 'INTERMITENTE') { texto = texto.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
-                break;
-            case 'fibra': texto = "Identificamos indícios de rompimento de fibra ótica na região. A equipe técnica de campo da operadora já foi acionada e encontra-se em deslocamento para realizar o mapeamento e reparo físico no trecho afetado."; break;
-            case 'eletrica': texto = "Identificamos que o equipamento encontra-se indisponível devido a uma provável falha massiva no fornecimento de energia elétrica na região (incidente com a concessionária local). Aguardamos o restabelecimento da energia comercial para normalização do serviço."; break;
-            case 'pos_reparo': texto = "Informamos que o serviço de comunicação foi restabelecido. Contudo, o NOC manterá o circuito em acompanhamento de estabilidade e verificação de métricas antes do encerramento definitivo do incidente."; break;
-            case 'n2': texto = "O incidente foi escalonado para a equipe de Engenharia (N2) da operadora, que está realizando análises aprofundadas no backbone e em rotas alternativas para identificar a causa raiz da instabilidade."; break;
-            case 'validacao': texto = "A operadora informa que os testes apontam normalidade no circuito. Solicitamos, por gentileza, que a equipe local valide a disponibilidade dos serviços e acesso às aplicações internas para seguirmos com o encerramento."; break;
-        }
-        
-        if (desc.value.trim() !== "") {
-            if(confirm("Substituir o texto actual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
-        } else { desc.value = texto; }
-        update();
-    }
-
-    function abrirPicker(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
-    function inserirDataPicker(idTexto, valor) {
-        if (!valor) return; const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; const input = document.getElementById(idTexto);
-        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update();
-    }
-    function preencherAgoraText(idTexto) {
-        const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; const input = document.getElementById(idTexto);
-        input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update();
-    }
-    function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
-
-    function obterAssuntoGerado() {
-        const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE'; const host = document.getElementById('host').value.toUpperCase() || 'HOST';
-        let itemRaw = document.getElementById('item').value.toUpperCase().trim(); const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
-        const severidade = document.getElementById('severidade').value; const statusSelect = document.getElementById('status').value;
-        let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
-        const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
-        const timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
-        return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
-    }
-
     function update() {
-        const severidade = document.getElementById('severidade').value; const status = document.getElementById('status').value;
-        const vCliente = document.getElementById('cliente').value.toUpperCase().trim(); const vHost = document.getElementById('host').value || '---'; const vItem = document.getElementById('item').value.trim() || '---';
-        const vInicio = document.getElementById('inicio').value || '---'; const vProtocolo = document.getElementById('protocolo').value || '---'; const vFgrid = document.getElementById('f-grid').value || '-';
-        const vTermino = document.getElementById('termino').value || '-'; const vSolucionador = document.getElementById('solucionador').value || '---'; const vStatusInfo = document.getElementById('statusinfo').value.trim();
-        const vPressplay = document.getElementById('pressplay').value.trim(); const vDesc = document.getElementById('desc').value.trim(); const vObs = document.getElementById('obs').value.trim();
+        const severidade = document.getElementById('severidade').value; 
+        const status = document.getElementById('status').value;
+        const vCliente = document.getElementById('cliente').value.toUpperCase().trim(); 
+        const vHost = document.getElementById('host').value || '---'; 
+        const vItem = document.getElementById('item').value.trim() || '---';
+        const vInicio = document.getElementById('inicio').value || '---'; 
+        const vProtocolo = document.getElementById('protocolo').value || '---'; 
+        const vFgrid = document.getElementById('f-grid').value || '-';
+        const vTermino = document.getElementById('termino').value || '-'; 
+        const vSolucionador = document.getElementById('solucionador').value || '---'; 
+        const vStatusInfo = document.getElementById('statusinfo').value.trim();
+        const vPressplay = document.getElementById('pressplay').value.trim(); 
+        const vDesc = document.getElementById('desc').value.trim(); 
+        const vObs = document.getElementById('obs').value.trim();
         const temEvidencias = document.getElementById('evidencias').checked;
 
         if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
 
+        // Configuração de Cores e Textos da Severidade
+        let corSeveridade = '#64748B'; 
+        let sevTextHeader = '⚪ UNKNOWN';
+        if(severidade === 'CRITICAL') { corSeveridade = '#DC2626'; sevTextHeader = '🚨 CRITICAL'; }
+        if(severidade === 'WARNING') { corSeveridade = '#D97706'; sevTextHeader = '🟡 WARNING'; }
+        if(severidade === 'INTERMITENTE') { corSeveridade = '#EA580C'; sevTextHeader = '⚠️ INTERMITENTE'; }
+        if(severidade === 'UNKNOWN') { corSeveridade = '#8B5CF6'; sevTextHeader = '🟣 UNKNOWN'; }
+        if(severidade === 'OK') { corSeveridade = '#166534'; sevTextHeader = '✅ NORMALIZADO'; }
+
+        let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
+
+        // Atualiza a Barra Meta no Topo
+        const headerSevBadge = document.getElementById('header-sev-badge');
+        if (headerSevBadge) {
+            headerSevBadge.style.backgroundColor = corSeveridade;
+            headerSevBadge.innerHTML = sevTextHeader;
+        }
+
         let labelTerminoForm = ''; let tituloTerminoBox = ''; let tituloDescBox = 'DETALHAMENTO';
         const headerBg = document.getElementById('v-header-bg'); const topBorder = document.getElementById('render-header-cell');
 
+        // Lógica de Cor do Cabeçalho Dinâmico
         let headerBgColor = '#002D5B'; 
         if (status === 'EM ABERTO') headerBgColor = '#B91C1C'; 
         if (status === 'RESOLVIDO') headerBgColor = '#166534'; 
@@ -1765,19 +1715,21 @@
         document.getElementById('label-termino').innerText = labelTerminoForm; document.getElementById('v-titulo-termino').innerText = tituloTerminoBox; document.getElementById('v-titulo-desc').innerText = tituloDescBox;
 
         let prefixoTitulo = modoAtual === 'infra' ? '🖥️ INFORME DE INFRAESTRUTURA' : '🌐 INFORME GESTÃO OPERACIONAL';
-        let bgColor, textColor, fadeColor, tituloTexto, badgeTexto;
+        let bgColor, textColor, badgeTexto, tituloTexto;
         
-        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; fadeColor = '#BBF7D0'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
-        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; fadeColor = '#FECACA'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
-        else { bgColor = '#FEF3C7'; textColor = '#92400E'; fadeColor = '#FDE68A'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
+        if (status === 'RESOLVIDO') { bgColor = '#DCFCE7'; textColor = '#166534'; badgeTexto = 'RESOLVIDO'; tituloTexto = `${prefixoTitulo} | Encerramento de Incidente`; } 
+        else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
+        else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
-        if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); tituloForm.innerText = modoAtual === 'link' ? "🚨 Link/Ping (CRITICAL)" : "🚨 Infra (CRITICAL)"; } 
-        else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); tituloForm.innerText = modoAtual === 'link' ? "⚠️ Link/Ping (INTERMITENTE)" : "⚠️ Infra (INTERMITENTE)"; } 
-        else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); tituloForm.innerText = modoAtual === 'link' ? "✅ Link/Ping (NORMALIZADO)" : "✅ Infra (NORMALIZADO)"; } 
-        else { tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link/Ping" : "Infra / Aplicações"; }
+        if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); } 
+        else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); } 
+        else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); } 
+        
+        // MANTÉM O TÍTULO LIMPO
+        tituloForm.innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
 
         const headerCell = document.getElementById('render-header-cell');
         if (logosClientes[vCliente]) { 
@@ -1793,13 +1745,7 @@
         const dynamicGrid = document.getElementById('v-dynamic-grid');
         const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
         
-        let bgSeveridade = '#64748B'; 
-        if(severidade === 'CRITICAL') bgSeveridade = '#DC2626'; 
-        if(severidade === 'WARNING') bgSeveridade = '#D97706'; 
-        if(severidade === 'INTERMITENTE') bgSeveridade = '#EA580C'; 
-        if(severidade === 'OK') bgSeveridade = '#166534'; 
-        let displaySeveridade = severidade === 'OK' ? 'OK (NORMALIZADO)' : severidade;
-        let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
+        let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${corSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
 
         if (modoAtual === 'link') {
             dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="15"><td></td></tr><tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
@@ -1824,9 +1770,6 @@
         try { salvarRascunho(); } catch(e){}
     }
 
-    // ==========================================
-    // FUNÇÕES DE EXPORTAÇÃO E VALIDAÇÃO
-    // ==========================================
     function copyITSSM() {
         if (!validarCamposObrigatorios()) return;
         const vHost = document.getElementById('host').value || '---'; const vInicio = document.getElementById('inicio').value || '---'; const vFgrid = document.getElementById('f-grid').value || '-';
@@ -1875,27 +1818,6 @@
             document.getElementById('status').value = 'EM ABERTO'; document.getElementById('severidade').value = 'WARNING'; document.getElementById('evidencias').checked = false; 
             document.getElementById('protocolo').classList.remove('shake-error'); try { localStorage.removeItem('noc_rascunho_its'); } catch(e){} ultimaAssinaturaGerada = ''; update();
         }
-    }
-
-    function salvarRascunho() {
-        const rascunho = {
-            modo: modoAtual, cliente: document.getElementById('cliente').value, severidade: document.getElementById('severidade').value, host: document.getElementById('host').value, status: document.getElementById('status').value, item: document.getElementById('item').value, protocolo: document.getElementById('protocolo').value,
-            solucionador: document.getElementById('solucionador').value, inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, obs: document.getElementById('obs').value, statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, evidencias: document.getElementById('evidencias').checked 
-        };
-        try { localStorage.setItem('noc_rascunho_its', JSON.stringify(rascunho)); } catch(e){}
-    }
-
-    function carregarRascunho() {
-        try {
-            const salvo = localStorage.getItem('noc_rascunho_its');
-            if (salvo) {
-                const rascunho = JSON.parse(salvo); if (rascunho.modo) modoAtual = rascunho.modo; 
-                document.getElementById('cliente').value = rascunho.cliente || ''; document.getElementById('severidade').value = rascunho.severidade || 'WARNING'; document.getElementById('host').value = rascunho.host || ''; document.getElementById('status').value = rascunho.status || 'EM ABERTO';
-                document.getElementById('item').value = rascunho.item || ''; document.getElementById('protocolo').value = rascunho.protocolo || ''; document.getElementById('solucionador').value = rascunho.solucionador || ''; document.getElementById('inicio').value = rascunho.inicio || '';
-                document.getElementById('f-grid').value = rascunho.fgrid || ''; document.getElementById('termino').value = rascunho.termino || ''; document.getElementById('desc').value = rascunho.desc || ''; document.getElementById('obs').value = rascunho.obs || '';
-                document.getElementById('statusinfo').value = rascunho.statusinfo || ''; document.getElementById('pressplay').value = rascunho.pressplay || ''; document.getElementById('evidencias').checked = rascunho.evidencias || false; 
-            }
-        } catch(e) { console.error("Erro ao carregar rascunho.", e); localStorage.removeItem('noc_rascunho_its'); }
     }
 
     const itsLogoUrl = "Logos/logo-its.png"; 
