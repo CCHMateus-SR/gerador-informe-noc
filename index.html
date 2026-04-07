@@ -1894,7 +1894,7 @@
     document.body.removeChild(clone);
 
     // --- Estágio 2: downsample com alta qualidade ---
-    const fatorReducao = 1.2; // 60% das dimensões finais
+    const fatorReducao = 1.2/scale; // 60% das dimensões finais
     const smallCanvas = document.createElement('canvas');
     smallCanvas.width  = Math.floor(canvas.width  * fatorReducao);
     smallCanvas.height = Math.floor(canvas.height * fatorReducao);
