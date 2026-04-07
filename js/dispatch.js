@@ -417,14 +417,27 @@ function validarCamposObrigatorios(exigeProtocolo = false) {
 
 function obterAssuntoGerado() {
     let cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
-    if (cliente === 'CSD (GRUPO AMIGÃO)') {
-        cliente = 'GRUPO AMIGÃO';
+    const host = document.getElementById('host').value.toUpperCase() || 'HOST';
+    
+    // Variável que vai montar a primeira parte do assunto (Cliente + Host)
+    let primeiraParte = "";
+
+    // AJUSTE 10: Regra de Exceção LIBBS DIGIBEE
+    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') {
+        // Para este host específico, não vai o nome do cliente no início, mas sim a tag [DIGIBEE]
+        primeiraParte = `[DIGIBEE] | ${host}`;
+    } else {
+        // Regra do Ajuste 9: CSD (GRUPO AMIGÃO) -> GRUPO AMIGÃO
+        if (cliente === 'CSD (GRUPO AMIGÃO)') {
+            cliente = 'GRUPO AMIGÃO';
+        }
+        primeiraParte = `${cliente} | ${host}`;
     }
 
-    const host = document.getElementById('host').value.toUpperCase() || 'HOST';
     let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
     const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
     
+    // Regra do Ajuste 8: OK -> NORMALIZADO
     let severidade = document.getElementById('severidade').value; 
     if (severidade === 'OK') {
         severidade = 'NORMALIZADO';
@@ -433,7 +446,7 @@ function obterAssuntoGerado() {
     const statusSelect = document.getElementById('status').value;
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
     
-    // DEFINE QUAL CAMPO DE HORA LER BASEADO NO STATUS ATUAL
+    // Regra de seleção de data (Ajuste das datas dinâmicas)
     let campoDataHoraAlvo = '';
     if (statusSelect === 'EM ABERTO') {
         campoDataHoraAlvo = document.getElementById('inicio').value.trim();
@@ -446,7 +459,6 @@ function obterAssuntoGerado() {
     let timestampAssunto = "";
 
     if (campoDataHoraAlvo) {
-        // Puxa a data e hora do campo que foi selecionado na regra acima
         let match = campoDataHoraAlvo.match(/(\d{2}\/\d{2}\/\d{4}).*?(\d{2}:\d{2})/);
         if (match) {
             timestampAssunto = `${match[1]} - ${match[2]}`;
@@ -454,14 +466,14 @@ function obterAssuntoGerado() {
             timestampAssunto = campoDataHoraAlvo.substring(0, 20); 
         }
     } else {
-        // Fallback: Se o analista esqueceu de preencher a data do follow-up/término, puxa a hora do PC
         const agora = new Date(); 
         const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); 
         const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
         timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
     }
 
-    return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
+    // Retorno final montado com a regra da LIBBS aplicada
+    return `${primeiraParte} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
 }
 
 function registrarHistoricoNuvem(assunto) {
