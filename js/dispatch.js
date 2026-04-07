@@ -297,9 +297,30 @@ window.update = function() {
 // ------------------------------------------
 // UTILS DA TELA (MACROS, DATAS, ETC)
 // ------------------------------------------
+// Função auxiliar para verificar se o analista já preencheu algo
+function isFormularioSujo() {
+    const camposParaChecar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    for (let id of camposParaChecar) {
+        const el = document.getElementById(id);
+        if (el && el.value.trim() !== '') return true; // Achou algum texto digitado
+    }
+    // Verifica se os seletores saíram do padrão inicial
+    if (document.getElementById('status').value !== 'EM ABERTO') return true;
+    if (document.getElementById('severidade').value !== 'WARNING') return true;
+    if (document.getElementById('evidencias').checked) return true;
+
+    return false; // Formulário está 100% intocado
+}
+
 window.trocarModo = function(novoModo) {
-    // Trava de segurança: se clicar na aba que já está aberta, não faz nada
+    // Trava 1: se clicar na aba que já está aberta, não faz nada
     if (modoAtual === novoModo) return; 
+
+    // Trava 2: Proteção contra perda de dados acidental
+    if (isFormularioSujo()) {
+        const confirma = confirm("⚠️ ATENÇÃO!\n\nVocê tem dados preenchidos no formulário.\nSe trocar de aba agora, todas as informações não salvas serão perdidas.\n\nDeseja realmente descartar este rascunho e trocar de aba?");
+        if (!confirma) return; // O analista clicou em "Cancelar", a troca é abortada e ele não perde nada!
+    }
 
     // 1. Aplica o Reset nos campos do formulário
     const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
