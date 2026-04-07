@@ -107,7 +107,6 @@ function renderizarListaLateral() {
     
     if (visaoHistorico === 'meus' && currentUser) { chamadosExibidos = chamadosExibidos.filter(c => c.nome === currentUser.nome); }
     
-    // Atualizado: Agora a busca pesquisa por Cliente, Host e também pelo SERVIÇO!
     if (termoBusca !== '') {
         chamadosExibidos = chamadosExibidos.filter(c => {
             if (c.tipo === 'aviso_rapido') return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || (c.host && String(c.host).toLowerCase().includes(termoBusca));
@@ -132,26 +131,47 @@ function renderizarListaLateral() {
 
     let html = '';
     chamadosExibidos.forEach((log) => {
+        // LÓGICA DOS CARDS DE "AVISO RÁPIDO"
         if (log.tipo === 'aviso_rapido') {
-            html += `<div class="my-card card-aviso"><div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div><div class="my-card-host">🔖 ${log.servico}</div><div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569;">🖥️ ${log.host}</div><div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div></div>`;
+            const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
+            const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
+            
+            html += `
+            <div class="my-card card-aviso">
+                <div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div>
+                <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvAviso}')">🔖 ${log.servico}</div>
+                <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstAviso}')">🖥️ ${log.host}</div>
+                <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div>
+            </div>`;
             return;
         }
+        
+        // LÓGICA DOS CARDS NORMAIS (ABERTURA, FOLLOW, RESOLVIDO)
         const acao = (log.assunto || '').split(' | ')[5] || 'CHAMADO';
         let classeBadge = acao.includes('FOLLOW') ? 'badge-follow' : (acao.includes('ENCERRAMENTO') ? 'badge-ok' : 'badge-aberto');
         
-        // NOVIDADE: Pega a primeira linha do serviço para exibir (evita que logs gigantes quebrem o card)
+        const hostLimpo = log.form.host || 'Host Não Informado';
         const servicoResumido = log.form.item ? log.form.item.split('\n')[0] : 'Serviço Não Informado';
         
+        // Prepara os textos para não quebrarem o JS na hora da cópia (remove aspas simples)
+        const hstSafe = hostLimpo.replace(/'/g, "\\'");
+        const srvSafe = servicoResumido.replace(/'/g, "\\'");
+
         html += `
         <div class="my-card card-${log.form.modo || 'link'}">
             <div class="my-card-header"><span class="my-card-client">${log.form.cliente || 'CLIENTE'}</span><span class="my-card-badge ${classeBadge}">${acao}</span></div>
-            <div class="my-card-host">🖥️ ${log.form.host || 'Host Não Informado'}</div>
-            <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569;">🔖 ${servicoResumido}</div>
+            
+            <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstSafe}')">🖥️ ${hostLimpo}</div>
+            <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvSafe}')">🔖 ${servicoResumido}</div>
+            
             <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span><button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button></div>
         </div>`;
     });
     lista.innerHTML = html;
 }
+
+// Essa linha é essencial para o campo de busca (HTML) achar a função de renderizar!
+window.renderizarListaLateral = renderizarListaLateral;
 
 window.setVisaoHistorico = function(visao) {
     visaoHistorico = visao;
