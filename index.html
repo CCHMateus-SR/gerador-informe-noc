@@ -10,7 +10,8 @@
         :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-green: #166534; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         
-        .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center;}
+        /* ADICIONADO: flex-wrap para permitir quebra de linha em telas menores */
+        .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center; flex-wrap: wrap;}
         
         /* COLUNA 1: MEUS CHAMADOS */
         .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
@@ -135,27 +136,27 @@
 
         /* Sticky Footer */
         .action-footer { position: sticky; bottom: -30px; background: white; padding: 15px 30px 30px 30px; margin: 20px -30px -30px -30px; border-top: 1px solid var(--its-border); z-index: 10; display: flex; flex-direction: column; gap: 10px; transition: background-color 0.3s; }
-        .button-row { display: flex; gap: 8px; }
+        .button-row { display: flex; gap: 8px; flex-wrap: wrap;}
         
         /* Botões do Rodapé */
-        .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
+        .btn-copy-subject { flex: 1; min-width: 120px; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
         .btn-copy-subject:hover { background-color: #E0F2FE; }
         
-        .btn-copy-assunto-itssm { flex: 1; background-color: #F8FAFC; color: #64748B; border: 2px solid #94A3B8; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
+        .btn-copy-assunto-itssm { flex: 1; min-width: 120px; background-color: #F8FAFC; color: #64748B; border: 2px solid #94A3B8; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
         .btn-copy-assunto-itssm:hover { background-color: #E2E8F0; color: #475569; border-color: #64748B;}
         
-        .btn-copy { flex: 1; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
+        .btn-copy { flex: 1; min-width: 120px; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
         .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
         
-        .btn-copy-img { flex: 1; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+        .btn-copy-img { flex: 1; min-width: 120px; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
         .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
         
-        .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
+        .btn-copy-itssm { flex: 1; min-width: 120px; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
         .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
-        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
+        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; min-width: 150px;}
         .btn-danger-its:hover { background: #991B1B; transform: translateY(-2px); }
-        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
+        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; min-width: 150px;}
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
 
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: white; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
@@ -168,6 +169,20 @@
 
         /* COLUNA 3: PREVIEW DO E-MAIL */
         .preview-side { flex: 1.4; background: #CBD5E1; padding: 40px; border-radius: 16px; position: sticky; top: 20px; border: 1px solid #94A3B8; overflow-y: auto; max-height: 92vh; display: flex; justify-content: center; transition: background-color 0.3s; min-width: 650px;}
+
+        /* RESPONSIVIDADE (MEDIA QUERIES) */
+        @media (max-width: 1600px) {
+            .history-side { flex: 1 1 250px; max-width: 300px; }
+            .form-side { flex: 2 1 500px; max-width: 800px; }
+            /* Empurra o preview para baixo se não couber */
+            .preview-side { flex: 1 1 100%; width: 100%; max-width: 100%; margin-top: 10px; display: flex; justify-content: center; position: relative; top: 0;}
+        }
+
+        @media (max-width: 1024px) {
+            .container { flex-direction: column; align-items: center; }
+            .history-side, .form-side, .preview-side { width: 100%; max-width: 100%; flex: none; }
+            .history-side { max-height: 400px; }
+        }
 
         /* Modais e Toasts */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
@@ -191,7 +206,7 @@
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
         body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus { border-color: #38BDF8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); background: #1E293B;}
         body.dark-mode label { color: #94A3B8; }
-        body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
+        body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; color: #38bdf8;}
         body.dark-mode .status-conn { background: #0F172A; border-color: #334155; color: #94A3B8;}
         body.dark-mode .conn-online { color: #22C55E; border-color: #166534; }
         body.dark-mode .conn-offline { color: #F87171; border-color: #991B1B; }
@@ -204,7 +219,7 @@
         body.dark-mode .btn-copy-subject:hover { background-color: #0F172A; }
         
         body.dark-mode .btn-copy-assunto-itssm { background-color: #1E293B; border-color: #475569; color: #94A3B8; }
-        body.dark-mode .btn-copy-assunto-itssm:hover { background-color: #334155; color: #F8FAFC; }
+        body.dark-mode .btn-copy-assunto-itssm:hover { background-color: #334155; color: #F8FAFC; border-color: #64748B;}
         
         body.dark-mode .preview-side { background: #1E293B; border-color: #334155; }
         body.dark-mode .modal-content { background: #1E293B; border: 1px solid #334155; }
@@ -1591,6 +1606,7 @@
         return true; 
     }
 
+    // ===== FUNÇÃO MODIFICADA =====
     function obterAssuntoGerado() {
         const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE'; 
         const host = document.getElementById('host').value.toUpperCase() || 'HOST';
@@ -1604,8 +1620,10 @@
         let timestampAssunto = "";
 
         if (inicioVal) {
+            // Substitui o " às " gerado pelo botão para " - " para ficar no padrão visual
             timestampAssunto = inicioVal.replace(/ às /gi, ' - ');
         } else {
+            // Fallback (caso o analista tenha apagado tudo do campo início)
             const agora = new Date(); 
             const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); 
             const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
@@ -1614,6 +1632,7 @@
 
         return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
     }
+    // ============================
 
     function registrarHistoricoNuvem(assunto) {
         if(!currentUser) return;
@@ -1925,7 +1944,7 @@
         const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ A GERAR...';
         const node = document.getElementById('render'); const clone = node.cloneNode(true); clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px'; clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
 
-        html2canvas(clone, { scale: 2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+        html2canvas(clone, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
             document.body.removeChild(clone);
             canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia automática de imagem não é suportada por este navegador."); btn.innerHTML = originalText; } });
         }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
