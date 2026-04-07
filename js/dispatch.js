@@ -480,17 +480,32 @@ function registrarHistoricoNuvem(assunto) {
 }
 
 function verificarDuplicidade() {
-    const cliente = document.getElementById('cliente').value.toUpperCase().trim(); const host = document.getElementById('host').value.toUpperCase().trim(); const statusSelect = document.getElementById('status').value;
-    if (!cliente || !host) return true;
-    let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
-    const buscaStr = `${cliente} | ${host}`; 
+    let cliente = document.getElementById('cliente').value.toUpperCase().trim();
+    if (cliente === 'CSD (GRUPO AMIGÃO)') cliente = 'GRUPO AMIGÃO'; // Mantendo a regra que criamos antes!
     
-    // Agora ele verifica os últimos 150 logs globais, independentemente da hora
+    const host = document.getElementById('host').value.toUpperCase().trim(); 
+    
+    // NOVIDADE: Puxando o Serviço para dentro da trava de segurança
+    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
+    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    
+    const statusSelect = document.getElementById('status').value;
+    if (!cliente || !host) return true;
+    
+    let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+    
+    // A string de busca agora cruza as 3 informações exatas (Cliente | Host | Serviço)
+    const buscaStr = `${cliente} | ${host} | ${item}`; 
+    
     for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
         let log = ultimosLogsFirebase[i];
         if (log.tipo === 'aviso_rapido') continue; 
+        
         if(log.assunto && log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
-            if(currentUser && log.nome !== currentUser.nome) { return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este cliente/host às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`); }
+            if(currentUser && log.nome !== currentUser.nome) { 
+                // Atualizamos a mensagem de erro para deixar claro pro analista o porquê do bloqueio
+                return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este mesmo Cliente, Host e Serviço às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`); 
+            }
             return true;
         }
     }
