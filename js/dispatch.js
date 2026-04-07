@@ -483,30 +483,56 @@ window.copyITSSM = function() {
 
 window.copiarAssuntoAcao = function() {
     if (!validarCamposObrigatorios()) return;
-    try { const assunto = obterAssuntoGerado(); const tempInput = document.createElement("input"); tempInput.value = assunto; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); } catch(e) {}
+    const assunto = obterAssuntoGerado();
+    
+    // Tenta usar a API moderna e segura de cópia do navegador
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(assunto).then(() => {
+            mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info");
+        }).catch(err => {
+            console.error("Erro na API Clipboard: ", err);
+        });
+    } else {
+        // Plano B: Hack do Input (Para navegadores mais antigos)
+        try { 
+            const tempInput = document.createElement("input"); 
+            tempInput.value = assunto; 
+            document.body.appendChild(tempInput); 
+            tempInput.select(); 
+            document.execCommand("copy"); 
+            document.body.removeChild(tempInput); 
+            mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); 
+        } catch(e) {}
+    }
 }
 
 window.copiarAssuntoITSSM = function() {
     if (!validarCamposObrigatorios()) return;
     
-    try { 
-        // Puxa apenas o Host e o Serviço, formatando para ficar limpo
-        const host = document.getElementById('host').value.toUpperCase().trim() || 'HOST';
-        let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-        const servico = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
-        
-        // Monta o texto final (Ex: "FURACAO_FGT_BELO_HORIZONTE - LINK APEX NET 50MB")
-        const assuntoITSSM = `${host} - ${servico}`; 
-        
-        const tempInput = document.createElement("input"); 
-        tempInput.value = assuntoITSSM; 
-        document.body.appendChild(tempInput); 
-        tempInput.select(); 
-        document.execCommand("copy"); 
-        document.body.removeChild(tempInput); 
-        
-        mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
-    } catch(e) {}
+    const host = document.getElementById('host').value.toUpperCase().trim() || 'HOST';
+    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
+    const servico = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    const assuntoITSSM = `${host} - ${servico}`; 
+    
+    // Tenta usar a API moderna e segura de cópia do navegador
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(assuntoITSSM).then(() => {
+            mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
+        }).catch(err => {
+            console.error("Erro na API Clipboard: ", err);
+        });
+    } else {
+        // Plano B: Hack do Input
+        try { 
+            const tempInput = document.createElement("input"); 
+            tempInput.value = assuntoITSSM; 
+            document.body.appendChild(tempInput); 
+            tempInput.select(); 
+            document.execCommand("copy"); 
+            document.body.removeChild(tempInput); 
+            mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
+        } catch(e) {}
+    }
 }
 
 window.limparFormulario = function() {
