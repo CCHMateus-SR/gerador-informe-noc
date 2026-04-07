@@ -14,6 +14,66 @@ let modoAtual = 'link';
 let ultimaAssinaturaGerada = '';
 let timestampCarregamento = Date.now();
 
+// ==========================================
+// MEMÓRIA PREDITIVA (AUTOCOMPLETAR)
+// ==========================================
+let memoriaNOC = { link: {}, infra: {} };
+
+function atualizarMemoria() {
+    memoriaNOC = { link: {}, infra: {} };
+    chamadosDoTurno.forEach(log => {
+        if (!log.form) return;
+        const modo = log.form.modo || 'link';
+        const c = (log.form.cliente || '').toUpperCase().trim();
+        const h = (log.form.host || '').toUpperCase().trim();
+        const i = (log.form.item || '').trim();
+
+        if (!c || !h) return;
+
+        // Monta um dicionário: Cliente -> Host -> Serviços
+        if (!memoriaNOC[modo][c]) memoriaNOC[modo][c] = {};
+        if (!memoriaNOC[modo][c][h]) memoriaNOC[modo][c][h] = new Set();
+        if (i) memoriaNOC[modo][c][h].add(i);
+    });
+}
+
+function renderSugestoes(campoId, valores) {
+    let containerId = 'sugestoes-' + campoId;
+    let container = document.getElementById(containerId);
+    
+    // Cria o espaço para as sugestões abaixo do input se não existir
+    if (!container) {
+        container = document.createElement('div');
+        container.id = containerId;
+        container.style.marginTop = '6px';
+        container.style.display = 'flex';
+        container.style.flexWrap = 'wrap';
+        container.style.gap = '6px';
+        
+        let input = document.getElementById(campoId);
+        if(input) input.parentNode.insertBefore(container, input.nextSibling);
+    }
+    
+    if (!valores || valores.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '<span style="font-size: 10px; color: #64748B; margin-top: 3px; margin-right: 4px;">🧠 Sugestões:</span>';
+    
+    // Pega no máximo as 5 opções mais usadas
+    valores.slice(0, 5).forEach(val => {
+        let label = val.split('\n')[0].substring(0, 30); // Pega só a primeira linha para o botão
+        if (val.length > 30) label += '...';
+        
+        // Tratamento seguro para textos complexos
+        let safeVal = val.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n");
+        
+        html += `<span onclick="document.getElementById('${campoId}').value = '${safeVal}'; window.update();" style="background: #E2E8F0; color: #0F172A; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; cursor: pointer; border: 1px solid #CBD5E1; transition: 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">${label}</span>`;
+    });
+    container.innerHTML = html;
+}
+
 // Dicionário de Logos
 const itsLogoUrl = "Logos/logo-its.png"; 
 const logosClientes = {
@@ -36,12 +96,15 @@ const logosClientes = {
 // LÓGICA DO FIREBASE (Histórico e Radar)
 // ------------------------------------------
 export function iniciarBancoDeDados() {
-    // Removemos o "startAt(inicioTurno)", agora ele escuta tudo que está no banco
     db.ref('historico_noc').orderByChild('timestamp').on('value', (snapshot) => {
         chamadosDoTurno = [];
         if(snapshot.exists()) { snapshot.forEach(child => { chamadosDoTurno.push(child.val()); }); }
         renderizarListaLateral();
         atualizarDashboard();
+        
+        // LIGA A MEMÓRIA AQUI!
+        atualizarMemoria(); 
+        if(document.getElementById('cliente').value !== '') window.update(); 
     });
 
     db.ref('historico_noc').orderByChild('timestamp').startAt(timestampCarregamento).on('child_added', (snapshot) => {
@@ -229,6 +292,28 @@ window.update = function() {
 
     if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
     
+    // --- LÓGICA DOS CHIPS DE SUGESTÃO ---
+    const hostLimpo = document.getElementById('host').value.toUpperCase().trim();
+    const itemLimpo = document.getElementById('item').value.trim();
+
+    // Mostra Sugestões de Host (Baseado no Cliente)
+    let hostsSugeridos = [];
+    if (vCliente && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente]) {
+        hostsSugeridos = Object.keys(memoriaNOC[modoAtual][vCliente]);
+    }
+    renderSugestoes('host', hostsSugeridos.filter(h => h !== hostLimpo));
+
+    // Mostra Sugestões de Item (Baseado no Cliente + Host)
+    let itensSugeridos = [];
+    if (vCliente && hostLimpo && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente] && memoriaNOC[modoAtual][vCliente][hostLimpo]) {
+        itensSugeridos = Array.from(memoriaNOC[modoAtual][vCliente][hostLimpo]);
+    }
+    renderSugestoes('item', itensSugeridos.filter(i => i !== itemLimpo));
+    // -------------------------------------
+
+    document.getElementById('v-host').innerText = vHost;
+    document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
+    
     let corSeveridade = '#64748B'; let sevTextHeader = '⚪ UNKNOWN';
     if(severidade === 'CRITICAL') { corSeveridade = '#DC2626'; sevTextHeader = '🚨 CRITICAL'; }
     if(severidade === 'WARNING') { corSeveridade = '#D97706'; sevTextHeader = '🟡 WARNING'; }
@@ -238,6 +323,8 @@ window.update = function() {
 
     const headerSevBadge = document.getElementById('header-sev-badge');
     if (headerSevBadge) { headerSevBadge.style.backgroundColor = corSeveridade; headerSevBadge.innerHTML = sevTextHeader; }
+    
+    // ... (o restante da função segue normal daqui para baixo) ...
 
     let labelTerminoForm = ''; let tituloTerminoBox = ''; let tituloDescBox = 'DETALHAMENTO';
     const headerBg = document.getElementById('v-header-bg'); const topBorder = document.getElementById('render-header-cell');
