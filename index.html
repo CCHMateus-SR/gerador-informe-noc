@@ -1907,9 +1907,9 @@
 
     function copyITSSM() {
         if (!validarCamposObrigatorios()) return;
-        const vHost = document.getElementById('host').value || '---'; const vItem = document.getElementById('item').value.trim() || '---'; const vInicio = document.getElementById('inicio').value || '---'; const vFgrid = document.getElementById('f-grid').value || '-';
+        const vHost = document.getElementById('host').value || '---'; const vInicio = document.getElementById('inicio').value || '---'; const vFgrid = document.getElementById('f-grid').value || '-';
         const vTermino = document.getElementById('termino').value || '-'; const vCliente = document.getElementById('cliente').value || '---'; const vStatusInfo = document.getElementById('statusinfo').value.trim();
-        let textoITSSM = `Host: ${vHost}\nServiço: ${vItem}\nInício da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\nCliente: ${vCliente}\n`;
+        let textoITSSM = `Host: ${vHost}\nInício da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\nCliente: ${vCliente}\n`;
         if (vStatusInfo) { textoITSSM += `\nDados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`; }
         const vPressplay = document.getElementById('pressplay').value.trim();
         if (modoAtual === 'infra' && vPressplay) { textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`; }
