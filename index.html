@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>NOC ITS - Central de Despacho</title>
+    <title>NOC ITS - Central de Informes</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -10,11 +10,11 @@
         :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-green: #166534; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         
-        .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center; flex-wrap: wrap;}
+        .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center;}
         
         /* COLUNA 1: MEUS CHAMADOS */
         .history-side { flex: 0.8; min-width: 280px; max-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-top: 8px solid var(--its-blue); max-height: 92vh; overflow-y: auto; transition: all 0.3s; display: none; }
-        .history-side h3 { color: var(--its-blue); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; transition: color 0.3s; }
+        .history-side h3 { color: var(--its-blue); margin: 0 0 15px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         
         .tabs-container { display: flex; gap: 5px; margin-bottom: 10px; background: #F1F5F9; padding: 4px; border-radius: 8px; border: 1px solid #E2E8F0;}
         .tab-btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.2s; text-transform: uppercase; color: #64748B; background: transparent; }
@@ -98,7 +98,7 @@
         .alerta-laranja { border-top: 8px solid var(--its-orange) !important; box-shadow: 0 0 25px rgba(234, 88, 12, 0.25) !important; }
         .alerta-verde { border-top: 8px solid var(--its-green) !important; box-shadow: 0 0 25px rgba(22, 101, 52, 0.15) !important; }
 
-        /* CHAVEADOR DE MODOS */
+        /* CHAVEADOR DE MODOS (Agora no Header) */
         .mode-switch-container { display: flex; gap: 8px; background: #E2E8F0; padding: 5px; border-radius: 8px; transition: background 0.3s;}
         .mode-btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; color: #475569; background: transparent; display: flex; justify-content: center; align-items: center; gap: 6px;}
         .mode-btn.active { background: white; color: var(--its-blue); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
@@ -112,7 +112,7 @@
         
         .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
         .label-flex { display: flex; justify-content: space-between; align-items: center; }
-        label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; transition: color 0.3s;}
+        label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em; }
         
         .actions-flex { display: flex; gap: 12px; }
         .btn-action { background: none; border: none; color: #0078d4; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase; padding: 0; display: flex; align-items: center; gap: 4px; }
@@ -135,25 +135,19 @@
 
         /* Sticky Footer */
         .action-footer { position: sticky; bottom: -30px; background: white; padding: 15px 30px 30px 30px; margin: 20px -30px -30px -30px; border-top: 1px solid var(--its-border); z-index: 10; display: flex; flex-direction: column; gap: 10px; transition: background-color 0.3s; }
-        .button-row { display: flex; gap: 8px; flex-wrap: wrap;}
-        
-        /* Botões do Rodapé */
-        .btn-copy-subject { flex: 1; min-width: 120px; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
+        .button-row { display: flex; gap: 8px; }
+        .btn-copy-subject { flex: 1; background-color: #F1F5F9; color: #0078d4; border: 2px solid #0078d4; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; }
         .btn-copy-subject:hover { background-color: #E0F2FE; }
-        
-        .btn-copy-assunto-itssm { flex: 1; min-width: 120px; background-color: #F8FAFC; color: #64748B; border: 2px solid #94A3B8; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
-        .btn-copy-assunto-itssm:hover { background-color: #E2E8F0; color: #475569; border-color: #64748B;}
-        
-        .btn-copy-img { flex: 1; min-width: 120px; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
+        .btn-copy { flex: 1.2; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
+        .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
+        .btn-copy-img { flex: 1.2; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
         .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
-        
-        .btn-copy-itssm { flex: 1; min-width: 120px; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
+        .btn-copy-itssm { flex: 1; background-color: #475569; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; transition: 0.3s; box-shadow: 0 4px 12px rgba(71, 85, 105, 0.2); }
         .btn-copy-itssm:hover { background-color: #334155; transform: translateY(-2px); }
 
-        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; min-width: 150px;}
+        .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; }
         .btn-danger-its:hover { background: #991B1B; transform: translateY(-2px); }
-        
-        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; min-width: 150px;}
+        .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; }
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
 
         .user-badge { font-size: 12px; font-weight: 700; color: #0EA5E9; background: white; padding: 6px 12px; border-radius: 20px; border: 1px solid #BAE6FD; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
@@ -161,31 +155,16 @@
         .btn-sair:hover { background: #FEE2E2; transform: scale(1.05); }
         .btn-theme { background: white; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 600; color: #64748B; transition: 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);}
         .btn-theme:hover { background: #F1F5F9; }
+        .btn-undo { color: #1E293B; text-decoration: underline; font-weight: 900; cursor: pointer; margin-left: 10px; padding: 4px 8px; background: rgba(0,0,0,0.1); border-radius: 4px;}
+        .btn-undo:hover { background: rgba(0,0,0,0.2); }
 
         /* COLUNA 3: PREVIEW DO E-MAIL */
         .preview-side { flex: 1.4; background: #CBD5E1; padding: 40px; border-radius: 16px; position: sticky; top: 20px; border: 1px solid #94A3B8; overflow-y: auto; max-height: 92vh; display: flex; justify-content: center; transition: background-color 0.3s; min-width: 650px;}
-
-        /* RESPONSIVIDADE (MEDIA QUERIES) */
-        @media (max-width: 1600px) {
-            .history-side { flex: 1 1 250px; max-width: 300px; }
-            .form-side { flex: 2 1 500px; max-width: 800px; }
-            .preview-side { flex: 1 1 100%; width: 100%; max-width: 100%; margin-top: 10px; display: flex; justify-content: center; position: relative; top: 0;}
-        }
-
-        @media (max-width: 1024px) {
-            .container { flex-direction: column; align-items: center; }
-            .history-side, .form-side, .preview-side { width: 100%; max-width: 100%; flex: none; }
-            .history-side { max-height: 400px; }
-        }
 
         /* Modais e Toasts */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 30px; border-radius: 16px; width: 650px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); transition: background-color 0.3s;}
         .modal-login-content { width: 400px; text-align: center; }
-        
-        .modal-title { margin-top: 0; margin-bottom: 5px; color: var(--its-blue); transition: color 0.3s;}
-        .modal-subtitle { font-size: 13px; color: #64748B; margin: 0; margin-bottom: 25px; transition: color 0.3s;}
-        
         .log-item { background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; border-left: 4px solid #0EA5E9; transition: background-color 0.3s;}
         .log-time { font-size: 11px; color: #64748B; font-weight: bold; display: flex; justify-content: space-between;}
         .log-subject { font-size: 13px; color: #1E293B; font-family: monospace; font-weight: bold;}
@@ -204,7 +183,7 @@
         body.dark-mode input, body.dark-mode select, body.dark-mode textarea { background: #0F172A; color: #F8FAFC; border-color: #475569; }
         body.dark-mode input:focus, body.dark-mode select:focus, body.dark-mode textarea:focus { border-color: #38BDF8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); background: #1E293B;}
         body.dark-mode label { color: #94A3B8; }
-        body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; color: #38bdf8;}
+        body.dark-mode .user-badge { background: #0F172A; border-color: #0EA5E9; }
         body.dark-mode .status-conn { background: #0F172A; border-color: #334155; color: #94A3B8;}
         body.dark-mode .conn-online { color: #22C55E; border-color: #166534; }
         body.dark-mode .conn-offline { color: #F87171; border-color: #991B1B; }
@@ -213,19 +192,13 @@
         body.dark-mode .btn-theme { background: #1E293B; border-color: #475569; color: #94A3B8; }
         body.dark-mode .btn-theme:hover { background: #334155; }
         body.dark-mode .header-title-row h2 { color: #38bdf8; }
-        body.dark-mode .history-side h3 { color: #38bdf8; }
         body.dark-mode .btn-copy-subject { background-color: #1E293B; border-color: #38bdf8; color: #38bdf8; }
         body.dark-mode .btn-copy-subject:hover { background-color: #0F172A; }
-        
-        body.dark-mode .btn-copy-assunto-itssm { background-color: #1E293B; border-color: #475569; color: #94A3B8; }
-        body.dark-mode .btn-copy-assunto-itssm:hover { background-color: #334155; color: #F8FAFC; border-color: #64748B;}
-        
         body.dark-mode .preview-side { background: #1E293B; border-color: #334155; }
         body.dark-mode .modal-content { background: #1E293B; border: 1px solid #334155; }
-        body.dark-mode .modal-title { color: #38bdf8; }
-        body.dark-mode .modal-subtitle { color: #94A3B8; }
         body.dark-mode .log-item { background: #0F172A; border-color: #334155; border-left-color: #38bdf8;}
         body.dark-mode .log-subject { color: #F8FAFC; }
+        body.dark-mode .modal-content h3 { color: #38bdf8; }
         body.dark-mode .section-title { color: #38bdf8; border-color: #334155; background: #0F172A; border-left-color: #38bdf8; }
         body.dark-mode .section-title:hover { background: #1E293B; }
         body.dark-mode .action-footer { background: #1E293B; border-top-color: #334155; }
@@ -279,7 +252,6 @@
         body.pro-mode input:focus, body.pro-mode select:focus, body.pro-mode textarea:focus { border-color: #2D8CEB; background: #252525;}
         body.pro-mode label { color: #AAAAAA; }
         body.pro-mode .header-title-row h2 { color: #CCCCCC; letter-spacing: 0; }
-        body.pro-mode .history-side h3 { color: #CCCCCC; letter-spacing: 0; }
         body.pro-mode .btn-theme { background: #282828; border-color: #444; color: #AAA; }
         body.pro-mode .btn-theme:hover { background: #444; color: #FFF; }
         body.pro-mode .user-badge { background: #282828; border-color: #444; color: #AAA; }
@@ -290,10 +262,10 @@
         body.pro-mode .btn-sair:hover { background: #5A2A2A; color: #E0E0E0; }
         
         /* Botões Estilo Toolbar (Flat Grey) */
-        body.pro-mode .btn-copy, body.pro-mode .btn-copy-img, body.pro-mode .btn-copy-subject, body.pro-mode .btn-copy-itssm, body.pro-mode .btn-its-history, body.pro-mode .btn-copy-assunto-itssm {
+        body.pro-mode .btn-copy, body.pro-mode .btn-copy-img, body.pro-mode .btn-copy-subject, body.pro-mode .btn-copy-itssm, body.pro-mode .btn-its-history {
             background-color: #444; border: 1px solid #555; color: #E0E0E0; box-shadow: none; border-radius: 4px; padding: 12px 5px;
         }
-        body.pro-mode .btn-copy:hover, body.pro-mode .btn-copy-img:hover, body.pro-mode .btn-copy-subject:hover, body.pro-mode .btn-copy-itssm:hover, body.pro-mode .btn-its-history:hover, body.pro-mode .btn-copy-assunto-itssm:hover {
+        body.pro-mode .btn-copy:hover, body.pro-mode .btn-copy-img:hover, body.pro-mode .btn-copy-subject:hover, body.pro-mode .btn-copy-itssm:hover, body.pro-mode .btn-its-history:hover {
             background-color: #555; border-color: #666; transform: none; color: #FFF;
         }
         body.pro-mode .btn-danger-its { background-color: #5A2A2A; color: #E0E0E0; box-shadow: none; border: 1px solid #703030; border-radius: 4px; padding: 12px; }
@@ -301,10 +273,9 @@
         
         body.pro-mode .preview-side { background: #282828; border-color: #444; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
         body.pro-mode .modal-content { background: #323232; border: 1px solid #444; box-shadow: 0 10px 30px rgba(0,0,0,0.5);}
-        body.pro-mode .modal-title { color: #CCCCCC; }
-        body.pro-mode .modal-subtitle { color: #AAAAAA; }
         body.pro-mode .log-item { background: #282828; border-color: #444; border-left-color: #555;}
         body.pro-mode .log-subject { color: #E0E0E0; }
+        body.pro-mode .modal-content h3 { color: #CCC; }
         body.pro-mode .section-title { color: #CCC; border-color: #444; background: #282828; border-left-color: #555; }
         body.pro-mode .section-title:hover { background: #383838; }
         body.pro-mode .action-footer { background: #323232; border-top-color: #444; }
@@ -364,7 +335,7 @@
 
 <div id="modal-alerta" class="modal-overlay" style="z-index: 2000;">
     <div class="modal-content" style="width: 480px; border-top: 8px solid var(--its-orange); padding: 30px; text-align: center;">
-        <h3 class="modal-title" style="font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">🚨 Atualização no Radar!</h3>
+        <h3 style="margin-top: 0; color: var(--its-orange); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 15px;">🚨 Atualização no Radar!</h3>
         <div id="texto-alerta" style="margin-bottom: 25px; text-align: left;"></div>
         
         <div id="botoes-alerta"></div>
@@ -374,8 +345,8 @@
 <div id="modal-login" class="modal-overlay">
     <div class="modal-content modal-login-content">
         <img src="Logos/logo-its.png" alt="ITS" width="120" style="margin-bottom: 20px;">
-        <h3 class="modal-title">Bem Vindo!</h3>
-        <p class="modal-subtitle">Identifique-se para utilizar a Central de Despacho.</p>
+        <h3 style="margin-top: 0; color: #002D5B;">Bem Vindo!</h3>
+        <p style="font-size: 13px; color: #64748B; margin-bottom: 25px;">Identifique-se para utilizar a Central de Despacho.</p>
         
         <div style="text-align: left; margin-bottom: 15px;">
             <label style="display: block; margin-bottom: 5px;">Seu Nome Oficial</label>
@@ -405,8 +376,8 @@
         <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div>
-                <h3 class="modal-title">📡 Radar do Plantão</h3>
-                <p class="modal-subtitle">Relatórios e Avisos ativos da equipe.</p>
+                <h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3>
+                <p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios e Avisos da equipe (desde as 07h).</p>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
                 <div id="dash-abertos" class="dash-badge dash-aberto">🔴 0</div>
@@ -438,7 +409,7 @@
         </div>
 
         <div id="meus-chamados-lista">
-            <div style="text-align: center; padding: 20px; font-size: 12px; color: inherit;">Carregando histórico...</div>
+            <div style="text-align: center; color: #94A3B8; font-size: 12px; margin-top: 30px;">Carregando histórico...</div>
         </div>
     </div>
 
@@ -504,7 +475,7 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label>Dados Técnicos (Status Information do Centreon)</label>
-                    <button type="button" class="btn-action" onclick="limparLogs('statusinfo')" title="Compactar espaços e quebras vazias">🧹 Compactar Log</button>
+                    <button type="button" class="btn-action" onclick="limparLogs('statusinfo')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
                 </div>
                 <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui..." oninput="update()"></textarea>
             </div>
@@ -512,7 +483,7 @@
             <div class="input-group full-width" id="grupo-pressplay" style="display: none;">
                 <div class="label-flex">
                     <label>Retorno / Logs do PressPlay (Opcional)</label>
-                    <button type="button" class="btn-action" onclick="limparLogs('pressplay')" title="Compactar espaços e quebras vazias">🧹 Compactar Log</button>
+                    <button type="button" class="btn-action" onclick="limparLogs('pressplay')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
                 </div>
                 <textarea id="pressplay" class="textarea-sm" placeholder="Cole o retorno da execução do PressPlay aqui..." oninput="update()"></textarea>
             </div>
@@ -577,7 +548,7 @@
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button type="button" class="btn-action" onclick="limparLogs('desc')" title="Compactar espaços e quebras vazias">🧹 Compactar Log</button>
+                        <button type="button" class="btn-action" onclick="limparLogs('desc')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
                         <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';" style="display: inline-block;">
                             <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
                             <option value="padrao">📋 Texto Padrão (Baseado no Status)</option>
@@ -594,19 +565,19 @@
             
             <div class="input-group full-width" id="grupo-evidencias" style="display: flex; flex-direction: row; align-items: center; gap: 8px; background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px dashed #CBD5E1; margin-top: 5px;">
                 <input type="checkbox" id="evidencias" onchange="update()" style="width: 18px; height: 18px; cursor: pointer; margin: 0; accent-color: var(--its-blue);">
-                <label for="evidencias" style="cursor: pointer; margin: 0; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong></label>
+                <label for="evidencias" style="cursor: pointer; margin: 0; color: #0F172A; text-transform: none; letter-spacing: normal; font-size: 13px;">📎 Anexar aviso de <strong>"Evidências no corpo do e-mail"</strong></label>
             </div>
         </div>
         
         <div class="action-footer">
             <div class="button-row">
                 <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-                <button class="btn-its-history" onclick="abrirHistorico()">📡 ABRIR RADAR</button>
+                <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
             </div>
             <div class="button-row" style="margin-bottom: 0;">
-                <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO E-MAIL</button>
-                <button class="btn-copy-assunto-itssm" id="btn-assunto-itssm" onclick="copiarAssuntoITSSM()">🎫 ASSUNTO ITSSM</button>
-                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 COPIAR INFORME</button>
+                <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO</button>
+                <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
+                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM HD</button>
                 <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
             </div>
         </div>
@@ -683,9 +654,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // ==========================================
-    // LISTA DE LOGOS
-    // ==========================================
+    // RESTAURANDO AS LOGOS
     const itsLogoUrl = "Logos/logo-its.png"; 
     const logosClientes = {
         "838 SOLUÇÕES": "Logos/logo-838-solucoes.png", "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png", "ATMOSPHERE": "Logos/logo-atmosphere.png",
@@ -786,7 +755,13 @@
     window.addEventListener('offline', atualizarStatusConexao);
 
     function getInicioDoPlantaoTimestamp() {
-        return 0; // Removido o reset automático a pedido. O radar agora exibe tudo até que seja limpo manualmente.
+        const agora = new Date();
+        const inicioPlantao = new Date(agora);
+        inicioPlantao.setHours(7, 0, 0, 0); 
+        if (agora.getHours() < 7) {
+            inicioPlantao.setDate(inicioPlantao.getDate() - 1);
+        }
+        return inicioPlantao.getTime();
     }
 
     // CLICK-TO-COPY INLINE
@@ -798,7 +773,7 @@
     }
 
     // ==========================================
-    // SISTEMA DE SALVAMENTO DO SLA NO LOCALSTORAGE
+    // SISTEMA DE SALVAMENTO DO SLA NO LOCALSTORAGE (ANTI-F5 BUG)
     // ==========================================
     function salvarEstadoSLA() {
         const estadoSLA = {
@@ -1366,7 +1341,7 @@
     }
 
     window.gerarPassagemPlantao = function() {
-        if (chamadosDoTurno.length === 0) { mostrarToast("Não há chamados no radar.", "warning"); return; }
+        if (chamadosDoTurno.length === 0) { mostrarToast("Não há chamados neste plantão.", "warning"); return; }
 
         let estadoRecente = {};
         chamadosDoTurno.forEach(log => {
@@ -1609,31 +1584,12 @@
         return true; 
     }
 
-    function obterAssuntoGerado() {
-        const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE'; 
-        const host = document.getElementById('host').value.toUpperCase() || 'HOST';
-        let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-        const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
-        const severidade = document.getElementById('severidade').value; 
-        const statusSelect = document.getElementById('status').value;
-        let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
-        
-        let inicioVal = document.getElementById('inicio').value.trim();
-        let timestampAssunto = "";
-
-        if (inicioVal) {
-            timestampAssunto = inicioVal.replace(/ às /gi, ' - ');
-        } else {
-            const agora = new Date(); 
-            const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); 
-            const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
-            timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
-        }
-
-        // Aplica a regra de mudar 'OK' para 'NORMALIZADO' no assunto
-        let sevAssunto = severidade === 'OK' ? 'NORMALIZADO' : severidade;
-
-        return `${cliente} | ${host} | ${item} | ${sevAssunto} | ${timestampAssunto} | ${acao}`;
+    function obterAssinaturaFormulario() {
+        const cliente = document.getElementById('cliente').value.toUpperCase().trim();
+        const host = document.getElementById('host').value.toUpperCase().trim();
+        const status = document.getElementById('status').value;
+        const fgrid = document.getElementById('f-grid').value.trim(); 
+        return `${modoAtual}|${cliente}|${host}|${status}|${fgrid}`;
     }
 
     function registrarHistoricoNuvem(assunto) {
@@ -1656,7 +1612,7 @@
         const listaHtml = document.getElementById('lista-historico');
         listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar do plantão...</div>';
         db.ref('historico_noc').orderByChild('timestamp').startAt(getInicioDoPlantaoTimestamp()).once('value', (snapshot) => {
-            if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado no radar atualmente.</div>'; return; }
+            if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado desde as 07h00 de hoje.</div>'; return; }
             let html = ''; const logs = [];
             snapshot.forEach(child => { logs.push(child.val()); });
             
@@ -1692,7 +1648,7 @@
     function fecharHistorico() { document.getElementById('modal-historico').style.display = 'none'; }
 
     function limparHistoricoPlantao() {
-        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios atuais gerados por TODA A EQUIPE no radar.\n\nPara prosseguir, digite exactamente a palavra: CONFIRMAR");
+        const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados e relatórios gerados por TODA A EQUIPE neste plantão (desde as 07h).\n\nPara prosseguir, digite exactamente a palavra: CONFIRMAR");
         
         if (confirmacao !== "CONFIRMAR") {
             if (confirmacao !== null) alert("Operação cancelada. A palavra de segurança não foi digitada correctamente.");
@@ -1709,7 +1665,7 @@
                 });
                 
                 db.ref('historico_noc').update(updates).then(() => {
-                    mostrarToast("🗑️ O radar foi completamente zerado.", "warning", 5000);
+                    mostrarToast("🗑️ O radar do plantão foi completamente zerado.", "warning", 5000);
                     chamadosAlertadosSLA.clear(); chamadosSilenciadosSLA.clear(); 
                     localStorage.removeItem('noc_sla_state'); // Limpa memória local SLA
                     fecharHistorico();
@@ -1771,6 +1727,16 @@
         input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; update();
     }
     function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
+
+    function obterAssuntoGerado() {
+        const cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE'; const host = document.getElementById('host').value.toUpperCase() || 'HOST';
+        let itemRaw = document.getElementById('item').value.toUpperCase().trim(); const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+        const severidade = document.getElementById('severidade').value; const statusSelect = document.getElementById('status').value;
+        let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+        const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        const timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
+        return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
+    }
 
     function update() {
         const severidade = document.getElementById('severidade').value; 
@@ -1841,7 +1807,6 @@
         const formContainer = document.getElementById('form-container'); const tituloForm = document.getElementById('titulo-form');
         formContainer.classList.remove('fogo-no-parquinho', 'alerta-laranja', 'alerta-verde');
         
-        // Formata o fundo se não tivermos removido a logica do titulo 
         if (severidade === 'CRITICAL') { formContainer.classList.add('fogo-no-parquinho'); } 
         else if (severidade === 'INTERMITENTE') { formContainer.classList.add('alerta-laranja'); } 
         else if (severidade === 'OK') { formContainer.classList.add('alerta-verde'); } 
@@ -1888,28 +1853,6 @@
         try { salvarRascunho(); } catch(e){}
     }
 
-    // ====== NOVA FUNÇÃO: COPIAR ASSUNTO ITSSM ======
-    function copiarAssuntoITSSM() {
-        if (!validarCamposObrigatorios()) return;
-        try { 
-            const host = document.getElementById('host').value.toUpperCase() || 'HOST';
-            let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-            const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
-            const assunto = `${host} - ${item}`; 
-            
-            const tempInput = document.createElement("input"); 
-            tempInput.value = assunto; 
-            document.body.appendChild(tempInput); 
-            tempInput.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(tempInput); 
-            
-            mostrarToast("🎫 ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
-        } catch(e) {
-            console.error("Erro ao copiar assunto ITSSM:", e);
-        }
-    }
-
     function copyITSSM() {
         if (!validarCamposObrigatorios()) return;
         const vHost = document.getElementById('host').value || '---'; const vInicio = document.getElementById('inicio').value || '---'; const vFgrid = document.getElementById('f-grid').value || '-';
@@ -1930,6 +1873,11 @@
     function copiarAssuntoAcao() {
         if (!validarCamposObrigatorios()) return;
         try { const assunto = obterAssuntoGerado(); const tempInput = document.createElement("input"); tempInput.value = assunto; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); } catch(e) {}
+    }
+
+    function copyHTML() {
+        if (!validarCamposObrigatorios(true)) return; 
+        try { const node = document.getElementById('render'); const range = document.createRange(); range.selectNode(node); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges(); mostrarToast("📋 HTML COPIADO COM SUCESSO!", "info"); } catch(e) {}
     }
 
     function copyAsImage() {
