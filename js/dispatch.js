@@ -278,6 +278,23 @@ window.update = function() {
 // UTILS DA TELA (MACROS, DATAS, ETC)
 // ------------------------------------------
 window.trocarModo = function(novoModo) {
+    // Trava de segurança: se clicar na aba que já está aberta, não faz nada
+    if (modoAtual === novoModo) return; 
+
+    // 1. Aplica o Reset nos campos do formulário
+    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    camposParaLimpar.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    
+    document.getElementById('status').value = 'EM ABERTO'; 
+    document.getElementById('severidade').value = 'WARNING'; 
+    document.getElementById('evidencias').checked = false;
+    document.getElementById('protocolo').classList.remove('shake-error');
+    ultimaAssinaturaGerada = '';
+
+    // 2. Faz a troca visual do painel
     modoAtual = novoModo;
     document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
     document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
@@ -292,7 +309,8 @@ window.trocarModo = function(novoModo) {
     document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none'; 
     document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
     
-    renderizarListaLateral(); window.update();
+    renderizarListaLateral(); 
+    window.update();
 }
 
 window.mudarStatus = function() { 
