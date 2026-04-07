@@ -106,10 +106,14 @@ function renderizarListaLateral() {
     let chamadosExibidos = chamadosDoTurno.filter(c => c.tipo === 'aviso_rapido' || (c.form && (c.form.modo || 'link') === modoAtual));
     
     if (visaoHistorico === 'meus' && currentUser) { chamadosExibidos = chamadosExibidos.filter(c => c.nome === currentUser.nome); }
+    
+    // Atualizado: Agora a busca pesquisa por Cliente, Host e também pelo SERVIÇO!
     if (termoBusca !== '') {
         chamadosExibidos = chamadosExibidos.filter(c => {
             if (c.tipo === 'aviso_rapido') return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || (c.host && String(c.host).toLowerCase().includes(termoBusca));
-            return (c.form && c.form.cliente && String(c.form.cliente).toLowerCase().includes(termoBusca)) || (c.form && c.form.host && String(c.form.host).toLowerCase().includes(termoBusca));
+            return (c.form && c.form.cliente && String(c.form.cliente).toLowerCase().includes(termoBusca)) || 
+                   (c.form && c.form.host && String(c.form.host).toLowerCase().includes(termoBusca)) || 
+                   (c.form && c.form.item && String(c.form.item).toLowerCase().includes(termoBusca)); 
         });
     }
     if (filtroAtivo !== '') {
@@ -127,17 +131,22 @@ function renderizarListaLateral() {
     if(chamadosExibidos.length === 0) { lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado.</div>`; return; }
 
     let html = '';
-    chamadosExibidos.forEach((log, index) => {
+    chamadosExibidos.forEach((log) => {
         if (log.tipo === 'aviso_rapido') {
-            html += `<div class="my-card card-aviso"><div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div><div class="my-card-host">🔖 ${log.servico}</div><div class="my-card-service">🖥️ ${log.host}</div><div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div></div>`;
+            html += `<div class="my-card card-aviso"><div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div><div class="my-card-host">🔖 ${log.servico}</div><div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569;">🖥️ ${log.host}</div><div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div></div>`;
             return;
         }
         const acao = (log.assunto || '').split(' | ')[5] || 'CHAMADO';
         let classeBadge = acao.includes('FOLLOW') ? 'badge-follow' : (acao.includes('ENCERRAMENTO') ? 'badge-ok' : 'badge-aberto');
+        
+        // NOVIDADE: Pega a primeira linha do serviço para exibir (evita que logs gigantes quebrem o card)
+        const servicoResumido = log.form.item ? log.form.item.split('\n')[0] : 'Serviço Não Informado';
+        
         html += `
         <div class="my-card card-${log.form.modo || 'link'}">
             <div class="my-card-header"><span class="my-card-client">${log.form.cliente || 'CLIENTE'}</span><span class="my-card-badge ${classeBadge}">${acao}</span></div>
-            <div class="my-card-host">${log.form.host || 'Host Não Informado'}</div>
+            <div class="my-card-host">🖥️ ${log.form.host || 'Host Não Informado'}</div>
+            <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569;">🔖 ${servicoResumido}</div>
             <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span><button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button></div>
         </div>`;
     });
