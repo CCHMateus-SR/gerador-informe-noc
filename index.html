@@ -10,7 +10,6 @@
         :root { --its-blue: #002D5B; --its-red: #DC2626; --its-orange: #EA580C; --its-green: #166534; --its-light: #F1F5F9; --its-text: #1E293B; --its-border: #E2E8F0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: #F8FAFC; margin: 0; padding: 20px; display: flex; justify-content: center; color: var(--its-text); transition: background-color 0.3s; }
         
-        /* ADICIONADO: flex-wrap para permitir quebra de linha em telas menores */
         .container { display: flex; gap: 30px; max-width: 1750px; width: 100%; align-items: flex-start; justify-content: center; flex-wrap: wrap;}
         
         /* COLUNA 1: MEUS CHAMADOS */
@@ -145,9 +144,6 @@
         .btn-copy-assunto-itssm { flex: 1; min-width: 120px; background-color: #F8FAFC; color: #64748B; border: 2px solid #94A3B8; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; }
         .btn-copy-assunto-itssm:hover { background-color: #E2E8F0; color: #475569; border-color: #64748B;}
         
-        .btn-copy { flex: 1; min-width: 120px; background-color: #0ea5e9; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2); }
-        .btn-copy:hover { background-color: #0284c7; transform: translateY(-2px); }
-        
         .btn-copy-img { flex: 1; min-width: 120px; background-color: #059669; color: white; border: none; padding: 15px 5px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 11px; transition: 0.3s; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2); }
         .btn-copy-img:hover { background-color: #047857; transform: translateY(-2px); }
         
@@ -156,6 +152,8 @@
 
         .btn-danger-its { background-color: var(--its-red); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2); flex: 1; min-width: 150px;}
         .btn-danger-its:hover { background: #991B1B; transform: translateY(-2px); }
+        
+        /* BOTÃO ABRIR RADAR ATUALIZADO */
         .btn-its-history { background-color: #FFEDD5; color: var(--its-orange); border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.3s; padding: 12px; flex: 1; min-width: 150px;}
         .btn-its-history:hover { background-color: #FFDBB5; color: #92400E; transform: translateY(-2px); }
 
@@ -174,7 +172,6 @@
         @media (max-width: 1600px) {
             .history-side { flex: 1 1 250px; max-width: 300px; }
             .form-side { flex: 2 1 500px; max-width: 800px; }
-            /* Empurra o preview para baixo se não couber */
             .preview-side { flex: 1 1 100%; width: 100%; max-width: 100%; margin-top: 10px; display: flex; justify-content: center; position: relative; top: 0;}
         }
 
@@ -500,7 +497,7 @@
             <div class="input-group full-width">
                 <div class="label-flex">
                     <label>Dados Técnicos (Status Information do Centreon)</label>
-                    <button type="button" class="btn-action" onclick="limparLogs('statusinfo')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
+                    <button type="button" class="btn-action" onclick="limparLogs('statusinfo')" title="Limpar espaços e quebras vazias">🧹 Compactar Log</button>
                 </div>
                 <textarea id="statusinfo" class="textarea-sm" placeholder="Cole os logs do Centreon aqui..." oninput="update()"></textarea>
             </div>
@@ -508,7 +505,7 @@
             <div class="input-group full-width" id="grupo-pressplay" style="display: none;">
                 <div class="label-flex">
                     <label>Retorno / Logs do PressPlay (Opcional)</label>
-                    <button type="button" class="btn-action" onclick="limparLogs('pressplay')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
+                    <button type="button" class="btn-action" onclick="limparLogs('pressplay')" title="Limpar espaços e quebras vazias">🧹 Compactar Log</button>
                 </div>
                 <textarea id="pressplay" class="textarea-sm" placeholder="Cole o retorno da execução do PressPlay aqui..." oninput="update()"></textarea>
             </div>
@@ -573,7 +570,7 @@
                 <div class="label-flex">
                     <label id="label-desc">Ações / Diagnóstico</label>
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <button type="button" class="btn-action" onclick="limparLogs('desc')" title="Limpar espaços e quebras vazias">🧹 Limpar Texto</button>
+                        <button type="button" class="btn-action" onclick="limparLogs('desc')" title="Limpar espaços e quebras vazias">🧹 Compactar Log</button>
                         <select id="macro-template" class="select-macro" onchange="inserirMacro(this.value); this.value='';" style="display: inline-block;">
                             <option value="" disabled selected>📝 Inserir Macro (Cliente)</option>
                             <option value="padrao">📋 Texto Padrão (Baseado no Status)</option>
@@ -597,12 +594,11 @@
         <div class="action-footer">
             <div class="button-row">
                 <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-                <button class="btn-its-history" onclick="abrirHistorico()">📡 TELA CHEIA</button>
+                <button class="btn-its-history" onclick="abrirHistorico()">📡 ABRIR RADAR</button>
             </div>
             <div class="button-row" style="margin-bottom: 0;">
                 <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao()">✉️ ASSUNTO E-MAIL</button>
                 <button class="btn-copy-assunto-itssm" id="btn-assunto-itssm" onclick="copiarAssuntoITSSM()">🎫 ASSUNTO ITSSM</button>
-                <button class="btn-copy" id="btn-copiar-html" onclick="copyHTML()">📋 HTML (TEXTO)</button>
                 <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage()">📸 IMAGEM HD</button>
                 <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM()">📝 TEXTO ITSSM</button>
             </div>
@@ -1620,17 +1616,18 @@
         let timestampAssunto = "";
 
         if (inicioVal) {
-            // Substitui o " às " gerado pelo botão para " - " para ficar no padrão visual
             timestampAssunto = inicioVal.replace(/ às /gi, ' - ');
         } else {
-            // Fallback (caso o analista tenha apagado tudo do campo início)
             const agora = new Date(); 
             const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); 
             const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
             timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
         }
 
-        return `${cliente} | ${host} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
+        // Aplica a regra de mudar 'OK' para 'NORMALIZADO' no assunto
+        let sevAssunto = severidade === 'OK' ? 'NORMALIZADO' : severidade;
+
+        return `${cliente} | ${host} | ${item} | ${sevAssunto} | ${timestampAssunto} | ${acao}`;
     }
     // ============================
 
@@ -1928,11 +1925,6 @@
     function copiarAssuntoAcao() {
         if (!validarCamposObrigatorios()) return;
         try { const assunto = obterAssuntoGerado(); const tempInput = document.createElement("input"); tempInput.value = assunto; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); } catch(e) {}
-    }
-
-    function copyHTML() {
-        if (!validarCamposObrigatorios(true)) return; 
-        try { const node = document.getElementById('render'); const range = document.createRange(); range.selectNode(node); window.getSelection().removeAllRanges(); window.getSelection().addRange(range); document.execCommand('copy'); window.getSelection().removeAllRanges(); mostrarToast("📋 HTML COPIADO COM SUCESSO!", "info"); } catch(e) {}
     }
 
     function copyAsImage() {
