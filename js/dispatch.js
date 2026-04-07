@@ -628,12 +628,74 @@ window.copiarAssuntoITSSM = function() {
     }
 }
 
+// Variável para guardar o backup temporário
+let backupFormulario = null;
+
 window.limparFormulario = function() {
     if(confirm("Deseja limpar todos os campos?")) {
+        // 1. Tira uma "foto" de tudo que está preenchido antes de apagar
+        backupFormulario = {
+            cliente: document.getElementById('cliente').value,
+            host: document.getElementById('host').value,
+            item: document.getElementById('item').value,
+            severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value,
+            pressplay: document.getElementById('pressplay').value,
+            status: document.getElementById('status').value,
+            protocolo: document.getElementById('protocolo').value,
+            inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value,
+            termino: document.getElementById('termino').value,
+            solucionador: document.getElementById('solucionador').value,
+            obs: document.getElementById('obs').value,
+            desc: document.getElementById('desc').value,
+            evidencias: document.getElementById('evidencias').checked
+        };
+
+        // 2. Apaga tudo normalmente
         document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-        document.getElementById('status').value = 'EM ABERTO'; document.getElementById('severidade').value = 'WARNING'; document.getElementById('evidencias').checked = false; 
-        document.getElementById('protocolo').classList.remove('shake-error'); ultimaAssinaturaGerada = ''; window.update();
+        document.getElementById('status').value = 'EM ABERTO'; 
+        document.getElementById('severidade').value = 'WARNING'; 
+        document.getElementById('evidencias').checked = false; 
+        document.getElementById('protocolo').classList.remove('shake-error'); 
+        ultimaAssinaturaGerada = ''; 
+        window.update();
+
+        // 3. Mostra o Toast flutuante com o botão de resgate (dura 6 segundos)
+        const toastResgate = `
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;">
+                <span>🧹 Formulário limpo.</span>
+                <button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button>
+            </div>
+        `;
+        mostrarToast(toastResgate, "info", 6000); 
     }
+}
+
+// 4. A função que é chamada se o analista clicar no botão do Toast
+window.desfazerLimpeza = function() {
+    if (!backupFormulario) return;
+
+    // Devolve os dados para os campos
+    document.getElementById('cliente').value = backupFormulario.cliente;
+    document.getElementById('host').value = backupFormulario.host;
+    document.getElementById('item').value = backupFormulario.item;
+    document.getElementById('severidade').value = backupFormulario.severidade;
+    document.getElementById('statusinfo').value = backupFormulario.statusinfo;
+    document.getElementById('pressplay').value = backupFormulario.pressplay;
+    document.getElementById('status').value = backupFormulario.status;
+    document.getElementById('protocolo').value = backupFormulario.protocolo;
+    document.getElementById('inicio').value = backupFormulario.inicio;
+    document.getElementById('f-grid').value = backupFormulario.fgrid;
+    document.getElementById('termino').value = backupFormulario.termino;
+    document.getElementById('solucionador').value = backupFormulario.solucionador;
+    document.getElementById('obs').value = backupFormulario.obs;
+    document.getElementById('desc').value = backupFormulario.desc;
+    document.getElementById('evidencias').checked = backupFormulario.evidencias;
+
+    backupFormulario = null; // Esvazia a memória após o resgate
+    window.update(); // Atualiza a tela direita
+    mostrarToast("✅ Informações restauradas com sucesso!", "success");
 }
 
 // ------------------------------------------
