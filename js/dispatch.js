@@ -416,7 +416,6 @@ function validarCamposObrigatorios(exigeProtocolo = false) {
 }
 
 function obterAssuntoGerado() {
-    // 1. Puxa o cliente e já aplica a regra de exceção do CSD
     let cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
     if (cliente === 'CSD (GRUPO AMIGÃO)') {
         cliente = 'GRUPO AMIGÃO';
@@ -434,17 +433,28 @@ function obterAssuntoGerado() {
     const statusSelect = document.getElementById('status').value;
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
     
-    let vInicio = document.getElementById('inicio').value.trim();
+    // DEFINE QUAL CAMPO DE HORA LER BASEADO NO STATUS ATUAL
+    let campoDataHoraAlvo = '';
+    if (statusSelect === 'EM ABERTO') {
+        campoDataHoraAlvo = document.getElementById('inicio').value.trim();
+    } else if (statusSelect === 'FOLLOW-UP') {
+        campoDataHoraAlvo = document.getElementById('f-grid').value.trim();
+    } else if (statusSelect === 'RESOLVIDO') {
+        campoDataHoraAlvo = document.getElementById('termino').value.trim();
+    }
+    
     let timestampAssunto = "";
 
-    if (vInicio) {
-        let match = vInicio.match(/(\d{2}\/\d{2}\/\d{4}).*?(\d{2}:\d{2})/);
+    if (campoDataHoraAlvo) {
+        // Puxa a data e hora do campo que foi selecionado na regra acima
+        let match = campoDataHoraAlvo.match(/(\d{2}\/\d{2}\/\d{4}).*?(\d{2}:\d{2})/);
         if (match) {
             timestampAssunto = `${match[1]} - ${match[2]}`;
         } else {
-            timestampAssunto = vInicio.substring(0, 20); 
+            timestampAssunto = campoDataHoraAlvo.substring(0, 20); 
         }
     } else {
+        // Fallback: Se o analista esqueceu de preencher a data do follow-up/término, puxa a hora do PC
         const agora = new Date(); 
         const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); 
         const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
