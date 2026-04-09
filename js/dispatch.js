@@ -279,6 +279,43 @@ window.update = function() {
     const vCliente = document.getElementById('cliente').value.toUpperCase().trim(); 
     const vHost = document.getElementById('host').value || '---'; 
     const vItem = document.getElementById('item').value.trim() || '---';
+    // --- LÓGICA DO ALERTA DE ABA ERRADA (Cross-Tab Warning) ---
+    const itemLower = vItem.toLowerCase();
+    let avisoCrossTab = '';
+    
+    // Palavras-chave que indicam o modo errado
+    if (modoAtual === 'link') {
+        if (itemLower.match(/(cpu|memory|disk|memória|disco|services-auto|ram|swap|banco de dados|sql|vmware)/)) {
+            avisoCrossTab = '⚠️ Atenção: Este serviço parece ser de Infraestrutura. Você está na aba Link/Ping!';
+        }
+    } else if (modoAtual === 'infra') {
+        if (itemLower.match(/(ping|bgp|link |operadora|fibra|mpls|ipsec|vpn)/)) {
+            avisoCrossTab = '⚠️ Atenção: Este serviço parece ser de Conectividade. Você está na aba Infra/Aplicações!';
+        }
+    }
+    
+    // Cria o aviso visualmente embaixo da caixa de Serviço (se não existir)
+    let divAviso = document.getElementById('aviso-crosstab');
+    if (!divAviso) {
+        divAviso = document.createElement('div');
+        divAviso.id = 'aviso-crosstab';
+        divAviso.style.cssText = 'color: #DC2626; font-size: 11px; font-weight: bold; margin-top: 4px; display: none; background: #FEE2E2; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #DC2626;';
+        
+        const itemInput = document.getElementById('item');
+        // Insere o alerta logo após o campo de Item Monitorado (Serviço)
+        if (itemInput && itemInput.parentNode) {
+            itemInput.parentNode.insertBefore(divAviso, itemInput.nextSibling);
+        }
+    }
+    
+    // Mostra ou esconde o alerta
+    if (avisoCrossTab && vItem !== '') {
+        divAviso.innerText = avisoCrossTab;
+        divAviso.style.display = 'block';
+    } else {
+        if (divAviso) divAviso.style.display = 'none';
+    }
+    // -----------------------------------------------------------
     const vInicio = document.getElementById('inicio').value || '---'; 
     const vProtocolo = document.getElementById('protocolo').value || '---'; 
     const vFgrid = document.getElementById('f-grid').value || '-';
@@ -431,6 +468,14 @@ window.trocarModo = function(novoModo) {
     document.getElementById('label-secao-1').innerHTML = modoAtual === 'link' ? "📍 1. Identificação do Alarme" : "📍 1. Identificação do Incidente";
     document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
     document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
+    
+    // NOVIDADE: Textos de exemplo dinâmicos para Host e Serviço
+    const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
+    const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
+    
+    document.getElementById('host').placeholder = placeholderHost;
+    document.getElementById('item').placeholder = placeholderItem;
+    // ---------------------------------------------------------
     
     document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
     document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex'; 
