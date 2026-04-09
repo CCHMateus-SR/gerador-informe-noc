@@ -546,8 +546,22 @@ window.limparLogs = function(id) {
 
 window.abrirDatalist = function(element) { if (element.value === '') { try { element.showPicker(); } catch(e) {} return; } const valorSalvo = element.value; element.value = ''; try { element.showPicker(); } catch(e) {} element.addEventListener('focusout', function handler() { if (element.value === '') { element.value = valorSalvo; window.update(); } element.removeEventListener('focusout', handler); }, { once: true }); }
 window.abrirPicker = function(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
-window.inserirDataPicker = function(idTexto, valor) { if (!valor) return; const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; const input = document.getElementById(idTexto); input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; window.update(); }
-window.preencherAgoraText = function(idTexto) { const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; const input = document.getElementById(idTexto); input.value = input.value && !input.value.startsWith(pt) ? pt + ' - ' + input.value : pt; window.update(); }
+// Função que insere a data vinda do calendário
+window.inserirDataPicker = function(idTexto, valor) { 
+    if (!valor) return; 
+    const d = valor.split('T'); 
+    const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; 
+    document.getElementById(idTexto).value = pt; // Agora ele apenas substitui o texto!
+    window.update(); 
+}
+
+// Função que insere a data/hora atual quando clica no reloginho
+window.preencherAgoraText = function(idTexto) { 
+    const d = new Date(); 
+    const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; 
+    document.getElementById(idTexto).value = pt; // Agora ele apenas substitui o texto!
+    window.update(); 
+}
 
 // ------------------------------------------
 // EXPORTAÇÃO E CÓPIAS
