@@ -520,6 +520,14 @@ function obterAssuntoGerado() {
         }
         primeiraParte = `${cliente} | ${host}`;
     }
+    
+    } else {
+        // Regra do Ajuste 15: AGROSTAHL (STAHL) -> STAHL
+        if (cliente === 'AGROSTAHL (STAHL)') {
+            cliente = 'STAHL';
+        }
+        primeiraParte = `${cliente} | ${host}`;
+    }
 
     let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
     const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
