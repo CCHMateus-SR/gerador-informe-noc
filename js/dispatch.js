@@ -19,6 +19,15 @@ let timestampCarregamento = Date.now();
 // ==========================================
 let memoriaNOC = { link: {}, infra: {} };
 
+// NOVIDADE 1: Variável que controla se os chips estão abertos ou fechados
+let sugestoesVisiveis = true; 
+
+// NOVIDADE 2: Função para o botão de Ocultar/Mostrar
+window.toggleSugestoes = function() {
+    sugestoesVisiveis = !sugestoesVisiveis;
+    window.update(); // Atualiza a tela imediatamente
+}
+
 function atualizarMemoria() {
     memoriaNOC = { link: {}, infra: {} };
     chamadosDoTurno.forEach(log => {
@@ -30,7 +39,6 @@ function atualizarMemoria() {
 
         if (!c || !h) return;
 
-        // Monta um dicionário: Cliente -> Host -> Serviços
         if (!memoriaNOC[modo][c]) memoriaNOC[modo][c] = {};
         if (!memoriaNOC[modo][c][h]) memoriaNOC[modo][c][h] = new Set();
         if (i) memoriaNOC[modo][c][h].add(i);
@@ -41,7 +49,6 @@ function renderSugestoes(campoId, valores) {
     let containerId = 'sugestoes-' + campoId;
     let container = document.getElementById(containerId);
     
-    // Cria o espaço para as sugestões abaixo do input se não existir
     if (!container) {
         container = document.createElement('div');
         container.id = containerId;
@@ -49,6 +56,7 @@ function renderSugestoes(campoId, valores) {
         container.style.display = 'flex';
         container.style.flexWrap = 'wrap';
         container.style.gap = '6px';
+        container.style.alignItems = 'center'; // Alinha os itens na vertical
         
         let input = document.getElementById(campoId);
         if(input) input.parentNode.insertBefore(container, input.nextSibling);
@@ -59,18 +67,29 @@ function renderSugestoes(campoId, valores) {
         return;
     }
 
-    let html = '<span style="font-size: 10px; color: #64748B; margin-top: 3px; margin-right: 4px;">🧠 Sugestões:</span>';
+    // NOVIDADE 3: Criando o botão tímido dinâmico
+    let textoBotao = sugestoesVisiveis ? 'Ocultar' : 'Mostrar';
+    let corBotao = sugestoesVisiveis ? '#94A3B8' : '#3B82F6'; // Fica azul quando está oculto para chamar uma leve atenção
+
+    let html = `
+        <span style="font-size: 10px; color: #64748B; margin-right: 4px; display: flex; align-items: center; gap: 6px;">
+            🧠 Sugestões
+            <button onclick="toggleSugestoes()" style="background: transparent; border: 1px solid ${corBotao}; color: ${corBotao}; font-size: 9px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: 0.2s;">${textoBotao}</button>
+        </span>
+    `;
     
-    // Pega no máximo as 5 opções mais usadas
-    valores.slice(0, 5).forEach(val => {
-        let label = val.split('\n')[0].substring(0, 30); // Pega só a primeira linha para o botão
-        if (val.length > 30) label += '...';
-        
-        // Tratamento seguro para textos complexos
-        let safeVal = val.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n");
-        
-        html += `<span onclick="document.getElementById('${campoId}').value = '${safeVal}'; window.update();" style="background: #E2E8F0; color: #0F172A; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; cursor: pointer; border: 1px solid #CBD5E1; transition: 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">${label}</span>`;
-    });
+    // NOVIDADE 4: Só desenha os chips se a variável estiver como TRUE
+    if (sugestoesVisiveis) {
+        valores.slice(0, 5).forEach(val => {
+            let label = val.split('\n')[0].substring(0, 30); 
+            if (val.length > 30) label += '...';
+            
+            let safeVal = val.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n");
+            
+            html += `<span onclick="document.getElementById('${campoId}').value = '${safeVal}'; window.update();" style="background: #E2E8F0; color: #0F172A; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; cursor: pointer; border: 1px solid #CBD5E1; transition: 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">${label}</span>`;
+        });
+    }
+    
     container.innerHTML = html;
 }
 
