@@ -239,7 +239,6 @@ function renderizarListaLateral() {
         const hstSafe = hostLimpo.replace(/'/g, "\\'");
         const srvSafe = servicoResumido.replace(/'/g, "\\'");
 
-        // NOVIDADE: Adicionado o nome do analista (${log.nome}) ao lado da hora!
         html += `
         <div class="my-card card-${log.form.modo || 'link'}">
             <div class="my-card-header"><span class="my-card-client">${log.form.cliente || 'CLIENTE'}</span><span class="my-card-badge ${classeBadge}">${acao}</span></div>
@@ -247,11 +246,11 @@ function renderizarListaLateral() {
             <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstSafe}')">🖥️ ${hostLimpo}</div>
             <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvSafe}')">🔖 ${servicoResumido}</div>
             
-            <div class="my-card-bottom">
-                <span class="my-card-time">🕒 ${log.hora} &nbsp;|&nbsp; <span style="color: #0284C7; font-weight: 700;">👤 ${log.nome}</span></span>
-                <button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button>
-            </div>
+            <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span><button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button></div>
         </div>`;
+    });
+    lista.innerHTML = html;
+}
 
 // Essa linha é essencial para o campo de busca (HTML) achar a função de renderizar!
 window.renderizarListaLateral = renderizarListaLateral;
