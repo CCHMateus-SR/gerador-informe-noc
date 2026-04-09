@@ -246,7 +246,10 @@ function renderizarListaLateral() {
             <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstSafe}')">🖥️ ${hostLimpo}</div>
             <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvSafe}')">🔖 ${servicoResumido}</div>
             
-            <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span><button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button></div>
+            <div class="my-card-bottom">
+                <span class="my-card-time">🕒 ${log.hora} &nbsp;|&nbsp; <span style="color: #0284C7; font-weight: 700;">👤 ${log.nome}</span></span>
+                <button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button>
+            </div>
         </div>`;
     });
     lista.innerHTML = html;
