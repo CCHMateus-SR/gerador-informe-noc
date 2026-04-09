@@ -587,26 +587,29 @@ function obterAssuntoGerado() {
     // Variável que vai montar a primeira parte do assunto (Cliente + Host)
     let primeiraParte = "";
 
-    // AJUSTE 10: Regra de Exceção LIBBS DIGIBEE
+    // Regra de Exceção LIBBS DIGIBEE
     if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') {
-        // Para este host específico, não vai o nome do cliente no início, mas sim a tag [DIGIBEE]
         primeiraParte = `[DIGIBEE] | ${host}`;
     } else {
-        // Regra do Ajuste 9: CSD (GRUPO AMIGÃO) -> GRUPO AMIGÃO
+        // Regras de Encurtamento de Nomes de Clientes
         if (cliente === 'CSD (GRUPO AMIGÃO)') {
             cliente = 'GRUPO AMIGÃO';
+        } else if (cliente === 'AGROSTAHL (STAHL)') {
+            cliente = 'STAHL'; // <-- Nova regra aplicada aqui!
         }
+        
         primeiraParte = `${cliente} | ${host}`;
     }
 
     let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
     const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
     
-    // Regra do Ajuste 8: OK -> NORMALIZADO
     let severidade = document.getElementById('severidade').value; 
     if (severidade === 'OK') {
         severidade = 'NORMALIZADO';
     }
+
+    // ... (o resto da função obterAssuntoGerado continua exatamente igual daqui para baixo) ...
 
     const statusSelect = document.getElementById('status').value;
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
@@ -658,16 +661,20 @@ function registrarHistoricoNuvem(assunto) {
 
 function verificarDuplicidade() {
     let cliente = document.getElementById('cliente').value.toUpperCase().trim();
-    if (cliente === 'CSD (GRUPO AMIGÃO)') cliente = 'GRUPO AMIGÃO'; // Mantendo a regra que criamos antes!
+    
+    // Encurtamentos para a verificação bater certinho com o assunto gerado
+    if (cliente === 'CSD (GRUPO AMIGÃO)') cliente = 'GRUPO AMIGÃO';
+    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; // <-- Nova regra aplicada aqui também!
     
     const host = document.getElementById('host').value.toUpperCase().trim(); 
     
-    // NOVIDADE: Puxando o Serviço para dentro da trava de segurança
     let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
     const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
     
     const statusSelect = document.getElementById('status').value;
     if (!cliente || !host) return true;
+
+    // ... (o resto da função verificarDuplicidade continua exatamente igual daqui para baixo) ...
     
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
     
