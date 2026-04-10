@@ -155,3 +155,11 @@ export function tocarSom(tipo) {
         }
     } catch(e) {}
 }
+
+// Função para abrir/fechar a gaveta do Histórico em telas pequenas
+window.abrirGavetaHistorico = function() {
+    const painel = document.getElementById('history-container');
+    if (painel) {
+        painel.classList.toggle('aberto');
+    }
+}
