@@ -587,25 +587,24 @@ function obterAssuntoGerado() {
     let cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
     const host = document.getElementById('host').value.toUpperCase() || 'HOST';
     
-    // Variável que vai montar a primeira parte do assunto (Cliente + Host)
     let primeiraParte = "";
-
-    // Regra de Exceção LIBBS DIGIBEE
-    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') {
-        primeiraParte = `[DIGIBEE] | ${host}`;
+    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') { 
+        primeiraParte = `[DIGIBEE] | ${host}`; 
     } else {
-        // Regras de Encurtamento de Nomes de Clientes
-        if (cliente === 'CSD (GRUPO AMIGÃO)') {
-            cliente = 'GRUPO AMIGÃO';
-        } else if (cliente === 'AGROSTAHL (STAHL)') {
-            cliente = 'STAHL'; // <-- Nova regra aplicada aqui!
+        // --- REGRAS INTELIGENTES DE ENCURTAMENTO ---
+        if (cliente === 'CSD (GRUPO AMIGÃO)') { 
+            cliente = 'GRUPO AMIGÃO'; 
+        } else if (cliente === 'AGROSTAHL (STAHL)') { 
+            cliente = 'STAHL'; 
+        } else if (cliente === 'TECNOGERA (TNG)') {
+            cliente = 'TECNOGERA'; // <--- Nova regra aplicada aqui!
         }
-        
+        // ------------------------------------------
         primeiraParte = `${cliente} | ${host}`;
     }
 
-    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    const itemRaw = document.getElementById('item').value.trim(); 
+    const item = formatarServicoInteligente(itemRaw);
     
     let severidade = document.getElementById('severidade').value; 
     if (severidade === 'OK') {
