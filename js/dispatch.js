@@ -587,24 +587,25 @@ function obterAssuntoGerado() {
     let cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
     const host = document.getElementById('host').value.toUpperCase() || 'HOST';
     
+    // Variável que vai montar a primeira parte do assunto (Cliente + Host)
     let primeiraParte = "";
-    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') { 
-        primeiraParte = `[DIGIBEE] | ${host}`; 
+
+    // Regra de Exceção LIBBS DIGIBEE
+    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') {
+        primeiraParte = `[DIGIBEE] | ${host}`;
     } else {
-        // --- REGRAS INTELIGENTES DE ENCURTAMENTO ---
-        if (cliente === 'CSD (GRUPO AMIGÃO)') { 
-            cliente = 'GRUPO AMIGÃO'; 
-        } else if (cliente === 'AGROSTAHL (STAHL)') { 
-            cliente = 'STAHL'; 
-        } else if (cliente === 'TECNOGERA (TNG)') {
-            cliente = 'TECNOGERA'; // <--- Nova regra aplicada aqui!
+        // Regras de Encurtamento de Nomes de Clientes
+        if (cliente === 'CSD (GRUPO AMIGÃO)') {
+            cliente = 'GRUPO AMIGÃO';
+        } else if (cliente === 'AGROSTAHL (STAHL)') {
+            cliente = 'STAHL'; // <-- Nova regra aplicada aqui!
         }
-        // ------------------------------------------
+        
         primeiraParte = `${cliente} | ${host}`;
     }
 
-    const itemRaw = document.getElementById('item').value.trim(); 
-    const item = formatarServicoInteligente(itemRaw);
+    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
+    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
     
     let severidade = document.getElementById('severidade').value; 
     if (severidade === 'OK') {
@@ -664,17 +665,14 @@ function registrarHistoricoNuvem(assunto) {
 function verificarDuplicidade() {
     let cliente = document.getElementById('cliente').value.toUpperCase().trim();
     
-    // --- REGRAS INTELIGENTES DE ENCURTAMENTO ---
+    // Encurtamentos para a verificação bater certinho com o assunto gerado
     if (cliente === 'CSD (GRUPO AMIGÃO)') cliente = 'GRUPO AMIGÃO';
-    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; 
-    if (cliente === 'TECNOGERA (TNG)') cliente = 'TECNOGERA'; // <--- Nova regra aplicada aqui!
-    // ------------------------------------------
+    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; // <-- Nova regra aplicada aqui também!
     
     const host = document.getElementById('host').value.toUpperCase().trim(); 
     
-    // Chama a nossa nova função inteligente de formatação
-    const itemRaw = document.getElementById('item').value.trim(); 
-    const item = formatarServicoInteligente(itemRaw);
+    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
+    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
     
     const statusSelect = document.getElementById('status').value;
     if (!cliente || !host) return true;
