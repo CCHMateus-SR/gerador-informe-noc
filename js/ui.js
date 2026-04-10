@@ -156,10 +156,28 @@ export function tocarSom(tipo) {
     } catch(e) {}
 }
 
-// Função para abrir/fechar a gaveta do Histórico em telas pequenas
+// ==========================================
+// FUNÇÃO DO BOTÃO (ABRIR E FECHAR)
+// ==========================================
 window.abrirGavetaHistorico = function() {
     const painel = document.getElementById('history-container');
     if (painel) {
         painel.classList.toggle('aberto');
     }
 }
+
+// ==========================================
+// FECHAR GAVETA AO CLICAR FORA (CLICK OUTSIDE)
+// ==========================================
+document.addEventListener('click', function(event) {
+    const painel = document.getElementById('history-container');
+    const botaoAbrir = document.querySelector('.btn-toggle-historico');
+    
+    // Verifica se a tela é a de notebook (onde o botão de abrir existe e está visível)
+    if (painel && painel.classList.contains('aberto') && botaoAbrir) {
+        // Se o clique NÃO foi dentro da gaveta E NÃO foi no botão de abrir
+        if (!painel.contains(event.target) && !botaoAbrir.contains(event.target)) {
+            painel.classList.remove('aberto'); // Esconde a gaveta
+        }
+    }
+});
