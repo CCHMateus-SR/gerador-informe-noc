@@ -310,3 +310,58 @@
         body.pro-mode .top-meta-bar { background: #1E1E1E; border-color: #444; }
         body.pro-mode .meta-clock { background: #282828; border-color: #444; color: #AAA; box-shadow: none;}
         body.pro-mode .meta-divider { background: #444; }
+/* ==========================================
+   RESPONSIVIDADE: Painel Deslizante (Off-Canvas)
+   ========================================== */
+.btn-toggle-historico {
+    display: none; /* Escondido no monitor grande */
+}
+
+@media screen and (max-width: 1400px) {
+    /* 1. O Formulário e o Preview passam a usar 100% do espaço livre */
+    #form-container, .preview-side {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    /* 2. O botão Hamburger aparece na barra superior */
+    .btn-toggle-historico {
+        display: inline-flex;
+        align-items: center;
+        background: #0284C7;
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 800;
+        font-size: 12px;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-right: 15px;
+        transition: 0.2s;
+    }
+    
+    .btn-toggle-historico:hover {
+        background: #0369A1;
+    }
+
+    /* 3. O painel de histórico vira a gaveta escondida */
+    #history-container {
+        position: fixed;
+        top: 0;
+        left: -400px; /* Joga 400px para fora do monitor, escondendo ele */
+        width: 320px; /* Largura da gaveta */
+        height: 100vh; /* Ocupa 100% da altura da tela */
+        z-index: 9999; /* Fica por cima de absolutamente tudo */
+        transition: left 0.3s ease-in-out; /* Efeito de deslizar suave */
+        box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+        margin: 0 !important; 
+        border-radius: 0; 
+    }
+
+    /* 4. A classe mágica que puxa a gaveta pra dentro da tela */
+    #history-container.aberto {
+        left: 0; 
+    }
+}
