@@ -664,14 +664,17 @@ function registrarHistoricoNuvem(assunto) {
 function verificarDuplicidade() {
     let cliente = document.getElementById('cliente').value.toUpperCase().trim();
     
-    // Encurtamentos para a verificação bater certinho com o assunto gerado
+    // --- REGRAS INTELIGENTES DE ENCURTAMENTO ---
     if (cliente === 'CSD (GRUPO AMIGÃO)') cliente = 'GRUPO AMIGÃO';
-    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; // <-- Nova regra aplicada aqui também!
+    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; 
+    if (cliente === 'TECNOGERA (TNG)') cliente = 'TECNOGERA'; // <--- Nova regra aplicada aqui!
+    // ------------------------------------------
     
     const host = document.getElementById('host').value.toUpperCase().trim(); 
     
-    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    // Chama a nossa nova função inteligente de formatação
+    const itemRaw = document.getElementById('item').value.trim(); 
+    const item = formatarServicoInteligente(itemRaw);
     
     const statusSelect = document.getElementById('status').value;
     if (!cliente || !host) return true;
