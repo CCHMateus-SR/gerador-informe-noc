@@ -96,16 +96,25 @@ export function mostrarToast(mensagem, tipo = 'success', duracao = null) {
     if(!container) return;
     const toast = document.createElement('div');
     toast.className = 'toast';
+    
+    // Configura o visual e garante que avisos com botão sejam clicáveis
     if (tipo === 'info') {
-        toast.style.background = '#3B82F6'; toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
+        toast.style.background = '#3B82F6'; 
+        toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
+        toast.style.pointerEvents = 'auto'; 
     } else if (tipo === 'warning') {
         toast.classList.add('toast-warning');
+        toast.style.pointerEvents = 'auto';
     } else {
-        toast.style.pointerEvents = 'none';
+        toast.style.pointerEvents = 'none'; // Success não bloqueia clique
     }
+    
     toast.innerHTML = mensagem;
     container.appendChild(toast);
-    let time = duracao || (tipo === 'success' ? 3000 : 5000);
+    
+    // MÁGICA DO TEMPO: 10 segundos (10000ms) para info/warning, 3 segundos para success
+    let time = duracao || (tipo === 'success' ? 3000 : 10000);
+    
     setTimeout(() => {
         toast.style.opacity = '0'; toast.style.transform = 'translateX(-100%)';
         setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
