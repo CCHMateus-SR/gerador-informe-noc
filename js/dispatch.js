@@ -14,18 +14,16 @@ let modoAtual = 'link';
 let ultimaAssinaturaGerada = '';
 let timestampCarregamento = Date.now();
 
-// ==========================================
-// MEMÓRIA PREDITIVA (AUTOCOMPLETAR)
-// ==========================================
 let memoriaNOC = { link: {}, infra: {} };
-
-// NOVIDADE 1: Variável que controla se os chips estão abertos ou fechados
 let sugestoesVisiveis = true; 
 
-// NOVIDADE 2: Função para o botão de Ocultar/Mostrar
+// Variáveis de Backup (Desfazer)
+let backupFormulario = null;
+let backupEstadoAba = null;
+
 window.toggleSugestoes = function() {
     sugestoesVisiveis = !sugestoesVisiveis;
-    window.update(); // Atualiza a tela imediatamente
+    window.update(); 
 }
 
 function atualizarMemoria() {
@@ -56,7 +54,7 @@ function renderSugestoes(campoId, valores) {
         container.style.display = 'flex';
         container.style.flexWrap = 'wrap';
         container.style.gap = '6px';
-        container.style.alignItems = 'center'; // Alinha os itens na vertical
+        container.style.alignItems = 'center'; 
         
         let input = document.getElementById(campoId);
         if(input) input.parentNode.insertBefore(container, input.nextSibling);
@@ -67,9 +65,8 @@ function renderSugestoes(campoId, valores) {
         return;
     }
 
-    // NOVIDADE 3: Criando o botão tímido dinâmico
     let textoBotao = sugestoesVisiveis ? 'Ocultar' : 'Mostrar';
-    let corBotao = sugestoesVisiveis ? '#94A3B8' : '#3B82F6'; // Fica azul quando está oculto para chamar uma leve atenção
+    let corBotao = sugestoesVisiveis ? '#94A3B8' : '#3B82F6'; 
 
     let html = `
         <span style="font-size: 10px; color: #64748B; margin-right: 4px; display: flex; align-items: center; gap: 6px;">
@@ -78,7 +75,6 @@ function renderSugestoes(campoId, valores) {
         </span>
     `;
     
-    // NOVIDADE 4: Só desenha os chips se a variável estiver como TRUE
     if (sugestoesVisiveis) {
         valores.slice(0, 5).forEach(val => {
             let label = val.split('\n')[0].substring(0, 30); 
@@ -89,11 +85,9 @@ function renderSugestoes(campoId, valores) {
             html += `<span onclick="document.getElementById('${campoId}').value = '${safeVal}'; window.update();" style="background: #E2E8F0; color: #0F172A; font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px; cursor: pointer; border: 1px solid #CBD5E1; transition: 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">${label}</span>`;
         });
     }
-    
     container.innerHTML = html;
 }
 
-// Dicionário de Logos
 const itsLogoUrl = "Logos/logo-its.png"; 
 const logosClientes = {
     "838 SOLUÇÕES": "Logos/logo-838-solucoes.png", "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png", "ATMOSPHERE": "Logos/logo-atmosphere.png",
@@ -111,17 +105,12 @@ const logosClientes = {
     "TERESA PEREZ": "Logos/logo-teresa-perez.png", "VISUS ENGENHARIA": "Logos/logo-visus.png", "VIVEO": "Logos/logo-viveo.png"
 };
 
-// ------------------------------------------
-// LÓGICA DO FIREBASE (Histórico e Radar)
-// ------------------------------------------
 export function iniciarBancoDeDados() {
     db.ref('historico_noc').orderByChild('timestamp').on('value', (snapshot) => {
         chamadosDoTurno = [];
         if(snapshot.exists()) { snapshot.forEach(child => { chamadosDoTurno.push(child.val()); }); }
         renderizarListaLateral();
         atualizarDashboard();
-        
-        // LIGA A MEMÓRIA AQUI!
         atualizarMemoria(); 
         if(document.getElementById('cliente').value !== '') window.update(); 
     });
@@ -136,13 +125,6 @@ export function iniciarBancoDeDados() {
         ultimosLogsFirebase = [];
         snapshot.forEach(child => { ultimosLogsFirebase.push(child.val()); });
     });
-}
-
-function getInicioDoPlantaoTimestamp() {
-    const agora = new Date(); const inicioPlantao = new Date(agora);
-    inicioPlantao.setHours(7, 0, 0, 0); 
-    if (agora.getHours() < 7) { inicioPlantao.setDate(inicioPlantao.getDate() - 1); }
-    return inicioPlantao.getTime();
 }
 
 function atualizarDashboard() {
@@ -165,11 +147,47 @@ function atualizarDashboard() {
     const dOk = document.getElementById('dash-ok'); if(dOk) dOk.innerText = `🟢 ${qtdOk}`;
 }
 
+function preverModoPeloServico(servicoBuscado) {
+    if (!servicoBuscado) return null;
+    const servicoLower = servicoBuscado.toLowerCase().trim();
+    let contagemLink = 0; let contagemInfra = 0;
+    if (memoriaNOC.link) { Object.values(memoriaNOC.link).forEach(hosts => Object.values(hosts).forEach(itensSet => { itensSet.forEach(item => { if (item.toLowerCase().includes(servicoLower)) contagemLink++; }); })); }
+    if (memoriaNOC.infra) { Object.values(memoriaNOC.infra).forEach(hosts => Object.values(hosts).forEach(itensSet => { itensSet.forEach(item => { if (item.toLowerCase().includes(servicoLower)) contagemInfra++; }); })); }
+    if (contagemLink > contagemInfra) return 'link';
+    if (contagemInfra > contagemLink) return 'infra';
+    if (servicoLower.match(/(ping|bgp|link |operadora|fibra|mpls|ipsec|vpn)/)) return 'link';
+    if (servicoLower.match(/(cpu|memory|disk|memória|disco|services-auto|ram|swap|banco de dados|sql|vmware)/)) return 'infra';
+    return null; 
+}
+
+function formatarServicoInteligente(textoBruto) {
+    if (!textoBruto) return 'SERVIÇO';
+    let linhas = textoBruto.toUpperCase().split('\n').map(l => l.trim()).filter(l => l !== '');
+    if (linhas.length === 0) return 'SERVIÇO';
+    if (linhas.length === 1) return linhas[0]; 
+    let matchUnidade = linhas[0].match(/^UN(\d+)/);
+    if (matchUnidade) {
+        let numeroUnidade = matchUnidade[1];
+        let isTodasAPMesmaUnidade = linhas.every(l => l.startsWith(`UN${numeroUnidade}`) && l.includes('AP'));
+        if (isTodasAPMesmaUnidade) { return `AP'S UNIDADE ${numeroUnidade}`; }
+    }
+    if (linhas.length >= 3) { return 'DIVERSOS'; }
+    return linhas.join(' + ');
+}
+
 window.enviarAvisoRapido = function() {
     if (!currentUser) return;
     const servico = document.getElementById('quick-item').value.trim();
     const host = document.getElementById('quick-host').value.trim();
+    
     if (!servico) { alert("Preencha o Serviço!"); return; }
+
+    const modoInteligente = preverModoPeloServico(servico);
+    if (modoInteligente && modoAtual !== modoInteligente) { window.trocarModo(modoInteligente); }
+    if (document.getElementById('item').value === '') { document.getElementById('item').value = servico; }
+    if (host && document.getElementById('host').value === '') { document.getElementById('host').value = host; }
+    window.update(); 
+
     const agora = new Date();
     db.ref('historico_noc').push({
         tipo: 'aviso_rapido', nome: currentUser.nome, turno: currentUser.turno,
@@ -177,8 +195,9 @@ window.enviarAvisoRapido = function() {
         hora: agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         timestamp: firebase.database.ServerValue.TIMESTAMP
     });
+    
     document.getElementById('quick-item').value = ''; document.getElementById('quick-host').value = '';
-    mostrarToast("✅ Equipe notificada com sucesso!", "success");
+    mostrarToast("✅ Equipe notificada e formulário preparado com sucesso!", "success");
 }
 
 function renderizarListaLateral() {
@@ -191,10 +210,25 @@ function renderizarListaLateral() {
     
     if (termoBusca !== '') {
         chamadosExibidos = chamadosExibidos.filter(c => {
-            if (c.tipo === 'aviso_rapido') return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || (c.host && String(c.host).toLowerCase().includes(termoBusca));
+            const nomeAnalista = String(c.nome || '').toLowerCase();
+            let dataFormatada = '';
+            if (c.timestamp) {
+                const d = new Date(c.timestamp);
+                dataFormatada = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+
+            if (c.tipo === 'aviso_rapido') {
+                return (c.servico && String(c.servico).toLowerCase().includes(termoBusca)) || 
+                       (c.host && String(c.host).toLowerCase().includes(termoBusca)) ||
+                       nomeAnalista.includes(termoBusca) || dataFormatada.includes(termoBusca);
+            }
+            
             return (c.form && c.form.cliente && String(c.form.cliente).toLowerCase().includes(termoBusca)) || 
                    (c.form && c.form.host && String(c.form.host).toLowerCase().includes(termoBusca)) || 
-                   (c.form && c.form.item && String(c.form.item).toLowerCase().includes(termoBusca)); 
+                   (c.form && c.form.item && String(c.form.item).toLowerCase().includes(termoBusca)) ||
+                   (c.form && c.form.itssm && String(c.form.itssm).toLowerCase().includes(termoBusca)) ||
+                   (c.form && c.form.protocoloLibbs && String(c.form.protocoloLibbs).toLowerCase().includes(termoBusca)) ||
+                   nomeAnalista.includes(termoBusca) || dataFormatada.includes(termoBusca);
         });
     }
     if (filtroAtivo !== '') {
@@ -212,8 +246,30 @@ function renderizarListaLateral() {
     if(chamadosExibidos.length === 0) { lista.innerHTML = `<div style="text-align:center; padding: 20px; color: #94A3B8; font-size: 12px;">Nenhum chamado gerado.</div>`; return; }
 
     let html = '';
+    let dataAtualAgrupamento = ""; 
+
     chamadosExibidos.forEach((log) => {
-        // LÓGICA DOS CARDS DE "AVISO RÁPIDO"
+        if (log.timestamp) {
+            const dataLog = new Date(log.timestamp);
+            const hoje = new Date();
+            const ontem = new Date();
+            ontem.setDate(hoje.getDate() - 1);
+
+            const isHoje = dataLog.getDate() === hoje.getDate() && dataLog.getMonth() === hoje.getMonth() && dataLog.getFullYear() === hoje.getFullYear();
+            const isOntem = dataLog.getDate() === ontem.getDate() && dataLog.getMonth() === ontem.getMonth() && dataLog.getFullYear() === ontem.getFullYear();
+
+            const dataFormatada = dataLog.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            let textoGrupo = dataFormatada; 
+            if (isHoje) textoGrupo = "HOJE / ATUAL";
+            else if (isOntem) textoGrupo = `Ontem / ${dataFormatada}`;
+
+            if (textoGrupo !== dataAtualAgrupamento) {
+                html += `<div style="color: #FFFFFF; font-size: 13px; font-weight: 800; margin: 18px 0 8px 4px; letter-spacing: 0.5px;">${textoGrupo}</div>`;
+                dataAtualAgrupamento = textoGrupo;
+            }
+        }
+
         if (log.tipo === 'aviso_rapido') {
             const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
             const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
@@ -228,22 +284,29 @@ function renderizarListaLateral() {
             return;
         }
         
-        // LÓGICA DOS CARDS NORMAIS (ABERTURA, FOLLOW, RESOLVIDO)
         const acao = (log.assunto || '').split(' | ')[5] || 'CHAMADO';
         let classeBadge = acao.includes('FOLLOW') ? 'badge-follow' : (acao.includes('ENCERRAMENTO') ? 'badge-ok' : 'badge-aberto');
         
         const hostLimpo = log.form.host || 'Host Não Informado';
         const servicoResumido = log.form.item ? log.form.item.split('\n')[0] : 'Serviço Não Informado';
         
-        // Prepara os textos para não quebrarem o JS na hora da cópia (remove aspas simples)
         const hstSafe = hostLimpo.replace(/'/g, "\\'");
         const srvSafe = servicoResumido.replace(/'/g, "\\'");
+
+        // --- MÁGICA: BADGE DO ITSSM COPIÁVEL E ISOLADO ---
+        let badgeItssmHTML = '';
+        if (log.form && log.form.itssm) {
+            const itssmSafe = log.form.itssm.replace(/'/g, "\\'");
+            badgeItssmHTML = `<span onclick="event.stopPropagation(); copiarTextoInline(event, '${itssmSafe}')" title="Copiar Nº ITSSM" style="font-size: 9px; background: #E2E8F0; color: #0F172A; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: bold; cursor: pointer; border: 1px solid #CBD5E1; transition: 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">📋 ${log.form.itssm}</span>`;
+        }
 
         html += `
         <div class="my-card card-${log.form.modo || 'link'}">
             <div class="my-card-header"><span class="my-card-client">${log.form.cliente || 'CLIENTE'}</span><span class="my-card-badge ${classeBadge}">${acao}</span></div>
             
-            <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstSafe}')">🖥️ ${hostLimpo}</div>
+            <div class="my-card-host" style="cursor: pointer; display: flex; align-items: center; flex-wrap: wrap;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstSafe}')">
+                <span>🖥️ ${hostLimpo}</span> ${badgeItssmHTML}
+            </div>
             <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvSafe}')">🔖 ${servicoResumido}</div>
             
             <div class="my-card-bottom">
@@ -255,7 +318,6 @@ function renderizarListaLateral() {
     lista.innerHTML = html;
 }
 
-// Essa linha é essencial para o campo de busca (HTML) achar a função de renderizar!
 window.renderizarListaLateral = renderizarListaLateral;
 
 window.setVisaoHistorico = function(visao) {
@@ -280,7 +342,14 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     document.getElementById('cliente').value = dados.cliente || ''; document.getElementById('host').value = dados.host || '';
     document.getElementById('item').value = dados.item || ''; document.getElementById('severidade').value = dados.severidade || 'WARNING';
     document.getElementById('statusinfo').value = dados.statusinfo || ''; document.getElementById('pressplay').value = dados.pressplay || ''; 
-    document.getElementById('status').value = dados.status || 'EM ABERTO'; document.getElementById('protocolo').value = dados.protocolo || '';
+    document.getElementById('status').value = dados.status || 'EM ABERTO'; 
+    document.getElementById('protocolo').value = dados.protocolo || '';
+    document.getElementById('itssm').value = dados.itssm || ''; 
+    
+    // Puxa o Protocolo Libbs, se existir
+    const elProtLibbs = document.getElementById('protocolo-libbs');
+    if(elProtLibbs) elProtLibbs.value = dados.protocoloLibbs || '';
+    
     document.getElementById('inicio').value = dados.inicio || ''; document.getElementById('f-grid').value = dados.fgrid || '';
     document.getElementById('termino').value = dados.termino || ''; document.getElementById('desc').value = dados.desc || '';
     document.getElementById('solucionador').value = dados.solucionador || ''; document.getElementById('obs').value = dados.obs || '';
@@ -290,22 +359,18 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     mostrarToast("✅ Formulário preenchido com sucesso!");
 }
 
-// ------------------------------------------
-// LÓGICA DO FORMULÁRIO E TELA
-// ------------------------------------------
 function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
 
 window.update = function() {
     const severidade = document.getElementById('severidade').value;
     const status = document.getElementById('status').value;
     const vCliente = document.getElementById('cliente').value.toUpperCase().trim(); 
-    const vHost = document.getElementById('host').value || '---'; 
+    const vHost = document.getElementById('host').value.toUpperCase().trim(); 
     const vItem = document.getElementById('item').value.trim() || '---';
-    // --- LÓGICA DO ALERTA DE ABA ERRADA (Cross-Tab Warning) ---
+    
     const itemLower = vItem.toLowerCase();
     let avisoCrossTab = '';
     
-    // Palavras-chave que indicam o modo errado
     if (modoAtual === 'link') {
         if (itemLower.match(/(cpu|memory|disk|memória|disco|services-auto|ram|swap|banco de dados|sql|vmware)/)) {
             avisoCrossTab = '⚠️ Atenção: Este serviço parece ser de Infraestrutura. Você está na aba Link/Ping!';
@@ -316,28 +381,28 @@ window.update = function() {
         }
     }
     
-    // Cria o aviso visualmente embaixo da caixa de Serviço (se não existir)
     let divAviso = document.getElementById('aviso-crosstab');
     if (!divAviso) {
-        divAviso = document.createElement('div');
-        divAviso.id = 'aviso-crosstab';
+        divAviso = document.createElement('div'); divAviso.id = 'aviso-crosstab';
         divAviso.style.cssText = 'color: #DC2626; font-size: 11px; font-weight: bold; margin-top: 4px; display: none; background: #FEE2E2; padding: 4px 8px; border-radius: 4px; border-left: 3px solid #DC2626;';
-        
         const itemInput = document.getElementById('item');
-        // Insere o alerta logo após o campo de Item Monitorado (Serviço)
-        if (itemInput && itemInput.parentNode) {
-            itemInput.parentNode.insertBefore(divAviso, itemInput.nextSibling);
-        }
+        if (itemInput && itemInput.parentNode) { itemInput.parentNode.insertBefore(divAviso, itemInput.nextSibling); }
     }
     
-    // Mostra ou esconde o alerta
-    if (avisoCrossTab && vItem !== '') {
-        divAviso.innerText = avisoCrossTab;
-        divAviso.style.display = 'block';
-    } else {
-        if (divAviso) divAviso.style.display = 'none';
+    if (avisoCrossTab && vItem !== '') { divAviso.innerText = avisoCrossTab; divAviso.style.display = 'block'; } 
+    else { if (divAviso) divAviso.style.display = 'none'; }
+    
+    // --- LÓGICA DO CAMPO FANTASMA (PROTOCOLO LIBBS) ---
+    const grupoLibbs = document.getElementById('grupo-protocolo-libbs');
+    if (grupoLibbs) {
+        if (vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
+            grupoLibbs.style.display = 'flex'; 
+        } else {
+            grupoLibbs.style.display = 'none';
+        }
     }
-    // -----------------------------------------------------------
+    // --------------------------------------------------
+
     const vInicio = document.getElementById('inicio').value || '---'; 
     const vProtocolo = document.getElementById('protocolo').value || '---'; 
     const vFgrid = document.getElementById('f-grid').value || '-';
@@ -351,26 +416,18 @@ window.update = function() {
 
     if (vProtocolo !== '') document.getElementById('protocolo').classList.remove('erro-validacao');
     
-    // --- LÓGICA DOS CHIPS DE SUGESTÃO ---
     const hostLimpo = document.getElementById('host').value.toUpperCase().trim();
     const itemLimpo = document.getElementById('item').value.trim();
 
-    // Mostra Sugestões de Host (Baseado no Cliente)
     let hostsSugeridos = [];
-    if (vCliente && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente]) {
-        hostsSugeridos = Object.keys(memoriaNOC[modoAtual][vCliente]);
-    }
+    if (vCliente && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente]) { hostsSugeridos = Object.keys(memoriaNOC[modoAtual][vCliente]); }
     renderSugestoes('host', hostsSugeridos.filter(h => h !== hostLimpo));
 
-    // Mostra Sugestões de Item (Baseado no Cliente + Host)
     let itensSugeridos = [];
-    if (vCliente && hostLimpo && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente] && memoriaNOC[modoAtual][vCliente][hostLimpo]) {
-        itensSugeridos = Array.from(memoriaNOC[modoAtual][vCliente][hostLimpo]);
-    }
+    if (vCliente && hostLimpo && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente] && memoriaNOC[modoAtual][vCliente][hostLimpo]) { itensSugeridos = Array.from(memoriaNOC[modoAtual][vCliente][hostLimpo]); }
     renderSugestoes('item', itensSugeridos.filter(i => i !== itemLimpo));
-    // -------------------------------------
 
-    document.getElementById('v-host').innerText = vHost;
+    document.getElementById('v-host').innerText = vHost || '---';
     document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
     
     let corSeveridade = '#64748B'; let sevTextHeader = '⚪ UNKNOWN';
@@ -383,8 +440,6 @@ window.update = function() {
     const headerSevBadge = document.getElementById('header-sev-badge');
     if (headerSevBadge) { headerSevBadge.style.backgroundColor = corSeveridade; headerSevBadge.innerHTML = sevTextHeader; }
     
-    // ... (o restante da função segue normal daqui para baixo) ...
-
     let labelTerminoForm = ''; let tituloTerminoBox = ''; let tituloDescBox = 'DETALHAMENTO';
     const headerBg = document.getElementById('v-header-bg'); const topBorder = document.getElementById('render-header-cell');
 
@@ -411,7 +466,6 @@ window.update = function() {
     else if (status === 'EM ABERTO') { bgColor = '#FEE2E2'; textColor = '#991B1B'; badgeTexto = 'EM ABERTO'; tituloTexto = `${prefixoTitulo} | Acompanhamento de Incidente`; } 
     else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
-    // RENDERIZAÇÃO DAS LOGOS NO PREVIEW
     const headerCell = document.getElementById('render-header-cell');
     if (logosClientes[vCliente]) { 
         headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 100px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td></tr></table>`;
@@ -420,7 +474,7 @@ window.update = function() {
     }
 
     document.getElementById('v-titulo').innerText = tituloTexto; document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
-    document.getElementById('v-host').innerText = vHost; document.getElementById('v-inicio').innerText = vInicio;
+    document.getElementById('v-host').innerText = vHost || '---'; document.getElementById('v-inicio').innerText = vInicio;
     document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid); document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
 
     const dynamicGrid = document.getElementById('v-dynamic-grid');
@@ -440,36 +494,52 @@ window.update = function() {
     if (vObs) { document.getElementById('obs-container').style.display = 'block'; document.getElementById('v-obs').innerHTML = formatarColchetes(vObs.replace(/\n/g, '<br>')); } else { document.getElementById('obs-container').style.display = 'none'; }
 }
 
-// ------------------------------------------
-// UTILS DA TELA (MACROS, DATAS, ETC)
-// ------------------------------------------
-// Função auxiliar para verificar se o analista já preencheu algo
 function isFormularioSujo() {
-    const camposParaChecar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    const camposParaChecar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'protocolo-libbs', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
     for (let id of camposParaChecar) {
         const el = document.getElementById(id);
-        if (el && el.value.trim() !== '') return true; // Achou algum texto digitado
+        if (el && el.value.trim() !== '') return true; 
     }
-    // Verifica se os seletores saíram do padrão inicial
     if (document.getElementById('status').value !== 'EM ABERTO') return true;
     if (document.getElementById('severidade').value !== 'WARNING') return true;
     if (document.getElementById('evidencias').checked) return true;
-
-    return false; // Formulário está 100% intocado
+    return false; 
 }
 
 window.trocarModo = function(novoModo) {
-    // Trava 1: se clicar na aba que já está aberta, não faz nada
     if (modoAtual === novoModo) return; 
 
-    // Trava 2: Proteção contra perda de dados acidental
-    if (isFormularioSujo()) {
+    let temDados = isFormularioSujo();
+
+    if (temDados) {
         const confirma = confirm("⚠️ ATENÇÃO!\n\nVocê tem dados preenchidos no formulário.\nSe trocar de aba agora, todas as informações não salvas serão perdidas.\n\nDeseja realmente descartar este rascunho e trocar de aba?");
-        if (!confirma) return; // O analista clicou em "Cancelar", a troca é abortada e ele não perde nada!
+        if (!confirma) return; 
+
+        // --- MÁGICA: SALVAR SNAPSHOT ANTES DE LIMPAR ---
+        const elProtLibbs = document.getElementById('protocolo-libbs');
+        backupEstadoAba = {
+            cliente: document.getElementById('cliente').value,
+            host: document.getElementById('host').value,
+            item: document.getElementById('item').value,
+            severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value,
+            pressplay: document.getElementById('pressplay').value,
+            status: document.getElementById('status').value,
+            protocolo: document.getElementById('protocolo').value,
+            itssm: document.getElementById('itssm').value,
+            protocoloLibbs: elProtLibbs ? elProtLibbs.value : '',
+            inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value,
+            termino: document.getElementById('termino').value,
+            solucionador: document.getElementById('solucionador').value,
+            obs: document.getElementById('obs').value,
+            desc: document.getElementById('desc').value,
+            evidencias: document.getElementById('evidencias').checked,
+            modoAnterior: modoAtual
+        };
     }
 
-    // 1. Aplica o Reset nos campos do formulário
-    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'protocolo-libbs', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
     camposParaLimpar.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
@@ -481,7 +551,6 @@ window.trocarModo = function(novoModo) {
     document.getElementById('protocolo').classList.remove('shake-error');
     ultimaAssinaturaGerada = '';
 
-    // 2. Faz a troca visual do painel
     modoAtual = novoModo;
     document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
     document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
@@ -491,13 +560,11 @@ window.trocarModo = function(novoModo) {
     document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
     document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
     
-    // NOVIDADE: Textos de exemplo dinâmicos para Host e Serviço
     const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
     const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
     
     document.getElementById('host').placeholder = placeholderHost;
     document.getElementById('item').placeholder = placeholderItem;
-    // ---------------------------------------------------------
     
     document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
     document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex'; 
@@ -506,7 +573,66 @@ window.trocarModo = function(novoModo) {
     
     renderizarListaLateral(); 
     window.update();
+
+    // Mostra o Toast com botão de Desfazer se havia dados
+    if (temDados) {
+        const toastResgateAba = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🔄 Aba trocada. Rascunho salvo.</span><button onclick="recuperarDadosAba()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
+        mostrarToast(toastResgateAba, "warning", 10000);
+    }
 }
+
+// ==========================================
+// FUNÇÃO NOVA: RESTAURAR ABA (UNDO)
+// ==========================================
+window.recuperarDadosAba = function() {
+    if (!backupEstadoAba) return;
+
+    // 1. Volta para a aba correta
+    modoAtual = backupEstadoAba.modoAnterior;
+    document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
+    document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
+
+    document.getElementById('titulo-form').innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
+    document.getElementById('label-secao-1').innerHTML = modoAtual === 'link' ? "📍 1. Identificação do Alarme" : "📍 1. Identificação do Incidente";
+    document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
+    document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
+
+    const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
+    const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
+
+    document.getElementById('host').placeholder = placeholderHost;
+    document.getElementById('item').placeholder = placeholderItem;
+
+    document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
+    document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex';
+    document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none';
+    document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
+
+    // 2. Devolve todos os valores
+    document.getElementById('cliente').value = backupEstadoAba.cliente;
+    document.getElementById('host').value = backupEstadoAba.host;
+    document.getElementById('item').value = backupEstadoAba.item;
+    document.getElementById('severidade').value = backupEstadoAba.severidade;
+    document.getElementById('statusinfo').value = backupEstadoAba.statusinfo;
+    document.getElementById('pressplay').value = backupEstadoAba.pressplay;
+    document.getElementById('status').value = backupEstadoAba.status;
+    document.getElementById('protocolo').value = backupEstadoAba.protocolo;
+    document.getElementById('itssm').value = backupEstadoAba.itssm;
+    if (document.getElementById('protocolo-libbs')) document.getElementById('protocolo-libbs').value = backupEstadoAba.protocoloLibbs;
+    document.getElementById('inicio').value = backupEstadoAba.inicio;
+    document.getElementById('f-grid').value = backupEstadoAba.fgrid;
+    document.getElementById('termino').value = backupEstadoAba.termino;
+    document.getElementById('solucionador').value = backupEstadoAba.solucionador;
+    document.getElementById('obs').value = backupEstadoAba.obs;
+    document.getElementById('desc').value = backupEstadoAba.desc;
+    document.getElementById('evidencias').checked = backupEstadoAba.evidencias;
+
+    backupEstadoAba = null; 
+    renderizarListaLateral();
+    window.update();
+    mostrarToast("✨ Aba e dados restaurados com sucesso!", "success");
+};
+
 
 window.mudarStatus = function() { 
     const status = document.getElementById('status').value; const d = new Date(); 
@@ -544,31 +670,22 @@ window.limparLogs = function(id) {
     if(val.trim() === "") return;
     val = val.replace(/^\s*[\r\n]/gm, '').replace(/\s+$/gm, '').trim();
     el.value = val; window.update(); 
-    mostrarToast("🪄 Texto formatado e organizado com sucesso!", "info", 2000); // <-- Mensagem alterada!
+    mostrarToast("🪄 Texto formatado e organizado com sucesso!", "info", 2000); 
 }
 
 window.abrirDatalist = function(element) { if (element.value === '') { try { element.showPicker(); } catch(e) {} return; } const valorSalvo = element.value; element.value = ''; try { element.showPicker(); } catch(e) {} element.addEventListener('focusout', function handler() { if (element.value === '') { element.value = valorSalvo; window.update(); } element.removeEventListener('focusout', handler); }, { once: true }); }
 window.abrirPicker = function(id) { try { document.getElementById(id).showPicker(); } catch (e) { alert("Use o preenchimento manual."); } }
-// Função que insere a data vinda do calendário
+
 window.inserirDataPicker = function(idTexto, valor) { 
-    if (!valor) return; 
-    const d = valor.split('T'); 
-    const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; 
-    document.getElementById(idTexto).value = pt; // Agora ele apenas substitui o texto!
-    window.update(); 
+    if (!valor) return; const d = valor.split('T'); const pt = `${d[0].split('-').reverse().join('/')} às ${d[1]}`; 
+    document.getElementById(idTexto).value = pt; window.update(); 
 }
 
-// Função que insere a data/hora atual quando clica no reloginho
 window.preencherAgoraText = function(idTexto) { 
-    const d = new Date(); 
-    const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; 
-    document.getElementById(idTexto).value = pt; // Agora ele apenas substitui o texto!
-    window.update(); 
+    const d = new Date(); const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`; 
+    document.getElementById(idTexto).value = pt; window.update(); 
 }
 
-// ------------------------------------------
-// EXPORTAÇÃO E CÓPIAS
-// ------------------------------------------
 function validarCamposObrigatorios(exigeProtocolo = false) {
     let valido = true; const campos = ['cliente', 'host', 'item'];
     campos.forEach(id => { const el = document.getElementById(id); if (!el.value.trim()) { el.classList.add('shake-error'); setTimeout(() => el.classList.remove('shake-error'), 500); valido = false; } });
@@ -587,71 +704,58 @@ function obterAssuntoGerado() {
     let cliente = document.getElementById('cliente').value.toUpperCase() || 'CLIENTE';
     const host = document.getElementById('host').value.toUpperCase() || 'HOST';
     
-    // Variável que vai montar a primeira parte do assunto (Cliente + Host)
     let primeiraParte = "";
-
-    // Regra de Exceção LIBBS DIGIBEE
-    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') {
-        primeiraParte = `[DIGIBEE] | ${host}`;
+    if (cliente === 'LIBBS' && host === 'LIBBS-DIGIBEE') { 
+        primeiraParte = `[DIGIBEE] | ${host}`; 
     } else {
-        // Regras de Encurtamento de Nomes de Clientes
-        if (cliente === 'CSD (GRUPO AMIGÃO)') {
-            cliente = 'GRUPO AMIGÃO';
-        } else if (cliente === 'AGROSTAHL (STAHL)') {
-            cliente = 'STAHL'; // <-- Nova regra aplicada aqui!
+        if (cliente === 'CSD (GRUPO AMIGÃO)') { 
+            cliente = 'GRUPO AMIGÃO'; 
+        } else if (cliente === 'AGROSTAHL (STAHL)') { 
+            cliente = 'STAHL'; 
+        } else if (cliente === 'TECNOGERA (TNG)') {
+            cliente = 'TECNOGERA';
         }
-        
         primeiraParte = `${cliente} | ${host}`;
     }
 
-    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    const itemRaw = document.getElementById('item').value.trim(); 
+    const item = formatarServicoInteligente(itemRaw);
     
     let severidade = document.getElementById('severidade').value; 
-    if (severidade === 'OK') {
-        severidade = 'NORMALIZADO';
-    }
-
-    // ... (o resto da função obterAssuntoGerado continua exatamente igual daqui para baixo) ...
+    if (severidade === 'OK') { severidade = 'NORMALIZADO'; }
 
     const statusSelect = document.getElementById('status').value;
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
     
-    // Regra de seleção de data (Ajuste das datas dinâmicas)
     let campoDataHoraAlvo = '';
-    if (statusSelect === 'EM ABERTO') {
-        campoDataHoraAlvo = document.getElementById('inicio').value.trim();
-    } else if (statusSelect === 'FOLLOW-UP') {
-        campoDataHoraAlvo = document.getElementById('f-grid').value.trim();
-    } else if (statusSelect === 'RESOLVIDO') {
-        campoDataHoraAlvo = document.getElementById('termino').value.trim();
-    }
+    if (statusSelect === 'EM ABERTO') { campoDataHoraAlvo = document.getElementById('inicio').value.trim(); } 
+    else if (statusSelect === 'FOLLOW-UP') { campoDataHoraAlvo = document.getElementById('f-grid').value.trim(); } 
+    else if (statusSelect === 'RESOLVIDO') { campoDataHoraAlvo = document.getElementById('termino').value.trim(); }
     
     let timestampAssunto = "";
-
     if (campoDataHoraAlvo) {
         let match = campoDataHoraAlvo.match(/(\d{2}\/\d{2}\/\d{4}).*?(\d{2}:\d{2})/);
-        if (match) {
-            timestampAssunto = `${match[1]} - ${match[2]}`;
-        } else {
-            timestampAssunto = campoDataHoraAlvo.substring(0, 20); 
-        }
+        if (match) { timestampAssunto = `${match[1]} - ${match[2]}`; } else { timestampAssunto = campoDataHoraAlvo.substring(0, 20); }
     } else {
-        const agora = new Date(); 
-        const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); 
-        const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
+        const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'}); const horaFormatada = agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'});
         timestampAssunto = `${dataFormatada} - ${horaFormatada}`;
     }
 
-    // Retorno final montado com a regra da LIBBS aplicada
     return `${primeiraParte} | ${item} | ${severidade} | ${timestampAssunto} | ${acao}`;
 }
 
 function registrarHistoricoNuvem(assunto) {
     if(!currentUser) return;
+    
+    // Captura o protocolo Libbs (se existir)
+    const elProtLibbs = document.getElementById('protocolo-libbs');
+    const valorProtLibbs = elProtLibbs ? elProtLibbs.value : '';
+
     const formData = {
         modo: modoAtual, cliente: document.getElementById('cliente').value, host: document.getElementById('host').value, item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
-        statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, status: document.getElementById('status').value, protocolo: document.getElementById('protocolo').value, 
+        statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, status: document.getElementById('status').value, 
+        protocolo: document.getElementById('protocolo').value, itssm: document.getElementById('itssm').value, 
+        protocoloLibbs: valorProtLibbs, 
         inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
         solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, evidencias: document.getElementById('evidencias').checked 
     };
@@ -662,26 +766,50 @@ function registrarHistoricoNuvem(assunto) {
     });
 }
 
+// ------------------------------------------
+// MÁGICA: VÍNCULO SILENCIOSO DO ITSSM
+// ------------------------------------------
+window.vincularRegistroITSSM = function() {
+    const itssm = document.getElementById('itssm').value.trim();
+    if (!itssm) { mostrarToast("⚠️ Digite o número do ITSSM primeiro!", "warning"); return; }
+    
+    const assunto = obterAssuntoGerado(); 
+    
+    db.ref('historico_noc').orderByChild('assunto').equalTo(assunto).once('value', snapshot => {
+        if (snapshot.exists()) {
+            let maiorTimestamp = 0; let chaveAlvo = null;
+            
+            snapshot.forEach(child => {
+                const data = child.val();
+                if (data.timestamp > maiorTimestamp) { maiorTimestamp = data.timestamp; chaveAlvo = child.key; }
+            });
+            
+            if (chaveAlvo) {
+                let updates = {}; updates[`${chaveAlvo}/form/itssm`] = itssm;
+                db.ref('historico_noc').update(updates).then(() => {
+                    mostrarToast("🔗 Número ITSSM vinculado ao radar com sucesso!", "success");
+                });
+            }
+        } else {
+            mostrarToast("⚠️ Gere o chamado (IMAGEM ou TEXTO) antes de tentar vincular o ITSSM.", "warning");
+        }
+    });
+}
+
 function verificarDuplicidade() {
     let cliente = document.getElementById('cliente').value.toUpperCase().trim();
-    
-    // Encurtamentos para a verificação bater certinho com o assunto gerado
     if (cliente === 'CSD (GRUPO AMIGÃO)') cliente = 'GRUPO AMIGÃO';
-    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; // <-- Nova regra aplicada aqui também!
+    if (cliente === 'AGROSTAHL (STAHL)') cliente = 'STAHL'; 
+    if (cliente === 'TECNOGERA (TNG)') cliente = 'TECNOGERA';
     
     const host = document.getElementById('host').value.toUpperCase().trim(); 
-    
-    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-    const item = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    const itemRaw = document.getElementById('item').value.trim(); 
+    const item = formatarServicoInteligente(itemRaw);
     
     const statusSelect = document.getElementById('status').value;
     if (!cliente || !host) return true;
 
-    // ... (o resto da função verificarDuplicidade continua exatamente igual daqui para baixo) ...
-    
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
-    
-    // A string de busca agora cruza as 3 informações exatas (Cliente | Host | Serviço)
     const buscaStr = `${cliente} | ${host} | ${item}`; 
     
     for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
@@ -690,7 +818,6 @@ function verificarDuplicidade() {
         
         if(log.assunto && log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
             if(currentUser && log.nome !== currentUser.nome) { 
-                // Atualizamos a mensagem de erro para deixar claro pro analista o porquê do bloqueio
                 return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este mesmo Cliente, Host e Serviço às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`); 
             }
             return true;
@@ -717,47 +844,53 @@ window.copyAsImage = function() {
 window.copyITSSM = function() {
     if (!validarCamposObrigatorios()) return;
     
-    // 1. Puxando as variáveis (Agora incluindo o vItem)
-    const vCliente = document.getElementById('cliente').value || '---'; 
-    const vHost = document.getElementById('host').value || '---'; 
-    const vItem = document.getElementById('item').value.trim() || '---'; // <-- Faltava puxar isso
+    const fgrid = document.getElementById('f-grid').value.trim();
+    const assinaturaAtual = `${modoAtual}|${document.getElementById('cliente').value.toUpperCase().trim()}|${document.getElementById('host').value.toUpperCase().trim()}|${document.getElementById('status').value}|${fgrid}`;
+    
+    if (assinaturaAtual !== ultimaAssinaturaGerada) { 
+        if (!verificarDuplicidade()) return; 
+        registrarHistoricoNuvem(obterAssuntoGerado()); 
+        ultimaAssinaturaGerada = assinaturaAtual; 
+    }
+    
+    const vCliente = document.getElementById('cliente').value.toUpperCase().trim() || '---'; 
+    const vHost = document.getElementById('host').value.toUpperCase().trim() || '---'; 
+    const vItem = document.getElementById('item').value.trim() || '---'; 
+    const vItssm = document.getElementById('itssm').value.trim(); 
+    
+    const elProtLibbs = document.getElementById('protocolo-libbs');
+    const vProtLibbs = elProtLibbs ? elProtLibbs.value.trim() : '';
+
     const vInicio = document.getElementById('inicio').value || '---'; 
     const vFgrid = document.getElementById('f-grid').value || '-'; 
     const vTermino = document.getElementById('termino').value || '-'; 
     const vStatusInfo = document.getElementById('statusinfo').value.trim();
     
-    // 2. Montando o cabeçalho do texto (Agora com o Item Monitorado incluído)
-    let textoITSSM = `Cliente: ${vCliente}\nHost: ${vHost}\nItem Monitorado (Serviço): ${vItem}\nInício da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\n`;
+    let textoITSSM = `Cliente: ${vCliente}\nHost: ${vHost}\nItem Monitorado (Serviço): ${vItem}\n`;
+    if (vItssm) { textoITSSM += `Nº Registro ITSSM: ${vItssm}\n`; }
     
-    // 3. Montando o restante dos campos condicionais
+    if (vProtLibbs && vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
+        textoITSSM += `Protocolo Libbs (E-mail): ${vProtLibbs}\n`;
+    }
+
+    textoITSSM += `Início da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\n`;
+    
     if (vStatusInfo) { textoITSSM += `\nDados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`; }
     const vPressplay = document.getElementById('pressplay').value.trim();
     if (modoAtual === 'infra' && vPressplay) { textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`; }
     
     const vSolucionador = document.getElementById('solucionador').value.trim();
-    if (vSolucionador) { 
-        const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)'; 
-        textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`; 
-    }
+    if (vSolucionador) { const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)'; textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`; }
     
     const vDesc = document.getElementById('desc').value.trim();
-    if (vDesc) { 
-        const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico'; 
-        textoITSSM += `\n${labelDesc}:\n${vDesc}\n`; 
-    }
+    if (vDesc) { const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico'; textoITSSM += `\n${labelDesc}:\n${vDesc}\n`; }
     
     const vObs = document.getElementById('obs').value.trim(); 
     if (vObs) { textoITSSM += `\nObservação:\n${vObs}\n`; }
 
-    // 4. Copiando para a área de transferência
     try { 
-        const tempTextarea = document.createElement("textarea"); 
-        tempTextarea.value = textoITSSM; 
-        document.body.appendChild(tempTextarea); 
-        tempTextarea.select(); 
-        document.execCommand("copy"); 
-        document.body.removeChild(tempTextarea); 
-        mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info"); 
+        const tempTextarea = document.createElement("textarea"); tempTextarea.value = textoITSSM; document.body.appendChild(tempTextarea); 
+        tempTextarea.select(); document.execCommand("copy"); document.body.removeChild(tempTextarea); mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info"); 
     } catch(e) {}
 }
 
@@ -765,136 +898,67 @@ window.copiarAssuntoAcao = function() {
     if (!validarCamposObrigatorios()) return;
     const assunto = obterAssuntoGerado();
     
-    // Tenta usar a API moderna e segura de cópia do navegador
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(assunto).then(() => {
-            mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info");
-        }).catch(err => {
-            console.error("Erro na API Clipboard: ", err);
-        });
+        navigator.clipboard.writeText(assunto).then(() => { mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); }).catch(err => { console.error("Erro na API Clipboard: ", err); });
     } else {
-        // Plano B: Hack do Input (Para navegadores mais antigos)
-        try { 
-            const tempInput = document.createElement("input"); 
-            tempInput.value = assunto; 
-            document.body.appendChild(tempInput); 
-            tempInput.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(tempInput); 
-            mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); 
-        } catch(e) {}
+        try { const tempInput = document.createElement("input"); tempInput.value = assunto; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO COPIADO COM SUCESSO!", "info"); } catch(e) {}
     }
 }
 
 window.copiarAssuntoITSSM = function() {
     if (!validarCamposObrigatorios()) return;
-    
     const host = document.getElementById('host').value.toUpperCase().trim() || 'HOST';
-    let itemRaw = document.getElementById('item').value.toUpperCase().trim(); 
-    const servico = itemRaw ? itemRaw.replace(/\n/g, ' + ') : 'SERVIÇO';
+    const itemRaw = document.getElementById('item').value.trim(); const servico = formatarServicoInteligente(itemRaw);
     const assuntoITSSM = `${host} - ${servico}`; 
     
-    // Tenta usar a API moderna e segura de cópia do navegador
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(assuntoITSSM).then(() => {
-            mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
-        }).catch(err => {
-            console.error("Erro na API Clipboard: ", err);
-        });
+        navigator.clipboard.writeText(assuntoITSSM).then(() => { mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); }).catch(err => { console.error("Erro na API Clipboard: ", err); });
     } else {
-        // Plano B: Hack do Input
-        try { 
-            const tempInput = document.createElement("input"); 
-            tempInput.value = assuntoITSSM; 
-            document.body.appendChild(tempInput); 
-            tempInput.select(); 
-            document.execCommand("copy"); 
-            document.body.removeChild(tempInput); 
-            mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
-        } catch(e) {}
+        try { const tempInput = document.createElement("input"); tempInput.value = assuntoITSSM; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); } catch(e) {}
     }
 }
-
-// Variável para guardar o backup temporário
-let backupFormulario = null;
 
 window.limparFormulario = function() {
     if(confirm("Deseja limpar todos os campos?")) {
-        // 1. Tira uma "foto" de tudo que está preenchido antes de apagar
+        const elProtLibbs = document.getElementById('protocolo-libbs');
+        
         backupFormulario = {
-            cliente: document.getElementById('cliente').value,
-            host: document.getElementById('host').value,
-            item: document.getElementById('item').value,
-            severidade: document.getElementById('severidade').value,
-            statusinfo: document.getElementById('statusinfo').value,
-            pressplay: document.getElementById('pressplay').value,
-            status: document.getElementById('status').value,
-            protocolo: document.getElementById('protocolo').value,
-            inicio: document.getElementById('inicio').value,
-            fgrid: document.getElementById('f-grid').value,
-            termino: document.getElementById('termino').value,
-            solucionador: document.getElementById('solucionador').value,
-            obs: document.getElementById('obs').value,
-            desc: document.getElementById('desc').value,
-            evidencias: document.getElementById('evidencias').checked
+            cliente: document.getElementById('cliente').value, host: document.getElementById('host').value, item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, status: document.getElementById('status').value,
+            protocolo: document.getElementById('protocolo').value, itssm: document.getElementById('itssm').value, 
+            protocoloLibbs: elProtLibbs ? elProtLibbs.value : '', 
+            inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+            solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, desc: document.getElementById('desc').value, evidencias: document.getElementById('evidencias').checked
         };
-
-        // 2. Apaga tudo normalmente
         document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-        document.getElementById('status').value = 'EM ABERTO'; 
-        document.getElementById('severidade').value = 'WARNING'; 
-        document.getElementById('evidencias').checked = false; 
-        document.getElementById('protocolo').classList.remove('shake-error'); 
-        ultimaAssinaturaGerada = ''; 
-        window.update();
-
-        // 3. Mostra o Toast flutuante com o botão de resgate (dura 6 segundos)
-        const toastResgate = `
-            <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;">
-                <span>🧹 Formulário limpo.</span>
-                <button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button>
-            </div>
-        `;
-        mostrarToast(toastResgate, "info", 6000); 
+        document.getElementById('status').value = 'EM ABERTO'; document.getElementById('severidade').value = 'WARNING'; document.getElementById('evidencias').checked = false; document.getElementById('protocolo').classList.remove('shake-error'); ultimaAssinaturaGerada = ''; window.update();
+        
+        // Ajustado para 10 segundos!
+        const toastResgate = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🧹 Formulário limpo.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
+        mostrarToast(toastResgate, "info", 10000); 
     }
 }
 
-// 4. A função que é chamada se o analista clicar no botão do Toast
 window.desfazerLimpeza = function() {
     if (!backupFormulario) return;
-
-    // Devolve os dados para os campos
-    document.getElementById('cliente').value = backupFormulario.cliente;
-    document.getElementById('host').value = backupFormulario.host;
-    document.getElementById('item').value = backupFormulario.item;
-    document.getElementById('severidade').value = backupFormulario.severidade;
-    document.getElementById('statusinfo').value = backupFormulario.statusinfo;
-    document.getElementById('pressplay').value = backupFormulario.pressplay;
-    document.getElementById('status').value = backupFormulario.status;
-    document.getElementById('protocolo').value = backupFormulario.protocolo;
-    document.getElementById('inicio').value = backupFormulario.inicio;
-    document.getElementById('f-grid').value = backupFormulario.fgrid;
-    document.getElementById('termino').value = backupFormulario.termino;
-    document.getElementById('solucionador').value = backupFormulario.solucionador;
-    document.getElementById('obs').value = backupFormulario.obs;
-    document.getElementById('desc').value = backupFormulario.desc;
-    document.getElementById('evidencias').checked = backupFormulario.evidencias;
-
-    backupFormulario = null; // Esvazia a memória após o resgate
-    window.update(); // Atualiza a tela direita
-    mostrarToast("✅ Informações restauradas com sucesso!", "success");
+    document.getElementById('cliente').value = backupFormulario.cliente; document.getElementById('host').value = backupFormulario.host; document.getElementById('item').value = backupFormulario.item; document.getElementById('severidade').value = backupFormulario.severidade;
+    document.getElementById('statusinfo').value = backupFormulario.statusinfo; document.getElementById('pressplay').value = backupFormulario.pressplay; document.getElementById('status').value = backupFormulario.status;
+    document.getElementById('protocolo').value = backupFormulario.protocolo; document.getElementById('itssm').value = backupFormulario.itssm; document.getElementById('inicio').value = backupFormulario.inicio;
+    
+    if (document.getElementById('protocolo-libbs')) document.getElementById('protocolo-libbs').value = backupFormulario.protocoloLibbs || '';
+    
+    document.getElementById('f-grid').value = backupFormulario.fgrid; document.getElementById('termino').value = backupFormulario.termino; document.getElementById('solucionador').value = backupFormulario.solucionador;
+    document.getElementById('obs').value = backupFormulario.obs; document.getElementById('desc').value = backupFormulario.desc; document.getElementById('evidencias').checked = backupFormulario.evidencias;
+    backupFormulario = null; window.update(); mostrarToast("✅ Informações restauradas com sucesso!", "success");
 }
 
-// ------------------------------------------
-// EXPORTAÇÕES DE RADAR (EXCEL / RESUMO)
-// ------------------------------------------
 window.exportarParaExcel = function() {
     if (chamadosDoTurno.length === 0) { mostrarToast("Não há dados neste plantão para exportar.", "warning"); return; }
-    let csvContent = "data:text/csv;charset=utf-8,"; csvContent += "Data/Hora,Analista,Turno,Modulo,Acao,Cliente,Host,Servico,Severidade,Status,Protocolo,SLA Previsto\n";
+    let csvContent = "data:text/csv;charset=utf-8,Data/Hora,Analista,Turno,Modulo,Acao,Cliente,Host,Servico,Severidade,Status,Protocolo,ITSSM,Protocolo Libbs,SLA Previsto\n";
     chamadosDoTurno.forEach(log => {
         if (log.tipo === 'aviso_rapido' || !log.form) return; 
         const partesAssunto = log.assunto ? log.assunto.split(' | ') : []; const acao = partesAssunto[5] ? partesAssunto[5].trim() : ''; const servicoLimpo = log.form.item ? log.form.item.split('\n')[0] : ''; 
-        let row = [ log.hora, log.nome, log.turno, log.form.modo === 'infra' ? 'Infra' : 'Link', acao, log.form.cliente || '-', log.form.host || '-', servicoLimpo, log.form.severidade || '-', log.form.status || '-', log.form.protocolo || '-', log.form.termino || '-' ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(","); 
+        let row = [ log.hora, log.nome, log.turno, log.form.modo === 'infra' ? 'Infra' : 'Link', acao, log.form.cliente || '-', log.form.host || '-', servicoLimpo, log.form.severidade || '-', log.form.status || '-', log.form.protocolo || '-', log.form.itssm || '-', log.form.protocoloLibbs || '-', log.form.termino || '-' ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(","); 
         csvContent += row + "\n";
     });
     const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", `relatorio_noc_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); mostrarToast("📊 Relatório exportado com sucesso!", "success");
@@ -907,8 +971,12 @@ window.gerarPassagemPlantao = function() {
     let links = []; let infra = [];
     for (let chave in estadoRecente) {
         let log = estadoRecente[chave]; let status = log.form.status; if (status === 'RESOLVIDO') continue; 
-        let modo = log.form.modo || 'link'; let cliente = log.form.cliente || 'N/A'; let host = log.form.host || 'N/A'; let item = log.form.item ? log.form.item.split('\n')[0] : 'N/A'; let previsao = log.form.termino || 'Sem previsão (Verificar)'; let prot = log.form.protocolo ? ` | Prot: ${log.form.protocolo}` : '';
-        let linha = `- [${status}] ${cliente} | Host: ${host} | Serviço: ${item}${prot} (SLA: ${previsao})`;
+        let modo = log.form.modo || 'link'; let cliente = log.form.cliente || 'N/A'; let host = log.form.host || 'N/A'; let item = log.form.item ? log.form.item.split('\n')[0] : 'N/A'; let previsao = log.form.termino || 'Sem previsão (Verificar)'; 
+        let prot = log.form.protocolo ? ` | Prot: ${log.form.protocolo}` : ''; 
+        let itssmTxt = log.form.itssm ? ` | ITSSM: ${log.form.itssm}` : '';
+        let libbsTxt = log.form.protocoloLibbs ? ` | Prot Libbs: ${log.form.protocoloLibbs}` : '';
+        
+        let linha = `- [${status}] ${cliente} | Host: ${host} | Serviço: ${item}${prot}${itssmTxt}${libbsTxt} (SLA: ${previsao})`;
         if (modo === 'link') links.push(linha); else infra.push(linha);
     }
     if (links.length === 0 && infra.length === 0) { mostrarToast("🎉 Nenhuma pendência em aberto para passagem de plantão!", "success"); return; }
@@ -921,14 +989,10 @@ window.gerarPassagemPlantao = function() {
 window.limparHistoricoPlantao = function() {
     const confirmacao = prompt("⚠️ ATENÇÃO DE SEGURANÇA ⚠️\n\nIsso irá apagar PERMANENTEMENTE todos os chamados atuais do radar...\n\nDigite: CONFIRMAR");
     if (confirmacao !== "CONFIRMAR") { if (confirmacao !== null) alert("Operação cancelada."); return; }
-    
-    // Apaga todo o nó do histórico, sem limite de horário
     db.ref('historico_noc').once('value', (snapshot) => {
         if (snapshot.exists()) {
             let updates = {}; snapshot.forEach(child => { updates[child.key] = null; });
-            db.ref('historico_noc').update(updates).then(() => {
-                mostrarToast("🗑️ Radar zerado.", "warning", 5000); localStorage.removeItem('noc_sla_state'); window.fecharHistorico();
-            }).catch((error) => { alert("Erro ao limpar histórico: " + error); });
+            db.ref('historico_noc').update(updates).then(() => { mostrarToast("🗑️ Radar zerado.", "warning", 5000); localStorage.removeItem('noc_sla_state'); window.fecharHistorico(); }).catch((error) => { alert("Erro ao limpar histórico: " + error); });
         } else { mostrarToast("O histórico já está vazio.", "info"); }
     });
 }
@@ -936,8 +1000,6 @@ window.limparHistoricoPlantao = function() {
 window.abrirHistorico = function() {
     document.getElementById('modal-historico').style.display = 'flex';
     const listaHtml = document.getElementById('lista-historico'); listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar contínuo...</div>';
-    
-    // Busca todos os logs no banco
     db.ref('historico_noc').orderByChild('timestamp').once('value', (snapshot) => {
         if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado no radar.</div>'; return; }
         let html = ''; const logs = []; snapshot.forEach(child => { logs.push(child.val()); });
@@ -952,3 +1014,369 @@ window.abrirHistorico = function() {
         listaHtml.innerHTML = html;
     });
 }
+
+// ==========================================
+// 🧠 MOTOR DE CORRELAÇÃO DE EVENTOS (SRE)
+// ==========================================
+window.detectarOperadoraOuGeral = function(texto) {
+    if (!texto) return "";
+    let srvUpper = texto.toUpperCase();
+    
+    const operadorasConhecidas = [
+        "American Tower", "Ligga Telecom", "Noroeste Net", "Mega Telecom", "VSX Networks",
+        "JacomeliNET", "ProntoFibra", "AmericaNet", "HostFiber", "Mundivox", "Ultracom",
+        "Apex Net", "UP Telecom", "Embratel", "MAXCOMM", "Ascenty", "Texnet", "Alcans",
+        "Claro", "GIGA+", "Algar", "Vero", "Vivo", "Net"
+    ];
+
+    let encontradas = [];
+    for (let op of operadorasConhecidas) {
+        if (srvUpper.includes(op.toUpperCase())) {
+            if (op === "Net" && !srvUpper.includes("_NET_") && !srvUpper.includes("-NET-") && !srvUpper.endsWith("_NET") && !srvUpper.includes(" APEX NET ")) {
+                continue;
+            }
+            if (!encontradas.includes(op)) encontradas.push(op);
+        }
+    }
+
+    if (encontradas.length > 1) return "GERAL";
+
+    let linhas = srvUpper.split('\n').map(l => l.trim());
+    let temPingPrincipal = linhas.includes("PING") || linhas.includes("PING_PRINCIPAL");
+    if (temPingPrincipal && encontradas.length > 0) return "GERAL";
+
+    if (srvUpper.includes("UPTIME") || srvUpper.includes("HARDWARE") || srvUpper.includes("MEMORY") || srvUpper.includes("CPU") || srvUpper.includes("TRAFFIC-GLOBAL")) {
+        return "GERAL";
+    }
+
+    if (encontradas.length === 1) return encontradas[0];
+
+    return "";
+};
+
+window.autoPreencherOperadora = function() {
+    let texto = document.getElementById('item').value;
+    let resultado = detectarOperadoraOuGeral(texto);
+    if (resultado) {
+        document.getElementById('solucionador').value = resultado;
+    }
+};
+
+// ==========================================
+// ✨ EXTRATOR MÁGICO DE TABELAS (CENTREON)
+// ==========================================
+window.processarExtratorMagico = function() {
+    const raw = document.getElementById('magic-paste-area').value;
+    if (!raw.trim()) {
+        mostrarToast("⚠️ Cole os dados do Centreon primeiro!", "warning");
+        return; 
+    }
+
+    let linhas = raw.split('\n').filter(l => l.trim() !== '');
+    if (linhas.length === 0) return;
+
+    let servicos = [];
+    let rawStatusInfos = []; 
+    let hostDetectado = "";
+
+    let prioridadeSeveridade = { "CRITICAL": 4, "DOWN": 4, "WARNING": 3, "UNKNOWN": 2, "OK": 1, "UP": 1 };
+    let piorSeveridadeNum = 0;
+    let severidadeFinal = "";
+    let menorDuracaoMs = Infinity;
+
+    function parseDurationToMs(durStr) {
+        let totalMs = 0;
+        let regex = /(\d+)([wdhms])/g;
+        let match;
+        while ((match = regex.exec(durStr)) !== null) {
+            let val = parseInt(match[1]);
+            let unit = match[2];
+            if (unit === 'w') totalMs += val * 7 * 24 * 60 * 60 * 1000;
+            if (unit === 'd') totalMs += val * 24 * 60 * 60 * 1000;
+            if (unit === 'h') totalMs += val * 60 * 60 * 1000;
+            if (unit === 'm') totalMs += val * 60 * 1000;
+            if (unit === 's') totalMs += val * 1000;
+        }
+        return totalMs;
+    }
+
+    let linhasColunas = linhas.map(l => l.split('\t').map(c => c.trim()).filter(c => c !== ''));
+
+    linhasColunas = linhasColunas.map(cols => {
+        return cols.filter(c => {
+            let up = c.toUpperCase();
+            return !up.includes('HTTP ACTION LINK') && 
+                   !up.includes('HTTP://') && 
+                   !up.includes('HTTPS://') && 
+                   !up.includes('NOTIFICATION IS DISABLED') && 
+                   !up.includes('NOTIFICATIONS ARE DISABLED');
+        });
+    });
+
+    linhasColunas.forEach((cols, i) => {
+        if (cols.length === 0) return;
+
+        let servicoStr = "";
+        let statusStr = cols[cols.length - 1];
+
+        if (cols.length >= 2) {
+            let offset = 0;
+            if (cols[0].toLowerCase() === 'vm' || cols[0].trim().length <= 2) {
+                offset = 1;
+            }
+            
+            let item0 = cols[offset];
+            let item1 = cols[offset + 1];
+
+            if (item1) {
+                const isItem1Status = /^(OK|CRITICAL|WARNING|UNKNOWN|UP|DOWN|PENDING)$/i.test(item1.trim());
+                if (isItem1Status) {
+                    servicoStr = item0; 
+                } else {
+                    if (!hostDetectado) hostDetectado = item0; 
+                    servicoStr = item1;
+                }
+            } else {
+                servicoStr = item0;
+            }
+        } else if (cols.length === 1) {
+            let linhaTexto = cols[0];
+            let matchStatusLinha = linhaTexto.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)\s*-\s*(.*)/i);
+            if (matchStatusLinha) {
+                statusStr = matchStatusLinha[0];
+                linhaTexto = linhaTexto.replace(matchStatusLinha[0], '').trim();
+            }
+            servicoStr = linhaTexto.split(/\s+/)[0]; 
+        }
+
+        if (servicoStr && !servicos.includes(servicoStr)) { servicos.push(servicoStr); }
+        if (statusStr) { rawStatusInfos.push({ servico: servicoStr, status: statusStr }); }
+
+        let matchStatusSev = statusStr.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)/i);
+        if (matchStatusSev) {
+            let statusEncontrado = matchStatusSev[1].toUpperCase();
+            let peso = prioridadeSeveridade[statusEncontrado] || 0;
+            if (peso > piorSeveridadeNum) {
+                piorSeveridadeNum = peso;
+                severidadeFinal = (statusEncontrado === 'DOWN') ? 'CRITICAL' : (statusEncontrado === 'UP' ? 'OK' : statusEncontrado);
+            }
+        }
+
+        for (let j = 1; j < cols.length - 1; j++) {
+            if (/^(\d+[wdhms]\s*)+$/.test(cols[j].trim())) {
+                let duracaoAtual = parseDurationToMs(cols[j].trim());
+                if (duracaoAtual < menorDuracaoMs) { menorDuracaoMs = duracaoAtual; }
+                break; 
+            }
+        }
+    });
+
+    let clienteDetectado = "";
+    if (hostDetectado) {
+        let hostUpper = hostDetectado.toUpperCase();
+
+        if (hostUpper.startsWith('ITS-BKP-VEEAM') && servicos.length > 0) {
+            const primeiroServico = servicos[0].toUpperCase();
+            const partes = primeiroServico.split('-');
+            if (partes.length > 1) {
+                const siglaVeeam = partes[1]; 
+                if (siglaVeeam === '838') clienteDetectado = '838 SOLUÇÕES';
+                else if (siglaVeeam === 'ALBA') clienteDetectado = 'HOTELARIA ALBA';
+                else if (siglaVeeam === 'IGUA') clienteDetectado = 'IGUA HOLDING';
+                else if (siglaVeeam === 'MEUCURSO') clienteDetectado = 'MEUCURSO';
+                else {
+                    const clientesLista = Object.keys(logosClientes || {});
+                    let match = clientesLista.find(c => c.startsWith(siglaVeeam));
+                    if (match) clienteDetectado = match;
+                }
+            }
+        }
+
+        if (!clienteDetectado) {
+            for (let modo in memoriaNOC) {
+                for (let cli in memoriaNOC[modo]) {
+                    if (memoriaNOC[modo][cli][hostDetectado]) { clienteDetectado = cli; break; }
+                }
+                if (clienteDetectado) break;
+            }
+        }
+
+        if (!clienteDetectado) {
+            if (hostUpper.includes('LIBBS')) clienteDetectado = 'LIBBS';
+            else if (hostUpper.includes('AMIGAO') || hostUpper.includes('CSD')) clienteDetectado = 'CSD (GRUPO AMIGÃO)';
+            else if (hostUpper.includes('AGIS')) clienteDetectado = 'GRUPO AGIS';
+            else if (hostUpper.includes('STAHL')) clienteDetectado = 'AGROSTAHL (STAHL)';
+            else if (hostUpper.includes('FURACAO')) clienteDetectado = 'FURACÃO';
+            else {
+                const prefixo = hostDetectado.split('-')[0].toUpperCase(); 
+                const prefixoUnder = hostDetectado.split('_')[0].toUpperCase();
+                const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
+                const clientesPossiveis = Object.keys(logosClientes || {});
+                let match = clientesPossiveis.find(c => c.startsWith(prefixoReal));
+                if (match) clienteDetectado = match;
+            }
+        }
+    }
+
+    if (clienteDetectado && !document.getElementById('cliente').value) {
+        document.getElementById('cliente').value = clienteDetectado;
+    }
+    if (hostDetectado && !document.getElementById('host').value) {
+        document.getElementById('host').value = hostDetectado;
+    }
+    if (servicos.length > 0) {
+        let itemAtual = document.getElementById('item').value;
+        let novoItem = itemAtual ? itemAtual + '\n' + servicos.join('\n') : servicos.join('\n');
+        document.getElementById('item').value = novoItem;
+        
+        if (typeof window.detectarOperadoraOuGeral === 'function') {
+            let opDetectada = window.detectarOperadoraOuGeral(novoItem);
+            if (opDetectada && !document.getElementById('solucionador').value) {
+                document.getElementById('solucionador').value = opDetectada;
+            }
+        }
+    }
+
+    if (rawStatusInfos.length > 0) {
+        let textoStatusFormatado = (rawStatusInfos.length === 1) 
+            ? rawStatusInfos[0].status 
+            : rawStatusInfos.map(info => `[${info.servico || 'Item'}]\n${info.status}`).join('\n\n');
+        let statusAtual = document.getElementById('statusinfo').value;
+        document.getElementById('statusinfo').value = statusAtual ? statusAtual + '\n\n' + textoStatusFormatado : textoStatusFormatado;
+    }
+    if (severidadeFinal) { document.getElementById('severidade').value = severidadeFinal; }
+
+    if (menorDuracaoMs !== Infinity && !document.getElementById('inicio').value) {
+        let dataCalculada = new Date(Date.now() - menorDuracaoMs);
+        const pt = `${dataCalculada.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'})} às ${dataCalculada.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        document.getElementById('inicio').value = pt;
+    }
+
+    document.getElementById('magic-paste-area').value = '';
+    window.update();
+    mostrarToast("🪄 Inteligência Artificial aplicou os dados com sucesso!", "success");
+}
+
+// ==========================================
+// FUNÇÕES DE TRANSIÇÃO E RECUPERAÇÃO DE ABA
+// ==========================================
+window.trocarModo = function(novoModo) {
+    if (modoAtual === novoModo) return; 
+
+    let temDados = isFormularioSujo();
+
+    if (temDados) {
+        const confirma = confirm("⚠️ ATENÇÃO!\n\nVocê tem dados preenchidos no formulário.\nSe trocar de aba agora, todas as informações não salvas serão perdidas.\n\nDeseja realmente descartar este rascunho e trocar de aba?");
+        if (!confirma) return; 
+
+        // --- SALVAR SNAPSHOT ANTES DE LIMPAR ---
+        const elProtLibbs = document.getElementById('protocolo-libbs');
+        backupEstadoAba = {
+            cliente: document.getElementById('cliente').value,
+            host: document.getElementById('host').value,
+            item: document.getElementById('item').value,
+            severidade: document.getElementById('severidade').value,
+            statusinfo: document.getElementById('statusinfo').value,
+            pressplay: document.getElementById('pressplay').value,
+            status: document.getElementById('status').value,
+            protocolo: document.getElementById('protocolo').value,
+            itssm: document.getElementById('itssm').value,
+            protocoloLibbs: elProtLibbs ? elProtLibbs.value : '',
+            inicio: document.getElementById('inicio').value,
+            fgrid: document.getElementById('f-grid').value,
+            termino: document.getElementById('termino').value,
+            solucionador: document.getElementById('solucionador').value,
+            obs: document.getElementById('obs').value,
+            desc: document.getElementById('desc').value,
+            evidencias: document.getElementById('evidencias').checked,
+            modoAnterior: modoAtual
+        };
+    }
+
+    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'protocolo-libbs', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    camposParaLimpar.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    
+    document.getElementById('status').value = 'EM ABERTO'; 
+    document.getElementById('severidade').value = 'WARNING'; 
+    document.getElementById('evidencias').checked = false;
+    document.getElementById('protocolo').classList.remove('shake-error');
+    ultimaAssinaturaGerada = '';
+
+    modoAtual = novoModo;
+    document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
+    document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
+    
+    document.getElementById('titulo-form').innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
+    document.getElementById('label-secao-1').innerHTML = modoAtual === 'link' ? "📍 1. Identificação do Alarme" : "📍 1. Identificação do Incidente";
+    document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
+    document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
+    
+    const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
+    const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
+    
+    document.getElementById('host').placeholder = placeholderHost;
+    document.getElementById('item').placeholder = placeholderItem;
+    
+    document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
+    document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex'; 
+    document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none'; 
+    document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
+    
+    renderizarListaLateral(); 
+    window.update();
+
+    if (temDados) {
+        const toastResgateAba = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🔄 Aba trocada. Rascunho salvo.</span><button onclick="recuperarDadosAba()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
+        mostrarToast(toastResgateAba, "warning", 10000);
+    }
+}
+
+window.recuperarDadosAba = function() {
+    if (!backupEstadoAba) return;
+
+    modoAtual = backupEstadoAba.modoAnterior;
+    document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
+    document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
+
+    document.getElementById('titulo-form').innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
+    document.getElementById('label-secao-1').innerHTML = modoAtual === 'link' ? "📍 1. Identificação do Alarme" : "📍 1. Identificação do Incidente";
+    document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
+    document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
+
+    const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
+    const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
+
+    document.getElementById('host').placeholder = placeholderHost;
+    document.getElementById('item').placeholder = placeholderItem;
+
+    document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
+    document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex';
+    document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none';
+    document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
+
+    document.getElementById('cliente').value = backupEstadoAba.cliente;
+    document.getElementById('host').value = backupEstadoAba.host;
+    document.getElementById('item').value = backupEstadoAba.item;
+    document.getElementById('severidade').value = backupEstadoAba.severidade;
+    document.getElementById('statusinfo').value = backupEstadoAba.statusinfo;
+    document.getElementById('pressplay').value = backupEstadoAba.pressplay;
+    document.getElementById('status').value = backupEstadoAba.status;
+    document.getElementById('protocolo').value = backupEstadoAba.protocolo;
+    document.getElementById('itssm').value = backupEstadoAba.itssm;
+    if (document.getElementById('protocolo-libbs')) document.getElementById('protocolo-libbs').value = backupEstadoAba.protocoloLibbs;
+    document.getElementById('inicio').value = backupEstadoAba.inicio;
+    document.getElementById('f-grid').value = backupEstadoAba.fgrid;
+    document.getElementById('termino').value = backupEstadoAba.termino;
+    document.getElementById('solucionador').value = backupEstadoAba.solucionador;
+    document.getElementById('obs').value = backupEstadoAba.obs;
+    document.getElementById('desc').value = backupEstadoAba.desc;
+    document.getElementById('evidencias').checked = backupEstadoAba.evidencias;
+
+    backupEstadoAba = null; 
+    renderizarListaLateral();
+    window.update();
+    mostrarToast("✨ Aba e dados restaurados com sucesso!", "success");
+};
