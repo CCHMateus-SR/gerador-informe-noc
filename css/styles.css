@@ -317,7 +317,7 @@
     display: none; /* Escondido no monitor grande */
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1600px) {
     /* 1. O Formulário e o Preview passam a usar 100% do espaço livre */
     #form-container, .preview-side {
         width: 100% !important;
@@ -353,15 +353,10 @@
         left: -400px; /* Joga 400px para fora do monitor, escondendo ele */
         width: 320px; /* Largura da gaveta */
         height: 100vh; /* Ocupa 100% da altura da tela */
+        overflow-y: auto; /* <--- OLHA A LINHA NOVA AQUI! */
         z-index: 9999; /* Fica por cima de absolutamente tudo */
         transition: left 0.3s ease-in-out; /* Efeito de deslizar suave */
         box-shadow: 5px 0 25px rgba(0,0,0,0.8);
         margin: 0 !important; 
         border-radius: 0; 
     }
-
-    /* 4. A classe mágica que puxa a gaveta pra dentro da tela */
-    #history-container.aberto {
-        left: 0; 
-    }
-}
