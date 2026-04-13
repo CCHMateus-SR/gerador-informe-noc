@@ -345,9 +345,11 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     document.getElementById('status').value = dados.status || 'EM ABERTO'; 
     document.getElementById('protocolo').value = dados.protocolo || '';
     
-    // --- MÁGICA: HERANÇA COM BARREIRA DE CICLO DE VIDA ---
+    // --- MÁGICA: HERANÇA COM BARREIRA DE CICLO DE VIDA (ITSSM + LIBBS) ---
     let itssmHerdado = dados.itssm || '';
-    if (!itssmHerdado) {
+    let libbsHerdado = dados.protocoloLibbs || '';
+
+    if (!itssmHerdado || !libbsHerdado) {
         const hostAlvo = (dados.host || '').toUpperCase().trim();
         const itemAlvo = (dados.item || '').toUpperCase().trim();
         
@@ -359,11 +361,21 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
                 const logItem = (c.form.item || '').toUpperCase().trim();
                 
                 if (logHost === hostAlvo && logItem === itemAlvo) {
-                    // Se achou o número no ciclo atual, copia e para de procurar
-                    if (c.form.itssm) {
+                    // Puxa o ITSSM se ainda estiver vazio
+                    if (!itssmHerdado && c.form.itssm) {
                         itssmHerdado = c.form.itssm;
+                    }
+                    
+                    // Puxa o Protocolo Libbs se ainda estiver vazio
+                    if (!libbsHerdado && c.form.protocoloLibbs) {
+                        libbsHerdado = c.form.protocoloLibbs;
+                    }
+
+                    // Se já achou os dois, não precisa mais voltar no tempo
+                    if (itssmHerdado && libbsHerdado) {
                         break;
                     }
+
                     // BARREIRA: Se bateu num chamado resolvido do passado, para de procurar!
                     if (c.form.status === 'RESOLVIDO') {
                         break;
@@ -372,12 +384,13 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
             }
         }
     }
+    
     document.getElementById('itssm').value = itssmHerdado;
-    // -----------------------------------------------------
-
-    // Puxa o Protocolo Libbs, se existir
+    
+    // Aplica o Protocolo Libbs herdado
     const elProtLibbs = document.getElementById('protocolo-libbs');
-    if(elProtLibbs) elProtLibbs.value = dados.protocoloLibbs || '';
+    if(elProtLibbs) elProtLibbs.value = libbsHerdado;
+    // ---------------------------------------------------------------------
     
     document.getElementById('inicio').value = dados.inicio || ''; document.getElementById('f-grid').value = dados.fgrid || '';
     document.getElementById('termino').value = dados.termino || ''; document.getElementById('desc').value = dados.desc || '';
