@@ -168,7 +168,13 @@ export function tocarSom(tipo) {
 // ==========================================
 // FUNÇÃO DO BOTÃO (ABRIR E FECHAR)
 // ==========================================
-window.abrirGavetaHistorico = function() {
+window.abrirGavetaHistorico = function(event) {
+    // 1. Cria um escudo absoluto contra o clique vazar (suporta qualquer navegador)
+    const e = event || window.event;
+    if (e && e.stopPropagation) {
+        e.stopPropagation();
+    }
+
     const painel = document.getElementById('history-container');
     if (painel) {
         painel.classList.toggle('aberto');
@@ -181,17 +187,17 @@ window.abrirGavetaHistorico = function() {
 document.addEventListener('click', function(event) {
     const painel = document.getElementById('history-container');
     
-    // 1. Se o clique foi no botão de abrir (ou no texto dentro dele), o sistema ignora! 
-    // Deixamos o próprio botão cuidar de abrir ou fechar a gaveta.
-    if (event.target.closest('.btn-toggle-historico')) {
-        return; 
-    }
-    
-    // 2. Se clicou em qualquer outro lugar e a gaveta estiver aberta...
-    if (painel && painel.classList.contains('aberto')) {
-        // Verifica se o clique foi do lado de fora da gaveta
-        if (!painel.contains(event.target)) {
-            painel.classList.remove('aberto'); // Esconde a gaveta
-        }
-    }
+    // Verifica se a gaveta existe e se está aberta (se não, nem perde tempo)
+    if (!painel || !painel.classList.contains('aberto')) return;
+
+    // Se o clique foi DENTRO da própria gaveta, ignora (não queremos fechar)
+    if (painel.contains(event.target)) return;
+
+    // Se o clique foi NO BOTÃO de abrir (ou no ícone dentro dele), ignora 
+    // Isso é uma camada extra de segurança!
+    const botaoAbrir = document.querySelector('.btn-toggle-historico');
+    if (botaoAbrir && botaoAbrir.contains(event.target)) return;
+
+    // Se passou por todas as barreiras acima, é porque clicou no fundo da tela. Aí sim, fecha!
+    painel.classList.remove('aberto');
 });
