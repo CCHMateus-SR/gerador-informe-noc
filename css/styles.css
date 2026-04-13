@@ -360,3 +360,11 @@
         margin: 0 !important; 
         border-radius: 0; 
     }
+        
+/* 4. A classe que a Inteligência do JS adiciona para a gaveta aparecer! */
+    #history-container.aberto {
+        left: 0 !important;
+        display: flex !important; 
+        flex-direction: column;
+    }
+}
