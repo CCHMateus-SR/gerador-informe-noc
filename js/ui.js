@@ -168,7 +168,13 @@ export function tocarSom(tipo) {
 // ==========================================
 // FUNÇÃO DO BOTÃO (ABRIR E FECHAR)
 // ==========================================
-window.abrirGavetaHistorico = function() {
+window.abrirGavetaHistorico = function(e) {
+    // Captura o evento de clique e cria um "escudo" para ele não vazar pro fundo da tela
+    const evento = e || window.event;
+    if (evento) {
+        evento.stopPropagation();
+    }
+
     const painel = document.getElementById('history-container');
     if (painel) {
         painel.classList.toggle('aberto');
@@ -182,11 +188,14 @@ document.addEventListener('click', function(event) {
     const painel = document.getElementById('history-container');
     const botaoAbrir = document.querySelector('.btn-toggle-historico');
     
-    // Verifica se a tela é a de notebook (onde o botão de abrir existe e está visível)
-    if (painel && painel.classList.contains('aberto') && botaoAbrir) {
-        // Se o clique NÃO foi dentro da gaveta E NÃO foi no botão de abrir
-        if (!painel.contains(event.target) && !botaoAbrir.contains(event.target)) {
-            painel.classList.remove('aberto'); // Esconde a gaveta
+    // Se o painel estiver aberto, vamos checar onde o usuário clicou
+    if (painel && painel.classList.contains('aberto')) {
+        const clicouNoPainel = painel.contains(event.target);
+        const clicouNoBotao = botaoAbrir ? botaoAbrir.contains(event.target) : false;
+        
+        // Se NÃO clicou dentro da gaveta E NÃO clicou no botão de abrir, aí sim a gente esconde
+        if (!clicouNoPainel && !clicouNoBotao) {
+            painel.classList.remove('aberto');
         }
     }
 });
