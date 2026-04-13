@@ -344,8 +344,37 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     document.getElementById('statusinfo').value = dados.statusinfo || ''; document.getElementById('pressplay').value = dados.pressplay || ''; 
     document.getElementById('status').value = dados.status || 'EM ABERTO'; 
     document.getElementById('protocolo').value = dados.protocolo || '';
-    document.getElementById('itssm').value = dados.itssm || ''; 
     
+    // --- MÁGICA: HERANÇA COM BARREIRA DE CICLO DE VIDA ---
+    let itssmHerdado = dados.itssm || '';
+    if (!itssmHerdado) {
+        const hostAlvo = (dados.host || '').toUpperCase().trim();
+        const itemAlvo = (dados.item || '').toUpperCase().trim();
+        
+        // Lê do mais recente para o mais antigo
+        for (let i = chamadosDoTurno.length - 1; i >= 0; i--) {
+            const c = chamadosDoTurno[i];
+            if (c.form) {
+                const logHost = (c.form.host || '').toUpperCase().trim();
+                const logItem = (c.form.item || '').toUpperCase().trim();
+                
+                if (logHost === hostAlvo && logItem === itemAlvo) {
+                    // Se achou o número no ciclo atual, copia e para de procurar
+                    if (c.form.itssm) {
+                        itssmHerdado = c.form.itssm;
+                        break;
+                    }
+                    // BARREIRA: Se bateu num chamado resolvido do passado, para de procurar!
+                    if (c.form.status === 'RESOLVIDO') {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    document.getElementById('itssm').value = itssmHerdado;
+    // -----------------------------------------------------
+
     // Puxa o Protocolo Libbs, se existir
     const elProtLibbs = document.getElementById('protocolo-libbs');
     if(elProtLibbs) elProtLibbs.value = dados.protocoloLibbs || '';
@@ -767,31 +796,58 @@ function registrarHistoricoNuvem(assunto) {
 }
 
 // ------------------------------------------
-// MÁGICA: VÍNCULO SILENCIOSO DO ITSSM
+// MÁGICA: VÍNCULO SILENCIOSO DO ITSSM (HERANÇA)
 // ------------------------------------------
 window.vincularRegistroITSSM = function() {
     const itssm = document.getElementById('itssm').value.trim();
     if (!itssm) { mostrarToast("⚠️ Digite o número do ITSSM primeiro!", "warning"); return; }
     
-    const assunto = obterAssuntoGerado(); 
+    const hostAtual = document.getElementById('host').value.toUpperCase().trim();
+    const itemAtual = document.getElementById('item').value.toUpperCase().trim();
     
-    db.ref('historico_noc').orderByChild('assunto').equalTo(assunto).once('value', snapshot => {
+    if (!hostAtual || !itemAtual) { mostrarToast("⚠️ Preencha o Host e o Serviço para vincular.", "warning"); return; }
+    
+    db.ref('historico_noc').once('value', snapshot => {
         if (snapshot.exists()) {
-            let maiorTimestamp = 0; let chaveAlvo = null;
+            let updates = {};
+            let encontrou = false;
+            let logsArr = [];
             
             snapshot.forEach(child => {
-                const data = child.val();
-                if (data.timestamp > maiorTimestamp) { maiorTimestamp = data.timestamp; chaveAlvo = child.key; }
+                logsArr.push({ key: child.key, data: child.val() });
             });
             
-            if (chaveAlvo) {
-                let updates = {}; updates[`${chaveAlvo}/form/itssm`] = itssm;
-                db.ref('historico_noc').update(updates).then(() => {
-                    mostrarToast("🔗 Número ITSSM vinculado ao radar com sucesso!", "success");
-                });
+            // Ordena os chamados do mais novo para o mais antigo
+            logsArr.sort((a, b) => b.data.timestamp - a.data.timestamp);
+            
+            // Varre o banco procurando chamados do mesmo ciclo
+            for (let i = 0; i < logsArr.length; i++) {
+                const log = logsArr[i];
+                const data = log.data;
+                
+                if (data.tipo === 'relatorio' && data.form) {
+                    const logHost = (data.form.host || '').toUpperCase().trim();
+                    const logItem = (data.form.item || '').toUpperCase().trim();
+                    
+                    if (logHost === hostAtual && logItem === itemAtual) {
+                        updates[`${log.key}/form/itssm`] = itssm;
+                        encontrou = true;
+                        
+                        // BARREIRA: Bateu num Resolvido? Para de espalhar o ITSSM para o passado!
+                        if (data.form.status === 'RESOLVIDO') {
+                            break;
+                        }
+                    }
+                }
             }
-        } else {
-            mostrarToast("⚠️ Gere o chamado (IMAGEM ou TEXTO) antes de tentar vincular o ITSSM.", "warning");
+            
+            if (encontrou) {
+                db.ref('historico_noc').update(updates).then(() => {
+                    mostrarToast("🔗 Número ITSSM vinculado ao ciclo atual deste chamado!", "success");
+                });
+            } else {
+                mostrarToast("⚠️ Gere o chamado (IMAGEM ou TEXTO) antes de tentar vincular o ITSSM.", "warning");
+            }
         }
     });
 }
