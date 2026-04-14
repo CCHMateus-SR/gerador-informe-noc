@@ -274,18 +274,49 @@ function renderizarListaLateral() {
             const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
             const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
             
+            // --- NOVO VISUAL DIFERENCIADO DO "EM ANÁLISE" ---
             html += `
-            <div class="my-card card-aviso">
-                <div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div>
-                <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvAviso}')">🔖 ${log.servico}</div>
-                <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstAviso}')">🖥️ ${log.host}</div>
-                <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div>
+            <div style="border: 1px dashed #3B82F6; border-radius: 8px; padding: 10px; margin-bottom: 12px; background: rgba(59, 130, 246, 0.05); transition: 0.2s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 9px; font-weight: 900; color: #3B82F6; text-transform: uppercase; display: flex; align-items: center; gap: 5px; letter-spacing: 0.5px;">
+                        <span style="display:inline-block; width:6px; height:6px; background:#3B82F6; border-radius:50%; box-shadow: 0 0 6px rgba(59,130,246,0.8);"></span>
+                        Aviso de Análise
+                    </span>
+                    <span style="font-size: 9px; font-weight: bold; color: #64748B;">🕒 ${log.hora}</span>
+                </div>
+                
+                <div style="font-size: 11.5px; margin-bottom: 6px; color: var(--its-text); line-height: 1.4;">
+                    <strong style="color: #0EA5E9;">👤 ${log.nome}</strong> está verificando:
+                </div>
+                
+                <div style="background: rgba(128, 128, 128, 0.08); border-left: 2px solid #3B82F6; padding: 6px 8px; border-radius: 0 4px 4px 0; font-size: 11px;">
+                    <div style="font-weight: bold; color: var(--its-text); margin-bottom: 3px; cursor: pointer; word-break: break-all;" onclick="copiarTextoInline(event, '${hstAviso}')" title="Copiar Host">🖥️ ${log.host}</div>
+                    <div style="color: #64748B; font-weight: 500; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" onclick="copiarTextoInline(event, '${srvAviso}')" title="Copiar Serviço">🔖 ${log.servico}</div>
+                </div>
             </div>`;
             return;
         }
         
         const acao = (log.assunto || '').split(' | ')[5] || 'CHAMADO';
-        let classeBadge = acao.includes('FOLLOW') ? 'badge-follow' : (acao.includes('ENCERRAMENTO') ? 'badge-ok' : 'badge-aberto');
+        
+        // --- CORES DINÂMICAS E MODERNAS PARA O STATUS ---
+        let corBgAcao = 'rgba(100, 116, 139, 0.15)';
+        let corTextAcao = '#64748B';
+        let iconeAcao = '📌';
+
+        if (acao.includes('ABERTURA')) {
+            corBgAcao = 'rgba(239, 68, 68, 0.15)'; // Vermelho suave translúcido
+            corTextAcao = '#EF4444'; // Vermelho vivo
+            iconeAcao = '🚨';
+        } else if (acao.includes('FOLLOW')) {
+            corBgAcao = 'rgba(245, 158, 11, 0.15)'; // Laranja suave translúcido
+            corTextAcao = '#F59E0B'; // Laranja vivo
+            iconeAcao = '🔄';
+        } else if (acao.includes('ENCERRAMENTO')) {
+            corBgAcao = 'rgba(34, 197, 94, 0.15)'; // Verde suave translúcido
+            corTextAcao = '#22C55E'; // Verde vivo
+            iconeAcao = '✅';
+        }
         
         const hostLimpo = log.form.host || 'Host Não Informado';
         const servicoResumido = log.form.item ? log.form.item.split('\n')[0] : 'Serviço Não Informado';
@@ -293,25 +324,43 @@ function renderizarListaLateral() {
         const hstSafe = hostLimpo.replace(/'/g, "\\'");
         const srvSafe = servicoResumido.replace(/'/g, "\\'");
 
-        // --- MÁGICA: BADGE DO ITSSM COPIÁVEL E ISOLADO ---
+        // --- BADGE DO ITSSM ADAPTÁVEL (Light/Dark/Pro) ---
         let badgeItssmHTML = '';
         if (log.form && log.form.itssm) {
             const itssmSafe = log.form.itssm.replace(/'/g, "\\'");
-            badgeItssmHTML = `<span onclick="event.stopPropagation(); copiarTextoInline(event, '${itssmSafe}')" title="Copiar Nº ITSSM" style="font-size: 9px; background: #E2E8F0; color: #0F172A; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: bold; cursor: pointer; border: 1px solid #CBD5E1; transition: 0.2s;" onmouseover="this.style.background='#CBD5E1'" onmouseout="this.style.background='#E2E8F0'">📋 ${log.form.itssm}</span>`;
+            badgeItssmHTML = `<span onclick="event.stopPropagation(); copiarTextoInline(event, '${itssmSafe}')" title="Copiar Nº ITSSM" style="font-size: 9px; background: rgba(148, 163, 184, 0.15); color: var(--its-text); padding: 3px 8px; border-radius: 6px; margin-left: 8px; font-weight: 800; cursor: pointer; border: 1px solid rgba(148, 163, 184, 0.3); transition: 0.2s;">📋 ${log.form.itssm}</span>`;
         }
 
+        // --- NOVO LAYOUT DO CARD (SaaS) ---
         html += `
-        <div class="my-card card-${log.form.modo || 'link'}">
-            <div class="my-card-header"><span class="my-card-client">${log.form.cliente || 'CLIENTE'}</span><span class="my-card-badge ${classeBadge}">${acao}</span></div>
+        <div class="my-card card-${log.form.modo || 'link'}" style="position: relative; padding: 16px; border-radius: 12px; overflow: hidden; display: block;">
             
-            <div class="my-card-host" style="cursor: pointer; display: flex; align-items: center; flex-wrap: wrap;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstSafe}')">
-                <span>🖥️ ${hostLimpo}</span> ${badgeItssmHTML}
+            <div style="position: absolute; top: 14px; right: 14px; background: ${corBgAcao}; border: 1px solid ${corBgAcao}; padding: 4px 10px; border-radius: 8px; display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 10px;">${iconeAcao}</span>
+                <span style="font-size: 9px; font-weight: 900; color: ${corTextAcao}; text-transform: uppercase; letter-spacing: 0.5px;">${acao}</span>
             </div>
-            <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvSafe}')">🔖 ${servicoResumido}</div>
-            
-            <div class="my-card-bottom">
-                <span class="my-card-time">🕒 ${log.hora} &nbsp;|&nbsp; <span style="color: #0284C7; font-weight: 700;">👤 ${log.nome}</span></span>
-                <button class="btn-pull" onclick="carregarChamadoParaFormulario('${log.timestamp}')">🔄 Puxar Dados</button>
+
+            <div style="font-size: 10px; font-weight: 900; color: var(--its-text); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; opacity: 0.6; display: flex; align-items: center; gap: 4px;">
+                🏢 ${log.form.cliente || 'CLIENTE'}
+            </div>
+
+            <div style="display: flex; align-items: center; flex-wrap: wrap; margin-bottom: 8px; padding-right: 100px;">
+                <span style="font-size: 15px; font-weight: 800; color: var(--its-text); cursor: pointer; line-height: 1.2; letter-spacing: -0.3px;" title="Copiar Host" onclick="copiarTextoInline(event, '${hstSafe}')">🖥️ ${hostLimpo}</span>
+                ${badgeItssmHTML}
+            </div>
+
+            <div style="font-size: 11px; color: #64748B; cursor: pointer; display: flex; align-items: center; gap: 6px; margin-bottom: 16px;" title="Copiar Serviço" onclick="copiarTextoInline(event, '${srvSafe}')">
+                🔖 <span style="background: rgba(148, 163, 184, 0.1); padding: 4px 8px; border-radius: 6px; font-weight: 600; color: var(--its-text); opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${servicoResumido}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 14px; border-top: 1px dashed rgba(148, 163, 184, 0.25);">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">🕒 ${log.hora}</span>
+                    <span style="font-size: 11px; color: #0EA5E9; font-weight: 800;">👤 ${log.nome}</span>
+                </div>
+                <button class="btn-pull" style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-radius: 8px;" onclick="carregarChamadoParaFormulario('${log.timestamp}')">
+                    🔄 Puxar Dados
+                </button>
             </div>
         </div>`;
     });
