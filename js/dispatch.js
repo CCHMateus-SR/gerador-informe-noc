@@ -1277,7 +1277,7 @@ window.processarExtratorMagico = function() {
             }
         } else if (cols.length === 1) {
             let linhaTexto = cols[0];
-            let matchStatusLinha = linhaTexto.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)\s*-\s*(.*)/i);
+            let matchStatusLinha = linhaTexto.match(/(CRITICAL|CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)\s*-\s*(.*)/i);
             if (matchStatusLinha) {
                 statusStr = matchStatusLinha[0];
                 linhaTexto = linhaTexto.replace(matchStatusLinha[0], '').trim();
@@ -1295,14 +1295,14 @@ window.processarExtratorMagico = function() {
         
         for (let c of cols) {
             let cUp = c.trim().toUpperCase();
-            if (/^(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)$/.test(cUp)) {
+            if (/^(CRITICAL|CRITICO|WARNING|OK|UNKNOWN|UP|DOWN)$/.test(cUp)) {
                 statusEncontradoLinha = cUp;
                 break;
             }
         }
         
         if (!statusEncontradoLinha) {
-            let matchLog = statusStr.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)/i);
+            let matchLog = statusStr.match(/(CRITICAL|CRITICO|WARNING|OK|UNKNOWN|UP|DOWN)/i);
             if (matchLog) statusEncontradoLinha = matchLog[1].toUpperCase();
         }
 
