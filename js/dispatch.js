@@ -1261,7 +1261,7 @@ window.processarExtratorMagico = function() {
             let item1 = cols[offset + 1];
 
             if (item1) {
-                const isItem1Status = /^(OK|CRITICAL|WARNING|UNKNOWN|UP|DOWN|PENDING)$/i.test(item1.trim());
+                const isItem1Status = /^(OK|CRITICAL|CRITICO|WARNING|UNKNOWN|UP|DOWN|PENDING)$/i.test(item1.trim());
                 if (isItem1Status) {
                     servicoStr = item0; 
                 } else {
@@ -1277,7 +1277,7 @@ window.processarExtratorMagico = function() {
             }
         } else if (cols.length === 1) {
             let linhaTexto = cols[0];
-            let matchStatusLinha = linhaTexto.match(/(CRITICAL|CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)\s*-\s*(.*)/i);
+            let matchStatusLinha = linhaTexto.match(/(CRITICAL|CRITICO|WARNING|OK|UNKNOWN|UP|DOWN)\s*-\s*(.*)/i);
             if (matchStatusLinha) {
                 statusStr = matchStatusLinha[0];
                 linhaTexto = linhaTexto.replace(matchStatusLinha[0], '').trim();
@@ -1311,6 +1311,7 @@ window.processarExtratorMagico = function() {
             if (peso > piorSeveridadeNum) {
                 piorSeveridadeNum = peso;
                 severidadeFinal = (statusEncontradoLinha === 'DOWN') ? 'CRITICAL' : (statusEncontradoLinha === 'UP' ? 'OK' : statusEncontradoLinha);
+                severidadeFinal = (statusEncontradoLinha === 'DOWN') ? 'CRITICO' : (statusEncontradoLinha === 'UP' ? 'OK' : statusEncontradoLinha);
             }
         }
 
