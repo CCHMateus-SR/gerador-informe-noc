@@ -211,7 +211,10 @@
             </div>
             
             <div class="input-group" id="grupo-protocolo-libbs" style="display: none;">
-                <label style="color: #4338CA;">Protocolo Libbs (E-mail)</label>
+                <div class="label-flex">
+                    <label style="color: #4338CA;">Protocolo Libbs (E-mail)</label>
+                    <button type="button" class="btn-action" onclick="vincularRegistroITSSM()" title="Vincular a este chamado no banco de dados" style="color: #059669; font-weight: bold; font-size: 10px;">🔗 Vincular</button>
+                </div>
                 <input type="text" id="protocolo-libbs" placeholder="Ex: REQ0012345..." oninput="update()">
             </div>
             <div class="input-group">
