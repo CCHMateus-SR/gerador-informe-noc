@@ -265,7 +265,13 @@ function renderizarListaLateral() {
             else if (isOntem) textoGrupo = `Ontem / ${dataFormatada}`;
 
             if (textoGrupo !== dataAtualAgrupamento) {
-                html += `<div style="color: #FFFFFF; font-size: 13px; font-weight: 800; margin: 18px 0 8px 4px; letter-spacing: 0.5px;">${textoGrupo}</div>`;
+                html += `
+                <div style="display: flex; align-items: center; gap: 10px; margin: 28px 0 16px 0;">
+                    <div style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.3); border-left: 4px solid var(--its-blue); color: var(--its-text); padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        📅 ${textoGrupo}
+                    </div>
+                    <div style="flex: 1; height: 1px; background: rgba(148, 163, 184, 0.3);"></div>
+                </div>`;
                 dataAtualAgrupamento = textoGrupo;
             }
         }
@@ -274,12 +280,20 @@ function renderizarListaLateral() {
             const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
             const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
             
+            // --- NOVO VISUAL "EM ANÁLISE" (COMPACTO E COM SUPORTE TOTAL AO DARK MODE) ---
             html += `
-            <div class="my-card card-aviso">
-                <div class="my-card-header"><span style="font-size: 10px; font-weight: 800; color: #1D4ED8;">👀 EM ANÁLISE</span><span style="font-size: 9px; color: #1D4ED8; font-weight: bold; background: #BFDBFE; padding: 2px 6px; border-radius: 4px;">👤 ${log.nome}</span></div>
-                <div class="my-card-host" style="cursor: pointer;" title="Clique para copiar o Serviço" onclick="copiarTextoInline(event, '${srvAviso}')">🔖 ${log.servico}</div>
-                <div class="my-card-service" style="font-size: 11px; margin-top: 4px; color: #475569; cursor: pointer;" title="Clique para copiar o Host" onclick="copiarTextoInline(event, '${hstAviso}')">🖥️ ${log.host}</div>
-                <div class="my-card-bottom"><span class="my-card-time">🕒 ${log.hora}</span></div>
+            <div class="my-card" style="border-left: 4px solid #0EA5E9; padding: 10px 14px; margin-bottom: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 10px; font-weight: 900; color: #0EA5E9; text-transform: uppercase; letter-spacing: 0.5px;">👀 EM ANÁLISE</span>
+                    <span style="font-size: 9px; font-weight: 800; opacity: 0.5;">🕒 ${log.hora}</span>
+                </div>
+                <div style="font-size: 12px; line-height: 1.5; padding-top: 2px;">
+                    <span style="font-weight: 800; color: #0EA5E9;">👤 ${log.nome}</span> 
+                    <span style="font-weight: 600; font-size: 11px; opacity: 0.5;">pegou:</span> 
+                    <strong style="cursor: pointer; margin-left: 2px; font-size: 13px;" onclick="copiarTextoInline(event, '${hstAviso}')" title="Copiar Host">${log.host}</strong> 
+                    <span style="opacity: 0.2; margin: 0 4px;">|</span> 
+                    <span style="font-weight: 600; cursor: pointer; font-size: 11px; opacity: 0.7;" onclick="copiarTextoInline(event, '${srvAviso}')" title="Copiar Serviço">${log.servico}</span>
+                </div>
             </div>`;
             return;
         }
@@ -339,66 +353,54 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     const dados = log.form;
 
     window.trocarModo(dados.modo || 'link');
-    document.getElementById('cliente').value = dados.cliente || ''; document.getElementById('host').value = dados.host || '';
-    document.getElementById('item').value = dados.item || ''; document.getElementById('severidade').value = dados.severidade || 'WARNING';
-    document.getElementById('statusinfo').value = dados.statusinfo || ''; document.getElementById('pressplay').value = dados.pressplay || ''; 
+    document.getElementById('cliente').value = dados.cliente || ''; 
+    document.getElementById('host').value = dados.host || '';
+    document.getElementById('item').value = dados.item || ''; 
+    document.getElementById('severidade').value = dados.severidade || 'WARNING';
+    document.getElementById('statusinfo').value = dados.statusinfo || ''; 
+    document.getElementById('pressplay').value = dados.pressplay || ''; 
     document.getElementById('status').value = dados.status || 'EM ABERTO'; 
     document.getElementById('protocolo').value = dados.protocolo || '';
     
-    // --- MÁGICA: HERANÇA COM BARREIRA DE CICLO DE VIDA (ITSSM + LIBBS) ---
+    // --- MÁGICA 1: HORA ATUAL AUTOMÁTICA NO FOLLOW-UP ---
+    const agora = new Date();
+    const horaAtualFormatada = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    document.getElementById('f-grid').value = horaAtualFormatada;
+    // ----------------------------------------------------
+
+    // Herança inteligente de ITSSM e Libbs (Mantendo a regra de ciclo de vida que fizemos antes)
     let itssmHerdado = dados.itssm || '';
     let libbsHerdado = dados.protocoloLibbs || '';
-
     if (!itssmHerdado || !libbsHerdado) {
         const hostAlvo = (dados.host || '').toUpperCase().trim();
         const itemAlvo = (dados.item || '').toUpperCase().trim();
-        
-        // Lê do mais recente para o mais antigo
         for (let i = chamadosDoTurno.length - 1; i >= 0; i--) {
             const c = chamadosDoTurno[i];
             if (c.form) {
                 const logHost = (c.form.host || '').toUpperCase().trim();
                 const logItem = (c.form.item || '').toUpperCase().trim();
-                
                 if (logHost === hostAlvo && logItem === itemAlvo) {
-                    // Puxa o ITSSM se ainda estiver vazio
-                    if (!itssmHerdado && c.form.itssm) {
-                        itssmHerdado = c.form.itssm;
-                    }
-                    
-                    // Puxa o Protocolo Libbs se ainda estiver vazio
-                    if (!libbsHerdado && c.form.protocoloLibbs) {
-                        libbsHerdado = c.form.protocoloLibbs;
-                    }
-
-                    // Se já achou os dois, não precisa mais voltar no tempo
-                    if (itssmHerdado && libbsHerdado) {
-                        break;
-                    }
-
-                    // BARREIRA: Se bateu num chamado resolvido do passado, para de procurar!
-                    if (c.form.status === 'RESOLVIDO') {
-                        break;
-                    }
+                    if (!itssmHerdado && c.form.itssm) itssmHerdado = c.form.itssm;
+                    if (!libbsHerdado && c.form.protocoloLibbs) libbsHerdado = c.form.protocoloLibbs;
+                    if (itssmHerdado && libbsHerdado) break;
+                    if (c.form.status === 'RESOLVIDO') break;
                 }
             }
         }
     }
-    
     document.getElementById('itssm').value = itssmHerdado;
-    
-    // Aplica o Protocolo Libbs herdado
-    const elProtLibbs = document.getElementById('protocolo-libbs');
-    if(elProtLibbs) elProtLibbs.value = libbsHerdado;
-    // ---------------------------------------------------------------------
-    
-    document.getElementById('inicio').value = dados.inicio || ''; document.getElementById('f-grid').value = dados.fgrid || '';
-    document.getElementById('termino').value = dados.termino || ''; document.getElementById('desc').value = dados.desc || '';
-    document.getElementById('solucionador').value = dados.solucionador || ''; document.getElementById('obs').value = dados.obs || '';
+    if (document.getElementById('protocolo-libbs')) document.getElementById('protocolo-libbs').value = libbsHerdado;
+
+    document.getElementById('inicio').value = dados.inicio || ''; 
+    document.getElementById('termino').value = dados.termino || ''; 
+    document.getElementById('desc').value = dados.desc || '';
+    document.getElementById('solucionador').value = dados.solucionador || ''; 
+    document.getElementById('obs').value = dados.obs || '';
     document.getElementById('evidencias').checked = dados.evidencias || false; 
+    
     ultimaAssinaturaGerada = ''; 
     window.update();
-    mostrarToast("✅ Formulário preenchido com sucesso!");
+    mostrarToast("✅ Dados carregados e horário de Follow-Up atualizado!");
 }
 
 function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
@@ -809,11 +811,15 @@ function registrarHistoricoNuvem(assunto) {
 }
 
 // ------------------------------------------
-// MÁGICA: VÍNCULO SILENCIOSO DO ITSSM (HERANÇA)
+// MÁGICA: VÍNCULO SILENCIOSO DO ITSSM E LIBBS (HERANÇA)
 // ------------------------------------------
 window.vincularRegistroITSSM = function() {
     const itssm = document.getElementById('itssm').value.trim();
-    if (!itssm) { mostrarToast("⚠️ Digite o número do ITSSM primeiro!", "warning"); return; }
+    const elProtLibbs = document.getElementById('protocolo-libbs');
+    const libbs = elProtLibbs ? elProtLibbs.value.trim() : '';
+
+    // Agora o botão aceita salvar SÓ o ITSSM, SÓ o Libbs, ou OS DOIS ao mesmo tempo.
+    if (!itssm && !libbs) { mostrarToast("⚠️ Digite o número do ITSSM ou Protocolo Libbs primeiro!", "warning"); return; }
     
     const hostAtual = document.getElementById('host').value.toUpperCase().trim();
     const itemAtual = document.getElementById('item').value.toUpperCase().trim();
@@ -843,10 +849,14 @@ window.vincularRegistroITSSM = function() {
                     const logItem = (data.form.item || '').toUpperCase().trim();
                     
                     if (logHost === hostAtual && logItem === itemAtual) {
-                        updates[`${log.key}/form/itssm`] = itssm;
+                        
+                        // Vincula o que estiver preenchido na tela do analista
+                        if (itssm) updates[`${log.key}/form/itssm`] = itssm;
+                        if (libbs) updates[`${log.key}/form/protocoloLibbs`] = libbs;
+                        
                         encontrou = true;
                         
-                        // BARREIRA: Bateu num Resolvido? Para de espalhar o ITSSM para o passado!
+                        // BARREIRA: Bateu num Resolvido? Para de espalhar para o passado!
                         if (data.form.status === 'RESOLVIDO') {
                             break;
                         }
@@ -856,10 +866,10 @@ window.vincularRegistroITSSM = function() {
             
             if (encontrou) {
                 db.ref('historico_noc').update(updates).then(() => {
-                    mostrarToast("🔗 Número ITSSM vinculado ao ciclo atual deste chamado!", "success");
+                    mostrarToast("🔗 Registros vinculados ao ciclo atual deste chamado!", "success");
                 });
             } else {
-                mostrarToast("⚠️ Gere o chamado (IMAGEM ou TEXTO) antes de tentar vincular o ITSSM.", "warning");
+                mostrarToast("⚠️ Gere o chamado (IMAGEM ou TEXTO) antes de tentar vincular.", "warning");
             }
         }
     });
@@ -874,22 +884,34 @@ function verificarDuplicidade() {
     const host = document.getElementById('host').value.toUpperCase().trim(); 
     const itemRaw = document.getElementById('item').value.trim(); 
     const item = formatarServicoInteligente(itemRaw);
-    
     const statusSelect = document.getElementById('status').value;
+    
     if (!cliente || !host) return true;
 
     let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
     const buscaStr = `${cliente} | ${host} | ${item}`; 
     
+    const AGORA_MS = Date.now();
+    const TRINTA_MINUTOS_MS = 30 * 60 * 1000; // Tempo de folga (30 min)
+
     for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
         let log = ultimosLogsFirebase[i];
         if (log.tipo === 'aviso_rapido') continue; 
         
+        // Se bater Cliente, Host, Serviço e a Ação (Ex: Follow Up)
         if(log.assunto && log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
-            if(currentUser && log.nome !== currentUser.nome) { 
-                return confirm(`⚠️ COLISÃO DETECTADA!\n\nO analista ${log.nome} (${log.turno}) já enviou um(a) ${acao} para este mesmo Cliente, Host e Serviço às ${log.hora}.\n\nTem certeza que deseja gerar um chamado duplicado?`); 
+            
+            // --- NOVA LÓGICA: SÓ AVISA SE FOR RECENTE (MENOS DE 30 MIN) ---
+            const tempoPassado = AGORA_MS - log.timestamp;
+            
+            if (tempoPassado < TRINTA_MINUTOS_MS) {
+                if(currentUser && log.nome !== currentUser.nome) { 
+                    return confirm(`⚠️ COLISÃO RECENTE!\n\nO analista ${log.nome} enviou um(a) ${acao} idêntico há apenas ${Math.round(tempoPassado/60000)} minutos.\n\nDeseja realmente gerar outro agora?`); 
+                }
+            } else {
+                // Se já passou de 30 minutos, o sistema ignora que é "duplicado" e deixa passar direto
+                continue; 
             }
-            return true;
         }
     }
     return true;
@@ -927,6 +949,9 @@ window.copyITSSM = function() {
     const vItem = document.getElementById('item').value.trim() || '---'; 
     const vItssm = document.getElementById('itssm').value.trim(); 
     
+    // --- AGORA ELE CAPTURA O PROTOCOLO DA OPERADORA ---
+    const vProtocolo = document.getElementById('protocolo').value.trim(); 
+    
     const elProtLibbs = document.getElementById('protocolo-libbs');
     const vProtLibbs = elProtLibbs ? elProtLibbs.value.trim() : '';
 
@@ -936,30 +961,46 @@ window.copyITSSM = function() {
     const vStatusInfo = document.getElementById('statusinfo').value.trim();
     
     let textoITSSM = `Cliente: ${vCliente}\nHost: ${vHost}\nItem Monitorado (Serviço): ${vItem}\n`;
+    
     if (vItssm) { textoITSSM += `Nº Registro ITSSM: ${vItssm}\n`; }
     
-    if (vProtLibbs && vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
-        textoITSSM += `Protocolo Libbs (E-mail): ${vProtLibbs}\n`;
-    }
-
+    // --- E INJETA NO TEXTO (SE ESTIVER PREENCHIDO) ---
+    if (vProtocolo) { textoITSSM += `Protocolo Operadora: ${vProtocolo}\n`; }
+    
     textoITSSM += `Início da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\n`;
     
     if (vStatusInfo) { textoITSSM += `\nDados Técnicos (Status Information do Centreon):\n${vStatusInfo}\n`; }
+    
     const vPressplay = document.getElementById('pressplay').value.trim();
     if (modoAtual === 'infra' && vPressplay) { textoITSSM += `\nRetorno / Logs do PressPlay:\n${vPressplay}\n`; }
     
     const vSolucionador = document.getElementById('solucionador').value.trim();
-    if (vSolucionador) { const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)'; textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`; }
+    if (vSolucionador) { 
+        const labelSoluc = modoAtual === 'infra' ? 'Solucionador (Equipe / TI Local)' : 'Solucionador (Operadora / Analista)'; 
+        textoITSSM += `\n${labelSoluc}: ${vSolucionador}\n`; 
+    }
     
     const vDesc = document.getElementById('desc').value.trim();
-    if (vDesc) { const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico'; textoITSSM += `\n${labelDesc}:\n${vDesc}\n`; }
+    if (vDesc) { 
+        const labelDesc = modoAtual === 'infra' ? 'Logs / Evidências Adicionais' : 'Ações / Diagnóstico'; 
+        textoITSSM += `\n${labelDesc}:\n${vDesc}\n`; 
+    }
     
     const vObs = document.getElementById('obs').value.trim(); 
     if (vObs) { textoITSSM += `\nObservação:\n${vObs}\n`; }
 
+    if (vProtLibbs && vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
+        textoITSSM += `\nProtocolo Libbs (E-mail): ${vProtLibbs}\n`;
+    }
+
     try { 
-        const tempTextarea = document.createElement("textarea"); tempTextarea.value = textoITSSM; document.body.appendChild(tempTextarea); 
-        tempTextarea.select(); document.execCommand("copy"); document.body.removeChild(tempTextarea); mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info"); 
+        const tempTextarea = document.createElement("textarea"); 
+        tempTextarea.value = textoITSSM; 
+        document.body.appendChild(tempTextarea); 
+        tempTextarea.select(); 
+        document.execCommand("copy"); 
+        document.body.removeChild(tempTextarea); 
+        mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info"); 
     } catch(e) {}
 }
 
@@ -1141,12 +1182,31 @@ window.processarExtratorMagico = function() {
         return; 
     }
 
+    // --- MÁGICA NOVA: LIMPEZA SILENCIOSA E BACKUP (REPLACE) ---
+    const elProtLibbs = document.getElementById('protocolo-libbs');
+    backupFormulario = {
+        cliente: document.getElementById('cliente').value, host: document.getElementById('host').value, item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
+        statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, status: document.getElementById('status').value,
+        protocolo: document.getElementById('protocolo').value, itssm: document.getElementById('itssm').value, 
+        protocoloLibbs: elProtLibbs ? elProtLibbs.value : '', 
+        inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+        solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, desc: document.getElementById('desc').value, evidencias: document.getElementById('evidencias').checked
+    };
+    
+    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    camposParaLimpar.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    if (elProtLibbs) elProtLibbs.value = '';
+    document.getElementById('status').value = 'EM ABERTO'; 
+    document.getElementById('severidade').value = 'WARNING'; 
+    document.getElementById('evidencias').checked = false;
+    // ----------------------------------------------------------
+
     let linhas = raw.split('\n').filter(l => l.trim() !== '');
     if (linhas.length === 0) return;
 
     let servicos = [];
     let rawStatusInfos = []; 
-    let hostDetectado = "";
+    let hostsDetectados = []; 
 
     let prioridadeSeveridade = { "CRITICAL": 4, "DOWN": 4, "WARNING": 3, "UNKNOWN": 2, "OK": 1, "UP": 1 };
     let piorSeveridadeNum = 0;
@@ -1182,11 +1242,14 @@ window.processarExtratorMagico = function() {
         });
     });
 
+    let hostMemoria = ""; 
+
     linhasColunas.forEach((cols, i) => {
         if (cols.length === 0) return;
 
         let servicoStr = "";
         let statusStr = cols[cols.length - 1];
+        let hostDestaLinha = hostMemoria;
 
         if (cols.length >= 2) {
             let offset = 0;
@@ -1202,7 +1265,11 @@ window.processarExtratorMagico = function() {
                 if (isItem1Status) {
                     servicoStr = item0; 
                 } else {
-                    if (!hostDetectado) hostDetectado = item0; 
+                    if (item0 && !hostsDetectados.includes(item0)) {
+                        hostsDetectados.push(item0); 
+                    }
+                    hostMemoria = item0;
+                    hostDestaLinha = item0;
                     servicoStr = item1;
                 }
             } else {
@@ -1219,15 +1286,31 @@ window.processarExtratorMagico = function() {
         }
 
         if (servicoStr && !servicos.includes(servicoStr)) { servicos.push(servicoStr); }
-        if (statusStr) { rawStatusInfos.push({ servico: servicoStr, status: statusStr }); }
+        
+        if (statusStr) { 
+            rawStatusInfos.push({ host: hostDestaLinha, servico: servicoStr, status: statusStr }); 
+        }
 
-        let matchStatusSev = statusStr.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)/i);
-        if (matchStatusSev) {
-            let statusEncontrado = matchStatusSev[1].toUpperCase();
-            let peso = prioridadeSeveridade[statusEncontrado] || 0;
+        let statusEncontradoLinha = "";
+        
+        for (let c of cols) {
+            let cUp = c.trim().toUpperCase();
+            if (/^(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)$/.test(cUp)) {
+                statusEncontradoLinha = cUp;
+                break;
+            }
+        }
+        
+        if (!statusEncontradoLinha) {
+            let matchLog = statusStr.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN)/i);
+            if (matchLog) statusEncontradoLinha = matchLog[1].toUpperCase();
+        }
+
+        if (statusEncontradoLinha) {
+            let peso = prioridadeSeveridade[statusEncontradoLinha] || 0;
             if (peso > piorSeveridadeNum) {
                 piorSeveridadeNum = peso;
-                severidadeFinal = (statusEncontrado === 'DOWN') ? 'CRITICAL' : (statusEncontrado === 'UP' ? 'OK' : statusEncontrado);
+                severidadeFinal = (statusEncontradoLinha === 'DOWN') ? 'CRITICAL' : (statusEncontradoLinha === 'UP' ? 'OK' : statusEncontradoLinha);
             }
         }
 
@@ -1241,10 +1324,10 @@ window.processarExtratorMagico = function() {
     });
 
     let clienteDetectado = "";
-    if (hostDetectado) {
-        let hostUpper = hostDetectado.toUpperCase();
+    if (hostsDetectados.length > 0) {
+        let hostPrincipal = hostsDetectados[0].toUpperCase();
 
-        if (hostUpper.startsWith('ITS-BKP-VEEAM') && servicos.length > 0) {
+        if (hostPrincipal.startsWith('ITS-BKP-VEEAM') && servicos.length > 0) {
             const primeiroServico = servicos[0].toUpperCase();
             const partes = primeiroServico.split('-');
             if (partes.length > 1) {
@@ -1264,21 +1347,27 @@ window.processarExtratorMagico = function() {
         if (!clienteDetectado) {
             for (let modo in memoriaNOC) {
                 for (let cli in memoriaNOC[modo]) {
-                    if (memoriaNOC[modo][cli][hostDetectado]) { clienteDetectado = cli; break; }
+                    if (memoriaNOC[modo][cli][hostsDetectados[0]]) { clienteDetectado = cli; break; }
                 }
                 if (clienteDetectado) break;
             }
         }
 
         if (!clienteDetectado) {
-            if (hostUpper.includes('LIBBS')) clienteDetectado = 'LIBBS';
-            else if (hostUpper.includes('AMIGAO') || hostUpper.includes('CSD')) clienteDetectado = 'CSD (GRUPO AMIGÃO)';
-            else if (hostUpper.includes('AGIS')) clienteDetectado = 'GRUPO AGIS';
-            else if (hostUpper.includes('STAHL')) clienteDetectado = 'AGROSTAHL (STAHL)';
-            else if (hostUpper.includes('FURACAO')) clienteDetectado = 'FURACÃO';
+            if (hostPrincipal.includes('LIBBS')) clienteDetectado = 'LIBBS';
+            else if (hostPrincipal.includes('AMIGAO') || hostPrincipal.includes('CSD')) clienteDetectado = 'CSD (GRUPO AMIGÃO)';
+            else if (hostPrincipal.includes('AGIS')) clienteDetectado = 'GRUPO AGIS';
+            else if (hostPrincipal.includes('STAHL')) clienteDetectado = 'AGROSTAHL (STAHL)';
+            else if (hostPrincipal.includes('FURACAO')) clienteDetectado = 'FURACÃO';
+            
+            // --- REGRAS ESPECÍFICAS ADICIONADAS ---
+            else if (hostPrincipal.startsWith('TPG') || hostPrincipal.startsWith('TP-') || hostPrincipal.startsWith('TP_')) clienteDetectado = 'TERESA PEREZ';
+            else if (hostPrincipal.startsWith('ALBA')) clienteDetectado = 'HOTELARIA ALBA';
+            else if (hostPrincipal.startsWith('TNG')) clienteDetectado = 'TECNOGERA (TNG)';
+            
             else {
-                const prefixo = hostDetectado.split('-')[0].toUpperCase(); 
-                const prefixoUnder = hostDetectado.split('_')[0].toUpperCase();
+                const prefixo = hostPrincipal.split('-')[0].toUpperCase(); 
+                const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
                 const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
                 const clientesPossiveis = Object.keys(logosClientes || {});
                 let match = clientesPossiveis.find(c => c.startsWith(prefixoReal));
@@ -1287,35 +1376,45 @@ window.processarExtratorMagico = function() {
         }
     }
 
-    if (clienteDetectado && !document.getElementById('cliente').value) {
+    if (clienteDetectado) {
         document.getElementById('cliente').value = clienteDetectado;
     }
-    if (hostDetectado && !document.getElementById('host').value) {
-        document.getElementById('host').value = hostDetectado;
+    
+    if (hostsDetectados.length > 0) {
+        document.getElementById('host').value = hostsDetectados.join(' / ');
     }
+    
     if (servicos.length > 0) {
-        let itemAtual = document.getElementById('item').value;
-        let novoItem = itemAtual ? itemAtual + '\n' + servicos.join('\n') : servicos.join('\n');
+        let novoItem = servicos.join('\n');
         document.getElementById('item').value = novoItem;
         
         if (typeof window.detectarOperadoraOuGeral === 'function') {
             let opDetectada = window.detectarOperadoraOuGeral(novoItem);
-            if (opDetectada && !document.getElementById('solucionador').value) {
+            if (opDetectada) {
                 document.getElementById('solucionador').value = opDetectada;
             }
         }
     }
 
     if (rawStatusInfos.length > 0) {
-        let textoStatusFormatado = (rawStatusInfos.length === 1) 
-            ? rawStatusInfos[0].status 
-            : rawStatusInfos.map(info => `[${info.servico || 'Item'}]\n${info.status}`).join('\n\n');
-        let statusAtual = document.getElementById('statusinfo').value;
-        document.getElementById('statusinfo').value = statusAtual ? statusAtual + '\n\n' + textoStatusFormatado : textoStatusFormatado;
+        let textoStatusFormatado = "";
+        if (rawStatusInfos.length === 1) {
+            textoStatusFormatado = rawStatusInfos[0].status;
+        } else {
+            textoStatusFormatado = rawStatusInfos.map(info => {
+                let rotulo = info.servico || 'Item';
+                if (hostsDetectados.length > 1 && info.host) {
+                    rotulo = `${info.host} | ${rotulo}`;
+                }
+                return `[${rotulo}]\n${info.status}`;
+            }).join('\n\n');
+        }
+        document.getElementById('statusinfo').value = textoStatusFormatado;
     }
+    
     if (severidadeFinal) { document.getElementById('severidade').value = severidadeFinal; }
 
-    if (menorDuracaoMs !== Infinity && !document.getElementById('inicio').value) {
+    if (menorDuracaoMs !== Infinity) {
         let dataCalculada = new Date(Date.now() - menorDuracaoMs);
         const pt = `${dataCalculada.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'})} às ${dataCalculada.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
         document.getElementById('inicio').value = pt;
@@ -1323,129 +1422,7 @@ window.processarExtratorMagico = function() {
 
     document.getElementById('magic-paste-area').value = '';
     window.update();
-    mostrarToast("🪄 Inteligência Artificial aplicou os dados com sucesso!", "success");
+    
+    const toastMsg = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🪄 Dados aplicados! O chamado antigo foi limpo.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
+    mostrarToast(toastMsg, "info", 10000); 
 }
-
-// ==========================================
-// FUNÇÕES DE TRANSIÇÃO E RECUPERAÇÃO DE ABA
-// ==========================================
-window.trocarModo = function(novoModo) {
-    if (modoAtual === novoModo) return; 
-
-    let temDados = isFormularioSujo();
-
-    if (temDados) {
-        const confirma = confirm("⚠️ ATENÇÃO!\n\nVocê tem dados preenchidos no formulário.\nSe trocar de aba agora, todas as informações não salvas serão perdidas.\n\nDeseja realmente descartar este rascunho e trocar de aba?");
-        if (!confirma) return; 
-
-        // --- SALVAR SNAPSHOT ANTES DE LIMPAR ---
-        const elProtLibbs = document.getElementById('protocolo-libbs');
-        backupEstadoAba = {
-            cliente: document.getElementById('cliente').value,
-            host: document.getElementById('host').value,
-            item: document.getElementById('item').value,
-            severidade: document.getElementById('severidade').value,
-            statusinfo: document.getElementById('statusinfo').value,
-            pressplay: document.getElementById('pressplay').value,
-            status: document.getElementById('status').value,
-            protocolo: document.getElementById('protocolo').value,
-            itssm: document.getElementById('itssm').value,
-            protocoloLibbs: elProtLibbs ? elProtLibbs.value : '',
-            inicio: document.getElementById('inicio').value,
-            fgrid: document.getElementById('f-grid').value,
-            termino: document.getElementById('termino').value,
-            solucionador: document.getElementById('solucionador').value,
-            obs: document.getElementById('obs').value,
-            desc: document.getElementById('desc').value,
-            evidencias: document.getElementById('evidencias').checked,
-            modoAnterior: modoAtual
-        };
-    }
-
-    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'protocolo-libbs', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
-    camposParaLimpar.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = '';
-    });
-    
-    document.getElementById('status').value = 'EM ABERTO'; 
-    document.getElementById('severidade').value = 'WARNING'; 
-    document.getElementById('evidencias').checked = false;
-    document.getElementById('protocolo').classList.remove('shake-error');
-    ultimaAssinaturaGerada = '';
-
-    modoAtual = novoModo;
-    document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
-    document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
-    
-    document.getElementById('titulo-form').innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
-    document.getElementById('label-secao-1').innerHTML = modoAtual === 'link' ? "📍 1. Identificação do Alarme" : "📍 1. Identificação do Incidente";
-    document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
-    document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
-    
-    const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
-    const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
-    
-    document.getElementById('host').placeholder = placeholderHost;
-    document.getElementById('item').placeholder = placeholderItem;
-    
-    document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
-    document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex'; 
-    document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none'; 
-    document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
-    
-    renderizarListaLateral(); 
-    window.update();
-
-    if (temDados) {
-        const toastResgateAba = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🔄 Aba trocada. Rascunho salvo.</span><button onclick="recuperarDadosAba()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
-        mostrarToast(toastResgateAba, "warning", 10000);
-    }
-}
-
-window.recuperarDadosAba = function() {
-    if (!backupEstadoAba) return;
-
-    modoAtual = backupEstadoAba.modoAnterior;
-    document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
-    document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
-
-    document.getElementById('titulo-form').innerText = modoAtual === 'link' ? "Gestão de Link / Ping" : "Infraestrutura / Aplicações";
-    document.getElementById('label-secao-1').innerHTML = modoAtual === 'link' ? "📍 1. Identificação do Alarme" : "📍 1. Identificação do Incidente";
-    document.getElementById('label-host').innerText = modoAtual === 'link' ? "Host / Circuito" : "Host / Servidor";
-    document.getElementById('v-label-host').innerText = modoAtual === 'link' ? "Host" : "Host / Servidor";
-
-    const placeholderHost = modoAtual === 'link' ? "Ex: MATRIZ-FW-01, RTR-FILIAL-02..." : "Ex: SRV-APP-01, DB-PROD-01...";
-    const placeholderItem = modoAtual === 'link' ? "Ex: PING, BGP, LINK APEX 50MB, VPN..." : "Ex: CPU, Memory, Disk, Services-Auto, SQL...";
-
-    document.getElementById('host').placeholder = placeholderHost;
-    document.getElementById('item').placeholder = placeholderItem;
-
-    document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
-    document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex';
-    document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none';
-    document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
-
-    document.getElementById('cliente').value = backupEstadoAba.cliente;
-    document.getElementById('host').value = backupEstadoAba.host;
-    document.getElementById('item').value = backupEstadoAba.item;
-    document.getElementById('severidade').value = backupEstadoAba.severidade;
-    document.getElementById('statusinfo').value = backupEstadoAba.statusinfo;
-    document.getElementById('pressplay').value = backupEstadoAba.pressplay;
-    document.getElementById('status').value = backupEstadoAba.status;
-    document.getElementById('protocolo').value = backupEstadoAba.protocolo;
-    document.getElementById('itssm').value = backupEstadoAba.itssm;
-    if (document.getElementById('protocolo-libbs')) document.getElementById('protocolo-libbs').value = backupEstadoAba.protocoloLibbs;
-    document.getElementById('inicio').value = backupEstadoAba.inicio;
-    document.getElementById('f-grid').value = backupEstadoAba.fgrid;
-    document.getElementById('termino').value = backupEstadoAba.termino;
-    document.getElementById('solucionador').value = backupEstadoAba.solucionador;
-    document.getElementById('obs').value = backupEstadoAba.obs;
-    document.getElementById('desc').value = backupEstadoAba.desc;
-    document.getElementById('evidencias').checked = backupEstadoAba.evidencias;
-
-    backupEstadoAba = null; 
-    renderizarListaLateral();
-    window.update();
-    mostrarToast("✨ Aba e dados restaurados com sucesso!", "success");
-};
