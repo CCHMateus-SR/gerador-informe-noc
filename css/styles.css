@@ -371,13 +371,11 @@ body.pro-mode .meta-divider { background: #444; }
 :root {
     --modo-cor-principal: #E5003E; /* Vermelho ITS */
     --modo-cor-fundo: rgba(229, 0, 62, 0.08);
-    --watermark-icon: '🌐';
 }
 
 body.tema-infra {
     --modo-cor-principal: #0284C7; /* Azul Cloud */
     --modo-cor-fundo: rgba(2, 132, 199, 0.08);
-    --watermark-icon: '🖥️';
 }
 
 /* 1. Cores APENAS nos botões de Aba (Navegação) */
@@ -417,32 +415,6 @@ body.tema-infra {
     background-color: #1E293B !important; /* Escurece levemente no hover */
 }
 
-/* --- MARCA D'ÁGUA --- */
-#form-container {
-    position: relative;
-    z-index: 1;
-    clip-path: inset(0); /* Corta a imagem sem quebrar a barra fixa */
-}
-
-#form-container::before {
-    content: var(--watermark-icon);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 350px;
-    opacity: 0.02; 
-    z-index: -1;
-    pointer-events: none;
-    transition: all 0.5s ease;
-    filter: grayscale(100%);
-}
-
-.pro-mode #form-container::before,
-.dark-mode #form-container::before {
-    opacity: 0.04;
-}
-
 /* 4. COMPACTANDO E CAMUFLANDO O EXTRATOR MÁGICO */
 #magic-extractor-container {
     padding: 8px 12px !important; 
@@ -476,25 +448,39 @@ body.tema-infra {
     display: block;
     border-radius: 6px;
     transition: all 0.2s ease;
-    /* Estilo neutro genérico */
+    /* Estilo neutro genérico para o Modo Claro */
     background-color: transparent !important;
     border: 1px solid rgba(148, 163, 184, 0.4) !important;
     color: #64748B !important;
 }
 
-/* Aplica a paleta escura (translúcida com borda fina) no Modo Pro/Dark */
-.pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"],
+/* ======================================================== */
+/* Botão Translúcido apenas para o Modo Dark */
+/* ======================================================== */
 .dark-mode #magic-extractor-container button[onclick="processarExtratorMagico()"] {
     background-color: rgba(255, 255, 255, 0.03) !important; 
     border: 1px solid rgba(255, 255, 255, 0.08) !important; 
     color: #94A3B8 !important; 
 }
-
-/* Brilha levemente ao passar o mouse */
-.pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"]:hover,
 .dark-mode #magic-extractor-container button[onclick="processarExtratorMagico()"]:hover {
     background-color: rgba(255, 255, 255, 0.08) !important;
     color: #FFFFFF !important;
+}
+
+/* ======================================================== */
+/* Botão Atraente (Call to Action) para o Modo Pro */
+/* ======================================================== */
+.pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"] {
+    background-color: #2D8CEB !important; /* Azul Tech de Destaque */
+    border: 1px solid #1A6BBA !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+}
+.pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"]:hover {
+    background-color: #3AA0FF !important; /* Acende mais claro no hover */
+    border-color: #2D8CEB !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
 }
 
 /* ==========================================
