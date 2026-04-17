@@ -368,3 +368,171 @@
         flex-direction: column;
     }
 }
+
+/* ==========================================
+   MOTOR DE CORES CONTEXTUAIS (VERSÃO MINIMALISTA)
+   ========================================== */
+
+:root {
+    --modo-cor-principal: #E5003E; /* Vermelho ITS */
+    --modo-cor-fundo: rgba(229, 0, 62, 0.08);
+    --watermark-icon: '🌐';
+}
+
+body.tema-infra {
+    --modo-cor-principal: #0284C7; /* Azul Cloud */
+    --modo-cor-fundo: rgba(2, 132, 199, 0.08);
+    --watermark-icon: '🖥️';
+}
+
+/* 1. Cores APENAS nos botões de Aba (Navegação) */
+.mode-switch-container .mode-btn.active {
+    background-color: var(--modo-cor-principal) !important;
+    border-color: var(--modo-cor-principal) !important;
+    color: #FFFFFF !important;
+    transition: all 0.3s ease;
+}
+
+/* 2. Cores APENAS na barra de Assumir Análise (Contexto) */
+.quick-claim-bar {
+    border-left: 4px solid var(--modo-cor-principal) !important;
+    background-color: var(--modo-cor-fundo) !important;
+    transition: all 0.3s ease;
+}
+
+/* 3. BOTÃO PROCESSAR (NEUTRO E COMPACTO) */
+/* Aqui fazemos ele ficar menor e com cor de "ferramenta" */
+#magic-extractor-container button {
+    background-color: #334155 !important; /* Cinza Ardósia Neutro */
+    color: #F8FAFC !important;
+    width: auto !important; /* Deixa de ser largão/bloco */
+    min-width: 200px;
+    padding: 8px 20px !important; /* Mais fino */
+    font-size: 11px !important; /* Texto menor e mais técnico */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 10px auto !important; /* Centraliza ele no container */
+    display: block;
+    border-radius: 6px;
+    border: none;
+    transition: background 0.2s;
+}
+
+#magic-extractor-container button:hover {
+    background-color: #1E293B !important; /* Escurece levemente no hover */
+}
+
+/* --- MARCA D'ÁGUA --- */
+#form-container {
+    position: relative;
+    z-index: 1;
+    overflow: hidden; 
+}
+
+#form-container::before {
+    content: var(--watermark-icon);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 350px;
+    opacity: 0.02; 
+    z-index: -1;
+    pointer-events: none;
+    transition: all 0.5s ease;
+    filter: grayscale(100%);
+}
+
+.pro-mode #form-container::before,
+.dark-mode #form-container::before {
+    opacity: 0.04;
+}
+
+/* 4. COMPACTANDO E CAMUFLANDO O EXTRATOR MÁGICO */
+#magic-extractor-container {
+    padding: 8px 12px !important; 
+    margin-bottom: 12px !important; 
+}
+
+/* Deixa a borda do container quase invisível no Modo Pro/Dark */
+.pro-mode #magic-extractor-container,
+.dark-mode #magic-extractor-container {
+    border: 1px solid rgba(255, 255, 255, 0.03) !important; 
+    background-color: transparent !important; 
+}
+
+#magic-paste-area {
+    min-height: 40px !important; 
+    height: 40px !important;
+    padding: 6px 10px !important; 
+    margin-bottom: 6px !important; 
+    font-size: 10px !important; 
+}
+
+/* --- BOTÃO PROCESSAR (PALETA DO RODAPÉ) --- */
+#magic-extractor-container button[onclick="processarExtratorMagico()"] {
+    width: auto !important;
+    min-width: 200px;
+    padding: 8px 20px !important;
+    font-size: 10px !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 4px auto 2px auto !important;
+    display: block;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    /* Estilo neutro genérico */
+    background-color: transparent !important;
+    border: 1px solid rgba(148, 163, 184, 0.4) !important;
+    color: #64748B !important;
+}
+
+/* Aplica a paleta escura (translúcida com borda fina) no Modo Pro/Dark */
+.pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"],
+.dark-mode #magic-extractor-container button[onclick="processarExtratorMagico()"] {
+    background-color: rgba(255, 255, 255, 0.03) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.08) !important; 
+    color: #94A3B8 !important; 
+}
+
+/* Brilha levemente ao passar o mouse */
+.pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"]:hover,
+.dark-mode #magic-extractor-container button[onclick="processarExtratorMagico()"]:hover {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
+}
+
+/* ==========================================
+   5. SINCRONIZANDO O HISTÓRICO COM O TEMA
+   ========================================== */
+
+/* Abas MEUS / EQUIPE (Ativas) */
+#tab-meus.active, 
+#tab-equipe.active {
+    background-color: var(--modo-cor-principal) !important;
+    border-color: var(--modo-cor-principal) !important;
+    color: #FFFFFF !important;
+    transition: all 0.3s ease;
+}
+
+/* Filtros Rápidos / Chips (Ativos) */
+.chip.active {
+    background-color: var(--modo-cor-fundo) !important;
+    border-color: var(--modo-cor-principal) !important;
+    color: var(--modo-cor-principal) !important;
+    box-shadow: 0 0 8px var(--modo-cor-fundo) !important;
+    transition: all 0.3s ease;
+}
+
+/* Cor do texto da data no Histórico */
+.history-date-label {
+    color: #475569; /* Cor padrão para o modo claro */
+}
+
+/* Ajuste específico para os Modos Escuros (Pro e Dark) */
+.pro-mode .history-date-label,
+.dark-mode .history-date-label {
+    color: #FFFFFF !important; /* Branco Puro para legibilidade total */
+    background: rgba(0, 0, 0, 0.3) !important; /* Fundo mais fechado para dar contraste */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Sombra leve para "levantar" o texto */
+}
