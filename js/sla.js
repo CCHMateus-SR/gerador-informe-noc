@@ -80,7 +80,22 @@ export function iniciarMonitoramentoSLA() {
 }
 
 function dispararModalSLA(log, minutos, chave, alertaId) {
-    let tempoFormatado = `${Math.floor(minutos)} min`;
+    // --- LÓGICA DE CONVERSÃO DE TEMPO (HORAS E MINUTOS) ---
+    let totalMinutos = Math.floor(minutos);
+    let horas = Math.floor(totalMinutos / 60);
+    let minRestantes = totalMinutos % 60;
+    
+    let tempoFormatado = "";
+    if (horas > 0) {
+        let txtHora = horas === 1 ? "hora" : "horas";
+        let txtMin = minRestantes === 1 ? "minuto" : "minutos";
+        tempoFormatado = `${horas} ${txtHora} e ${minRestantes} ${txtMin}`;
+    } else {
+        let txtMin = totalMinutos === 1 ? "minuto" : "minutos";
+        tempoFormatado = `${totalMinutos} ${txtMin}`;
+    }
+    // -------------------------------------------------------
+
     let htmlMensagem = `
         <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center;">
             <div style="font-size: 16px; margin-bottom: 10px; color: var(--its-red); font-weight: 800;">⏰ ALERTA DE SLA DE LINK!</div>
