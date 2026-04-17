@@ -468,18 +468,20 @@ body.tema-infra {
 }
 
 /* ======================================================== */
-/* Botão Atraente (Call to Action) para o Modo Pro */
+/* Botão Atraente (Dinâmico) para o Modo Pro */
 /* ======================================================== */
 .pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"] {
-    background-color: #2D8CEB !important; /* Azul Tech de Destaque */
-    border: 1px solid #1A6BBA !important;
+    background-color: var(--modo-cor-principal) !important; /* Puxa o Vermelho ou Azul automaticamente */
+    border: 1px solid var(--modo-cor-principal) !important;
     color: #FFFFFF !important;
     font-weight: 800 !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
+    transition: all 0.2s ease !important;
 }
+
 .pro-mode #magic-extractor-container button[onclick="processarExtratorMagico()"]:hover {
-    background-color: #3AA0FF !important; /* Acende mais claro no hover */
-    border-color: #2D8CEB !important;
+    background-color: var(--modo-cor-principal) !important; 
+    filter: brightness(1.15) !important; /* Aumenta o brilho da cor atual em 15% no hover */
     box-shadow: 0 4px 8px rgba(0,0,0,0.4) !important;
 }
 
@@ -550,4 +552,16 @@ body.tema-infra {
 .pro-mode .action-footer {
     background: rgba(50, 50, 50, 0.95) !important; /* Combina perfeitamente com o fundo #323232 */
     border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ==========================================
+   7. MICROINTERAÇÃO DE CÓPIA (FEEDBACK TÁTIL)
+   ========================================== */
+.btn-copiado-sucesso {
+    background-color: #166534 !important; /* Verde Sucesso ITS */
+    color: #FFFFFF !important;
+    border-color: #166534 !important;
+    transform: scale(0.95) !important; /* Dá uma leve "afundada" no botão */
+    box-shadow: 0 0 15px rgba(22, 101, 52, 0.5) !important; /* Brilho verde */
+    transition: all 0.2s ease !important;
 }
