@@ -280,11 +280,11 @@ function renderizarListaLateral() {
             const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
             const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
             
-            // --- NOVO VISUAL "EM ANÁLISE" (NEUTRO, MAS COM O NOME DESTACADO) ---
+            // --- VISUAL "EM ANÁLISE" COM COR DE TEXTO INTELIGENTE (INHERIT) ---
             html += `
             <div class="my-card" style="border-left: 4px solid #000000; padding: 10px 14px; margin-bottom: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 10px; font-weight: 900; color: var(--its-text); text-transform: uppercase; letter-spacing: 0.5px;">👀 EM ANÁLISE</span>
+                    <span style="font-size: 10px; font-weight: 900; color: inherit; text-transform: uppercase; letter-spacing: 0.5px;">👀 EM ANÁLISE</span>
                     <span style="font-size: 9px; font-weight: 800; opacity: 0.5;">🕒 ${log.hora}</span>
                 </div>
                 <div style="font-size: 12px; line-height: 1.5; padding-top: 2px;">
