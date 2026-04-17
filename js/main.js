@@ -21,3 +21,22 @@ window.onload = () => {
         window.update(); // Renderiza o preview visual do lado direito
     }
 };
+
+// Função universal para dar o feedback visual (tátil) nos botões
+window.animarBotaoCopia = function(botaoId) {
+    const btn = document.getElementById(botaoId);
+    if (!btn) return;
+    
+    // Salva o que estava escrito no botão antes do clique
+    const textoOriginal = btn.innerHTML;
+    
+    // Aplica o visual de sucesso
+    btn.classList.add('btn-copiado-sucesso');
+    btn.innerHTML = '✔️ COPIADO!';
+    
+    // Programa para voltar ao normal exatamente após 2 segundos
+    setTimeout(() => {
+        btn.classList.remove('btn-copiado-sucesso');
+        btn.innerHTML = textoOriginal;
+    }, 2000);
+};
