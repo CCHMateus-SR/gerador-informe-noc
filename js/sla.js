@@ -126,6 +126,11 @@ function dispararModalManutencao(log, minutos, chave, alertaId) {
 }
 
 export function mostrarAlertaBloqueante(mensagemObj) {
+    // --- BARREIRA ANTI-FANTASMA ---
+    // Se a mensagem for apenas um clique de "Ciente" ou "Silenciar" na nuvem, ignora o pop-up!
+    if (mensagemObj.tipo === 'acao_sla') return;
+    // --------------------------------
+
     let htmlMensagem = '';
     let botoesHTML = `<button style="padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 800; font-size: 14px; text-transform: uppercase;" onclick="fecharAlertaBloqueante()">CIENTE 👍</button>`;
 
@@ -133,12 +138,11 @@ export function mostrarAlertaBloqueante(mensagemObj) {
         const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
         htmlMensagem = `
             <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; text-align: center;">
-                <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">👤 <strong>${mensagemObj.nome} (${mensagemObj.turno})</strong> assumiu:</div>
+                <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">👤 <strong>${mensagemObj.nome}</strong> assumiu:</div>
                 <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">👀 ${mensagemObj.servico}${hostText}</div>
             </div>`;
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'aviso' });
     } else {
-        const isInfra = mensagemObj.form && mensagemObj.form.modo === 'infra';
         const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
         htmlMensagem = `
             <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
