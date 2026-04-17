@@ -27,16 +27,25 @@ window.animarBotaoCopia = function(botaoId) {
     const btn = document.getElementById(botaoId);
     if (!btn) return;
     
-    // Salva o que estava escrito no botão antes do clique
-    const textoOriginal = btn.innerHTML;
-    
-    // Aplica o visual de sucesso
+    // 1. Limpa qualquer estado de "A GERAR..." ou travas anteriores
+    btn.classList.remove('btn-copiado-sucesso'); 
+
+    // 2. Define os nomes originais fixos para evitar que ele salve "A GERAR..." como nome original
+    const nomesOriginais = {
+        'btn-assunto': '✉️ ASSUNTO',
+        'btn-assunto-itssm': '✉️ ASSUNTO ITSSM',
+        'btn-copiar-img': '📸 COPIAR INFORME',
+        'btn-copiar-itssm': '📝 TEXTO ITSSM'
+    };
+
+    // 3. Aplica o visual de sucesso
     btn.classList.add('btn-copiado-sucesso');
     btn.innerHTML = '✔️ COPIADO!';
     
-    // Programa para voltar ao normal exatamente após 2 segundos
+    // 4. Reset forçado após 2 segundos
     setTimeout(() => {
         btn.classList.remove('btn-copiado-sucesso');
-        btn.innerHTML = textoOriginal;
+        // Devolve o nome correto baseado no ID, ignorando qualquer texto temporário
+        btn.innerHTML = nomesOriginais[botaoId] || btn.innerHTML;
     }, 2000);
 };
