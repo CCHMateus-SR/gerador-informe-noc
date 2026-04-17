@@ -267,7 +267,7 @@ function renderizarListaLateral() {
             if (textoGrupo !== dataAtualAgrupamento) {
                 html += `
                 <div style="display: flex; align-items: center; gap: 10px; margin: 28px 0 16px 0;">
-                    <div style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.3); border-left: 4px solid var(--its-blue); color: var(--its-text); padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div class="history-date-label" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.3); border-left: 4px solid var(--modo-cor-principal); padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease;">
                         📅 ${textoGrupo}
                     </div>
                     <div style="flex: 1; height: 1px; background: rgba(148, 163, 184, 0.3);"></div>
@@ -280,11 +280,11 @@ function renderizarListaLateral() {
             const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
             const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
             
-            // --- NOVO VISUAL "EM ANÁLISE" (COMPACTO E COM SUPORTE TOTAL AO DARK MODE) ---
+            // --- NOVO VISUAL "EM ANÁLISE" (NEUTRO, MAS COM O NOME DESTACADO) ---
             html += `
-            <div class="my-card" style="border-left: 4px solid #0EA5E9; padding: 10px 14px; margin-bottom: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
+            <div class="my-card" style="border-left: 4px solid #000000; padding: 10px 14px; margin-bottom: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 10px; font-weight: 900; color: #0EA5E9; text-transform: uppercase; letter-spacing: 0.5px;">👀 EM ANÁLISE</span>
+                    <span style="font-size: 10px; font-weight: 900; color: var(--its-text); text-transform: uppercase; letter-spacing: 0.5px;">👀 EM ANÁLISE</span>
                     <span style="font-size: 9px; font-weight: 800; opacity: 0.5;">🕒 ${log.hora}</span>
                 </div>
                 <div style="font-size: 12px; line-height: 1.5; padding-top: 2px;">
@@ -596,6 +596,12 @@ window.trocarModo = function(novoModo) {
     ultimaAssinaturaGerada = '';
 
     modoAtual = novoModo;
+    if (modoAtual === 'infra') {
+        document.body.classList.add('tema-infra');
+    } else {
+        document.body.classList.remove('tema-infra');
+    }
+
     document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
     document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
     
