@@ -948,8 +948,6 @@ window.copyITSSM = function() {
     const vHost = document.getElementById('host').value.toUpperCase().trim() || '---'; 
     const vItem = document.getElementById('item').value.trim() || '---'; 
     const vItssm = document.getElementById('itssm').value.trim(); 
-    
-    // --- AGORA ELE CAPTURA O PROTOCOLO DA OPERADORA ---
     const vProtocolo = document.getElementById('protocolo').value.trim(); 
     
     const elProtLibbs = document.getElementById('protocolo-libbs');
@@ -963,8 +961,6 @@ window.copyITSSM = function() {
     let textoITSSM = `Cliente: ${vCliente}\nHost: ${vHost}\nItem Monitorado (Serviço): ${vItem}\n`;
     
     if (vItssm) { textoITSSM += `Nº Registro ITSSM: ${vItssm}\n`; }
-    
-    // --- E INJETA NO TEXTO (SE ESTIVER PREENCHIDO) ---
     if (vProtocolo) { textoITSSM += `Protocolo Operadora: ${vProtocolo}\n`; }
     
     textoITSSM += `Início da ocorrência: ${vInicio}\nFollow-up da ocorrência: ${vFgrid}\nTérmino da ocorrência: ${vTermino}\n`;
@@ -989,7 +985,9 @@ window.copyITSSM = function() {
     const vObs = document.getElementById('obs').value.trim(); 
     if (vObs) { textoITSSM += `\nObservação:\n${vObs}\n`; }
 
-    if (vProtLibbs && vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
+    // --- MÁGICA PARA A LIBBS: APARECE SEMPRE ---
+    // Removemos a verificação "if(vProtLibbs)" para que a linha apareça mesmo vazia
+    if (vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
         textoITSSM += `\nProtocolo Libbs (E-mail): ${vProtLibbs}\n`;
     }
 
@@ -1182,7 +1180,6 @@ window.processarExtratorMagico = function() {
         return; 
     }
 
-    // --- MÁGICA NOVA: LIMPEZA SILENCIOSA E BACKUP (REPLACE) ---
     const elProtLibbs = document.getElementById('protocolo-libbs');
     backupFormulario = {
         cliente: document.getElementById('cliente').value, host: document.getElementById('host').value, item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
@@ -1199,7 +1196,6 @@ window.processarExtratorMagico = function() {
     document.getElementById('status').value = 'EM ABERTO'; 
     document.getElementById('severidade').value = 'WARNING'; 
     document.getElementById('evidencias').checked = false;
-    // ----------------------------------------------------------
 
     let linhas = raw.split('\n').filter(l => l.trim() !== '');
     if (linhas.length === 0) return;
@@ -1208,7 +1204,7 @@ window.processarExtratorMagico = function() {
     let rawStatusInfos = []; 
     let hostsDetectados = []; 
 
-    let prioridadeSeveridade = { "CRITICAL": 4, "DOWN": 4, "WARNING": 3, "UNKNOWN": 2, "OK": 1, "UP": 1 };
+    let prioridadeSeveridade = { "CRITICAL": 4, "WARNING": 3, "UNKNOWN": 2, "OK": 1 };
     let piorSeveridadeNum = 0;
     let severidadeFinal = "";
     let menorDuracaoMs = Infinity;
@@ -1244,6 +1240,10 @@ window.processarExtratorMagico = function() {
 
     let hostMemoria = ""; 
 
+    // --- DICIONÁRIO BILÍNGUE (Regex) ---
+    const regexStatus = /^(OK|CRITICAL|WARNING|UNKNOWN|UP|DOWN|PENDING|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)$/i;
+    const regexStatusLog = /(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)/i;
+
     linhasColunas.forEach((cols, i) => {
         if (cols.length === 0) return;
 
@@ -1261,7 +1261,7 @@ window.processarExtratorMagico = function() {
             let item1 = cols[offset + 1];
 
             if (item1) {
-                const isItem1Status = /^(OK|CRITICAL|CRITICO|WARNING|UNKNOWN|UP|DOWN|PENDING)$/i.test(item1.trim());
+                const isItem1Status = regexStatus.test(item1.trim());
                 if (isItem1Status) {
                     servicoStr = item0; 
                 } else {
@@ -1277,7 +1277,7 @@ window.processarExtratorMagico = function() {
             }
         } else if (cols.length === 1) {
             let linhaTexto = cols[0];
-            let matchStatusLinha = linhaTexto.match(/(CRITICAL|CRITICO|WARNING|OK|UNKNOWN|UP|DOWN)\s*-\s*(.*)/i);
+            let matchStatusLinha = linhaTexto.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)\s*-\s*(.*)/i);
             if (matchStatusLinha) {
                 statusStr = matchStatusLinha[0];
                 linhaTexto = linhaTexto.replace(matchStatusLinha[0], '').trim();
@@ -1295,23 +1295,29 @@ window.processarExtratorMagico = function() {
         
         for (let c of cols) {
             let cUp = c.trim().toUpperCase();
-            if (/^(CRITICAL|CRITICO|WARNING|OK|UNKNOWN|UP|DOWN)$/.test(cUp)) {
+            if (regexStatus.test(cUp)) {
                 statusEncontradoLinha = cUp;
                 break;
             }
         }
         
         if (!statusEncontradoLinha) {
-            let matchLog = statusStr.match(/(CRITICAL|CRITICO|WARNING|OK|UNKNOWN|UP|DOWN)/i);
+            let matchLog = statusStr.match(regexStatusLog);
             if (matchLog) statusEncontradoLinha = matchLog[1].toUpperCase();
         }
 
         if (statusEncontradoLinha) {
-            let peso = prioridadeSeveridade[statusEncontradoLinha] || 0;
+            // --- TRADUTOR INTERNO (PT-BR -> EN) ---
+            let statusNorm = statusEncontradoLinha.replace('Í', 'I');
+            if (statusNorm === 'CRITICO' || statusNorm === 'DOWN') statusNorm = 'CRITICAL';
+            else if (statusNorm === 'AVISO') statusNorm = 'WARNING';
+            else if (statusNorm === 'DESCONHECIDO') statusNorm = 'UNKNOWN';
+            else if (statusNorm === 'UP') statusNorm = 'OK';
+
+            let peso = prioridadeSeveridade[statusNorm] || 0;
             if (peso > piorSeveridadeNum) {
                 piorSeveridadeNum = peso;
-                severidadeFinal = (statusEncontradoLinha === 'DOWN') ? 'CRITICAL' : (statusEncontradoLinha === 'UP' ? 'OK' : statusEncontradoLinha);
-                severidadeFinal = (statusEncontradoLinha === 'DOWN') ? 'CRITICO' : (statusEncontradoLinha === 'UP' ? 'OK' : statusEncontradoLinha);
+                severidadeFinal = statusNorm;
             }
         }
 
@@ -1360,12 +1366,9 @@ window.processarExtratorMagico = function() {
             else if (hostPrincipal.includes('AGIS')) clienteDetectado = 'GRUPO AGIS';
             else if (hostPrincipal.includes('STAHL')) clienteDetectado = 'AGROSTAHL (STAHL)';
             else if (hostPrincipal.includes('FURACAO')) clienteDetectado = 'FURACÃO';
-            
-            // --- REGRAS ESPECÍFICAS ADICIONADAS ---
             else if (hostPrincipal.startsWith('TPG') || hostPrincipal.startsWith('TP-') || hostPrincipal.startsWith('TP_')) clienteDetectado = 'TERESA PEREZ';
             else if (hostPrincipal.startsWith('ALBA')) clienteDetectado = 'HOTELARIA ALBA';
             else if (hostPrincipal.startsWith('TNG')) clienteDetectado = 'TECNOGERA (TNG)';
-            
             else {
                 const prefixo = hostPrincipal.split('-')[0].toUpperCase(); 
                 const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
@@ -1377,23 +1380,16 @@ window.processarExtratorMagico = function() {
         }
     }
 
-    if (clienteDetectado) {
-        document.getElementById('cliente').value = clienteDetectado;
-    }
+    if (clienteDetectado) { document.getElementById('cliente').value = clienteDetectado; }
     
-    if (hostsDetectados.length > 0) {
-        document.getElementById('host').value = hostsDetectados.join(' / ');
-    }
+    if (hostsDetectados.length > 0) { document.getElementById('host').value = hostsDetectados.join(' / '); }
     
     if (servicos.length > 0) {
         let novoItem = servicos.join('\n');
         document.getElementById('item').value = novoItem;
-        
         if (typeof window.detectarOperadoraOuGeral === 'function') {
             let opDetectada = window.detectarOperadoraOuGeral(novoItem);
-            if (opDetectada) {
-                document.getElementById('solucionador').value = opDetectada;
-            }
+            if (opDetectada) document.getElementById('solucionador').value = opDetectada;
         }
     }
 
@@ -1404,9 +1400,7 @@ window.processarExtratorMagico = function() {
         } else {
             textoStatusFormatado = rawStatusInfos.map(info => {
                 let rotulo = info.servico || 'Item';
-                if (hostsDetectados.length > 1 && info.host) {
-                    rotulo = `${info.host} | ${rotulo}`;
-                }
+                if (hostsDetectados.length > 1 && info.host) { rotulo = `${info.host} | ${rotulo}`; }
                 return `[${rotulo}]\n${info.status}`;
             }).join('\n\n');
         }
