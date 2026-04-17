@@ -65,7 +65,7 @@ export function iniciarMonitoramentoSLA() {
                 }
 
                 // --- 2. NOVO MOTOR DE 4 EM 4 HORAS (SLA OPERADORA) ---
-                let ciclo4h = Math.floor(diffMinutos / 240); // 240 min = 4h
+                let ciclo4h = Math.floor(diffMinutos / 1); // Teste de 1 min
                 if (ciclo4h >= 1) {
                     let manutId = `${chave}-manutencao-${ciclo4h}`;
                     if (!ciclosCientes.has(manutId) && !chamadosAlertadosSLA.has(manutId)) {
