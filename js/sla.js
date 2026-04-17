@@ -1,37 +1,18 @@
 // ==========================================
-// MÓDULO DE MONITORAMENTO E SLA
+// MÓDULO DE MONITORAMENTO E SLA (NUVEM)
 // ==========================================
+import { db } from './firebase-config.js'; // Conectando o SLA ao Firebase
 import { currentUser } from './auth.js';
 import { startTabBlink, stopTabBlink, tocarSom, mostrarToast } from './ui.js';
-import { chamadosDoTurno } from './dispatch.js'; // Puxa os chamados do motor principal
+import { chamadosDoTurno } from './dispatch.js'; 
 
 let chamadosAlertadosSLA = new Set(); 
-let chamadosSilenciadosSLA = new Set();
 let filaDeAlertas = [];
 let modalAberto = false;
 
 export function carregarEstadoSLA() {
-    try {
-        const salvo = localStorage.getItem('noc_sla_state');
-        if (salvo) {
-            const estado = JSON.parse(salvo);
-            if (estado.data === new Date().toDateString()) {
-                chamadosAlertadosSLA = new Set(estado.alertados || []);
-                chamadosSilenciadosSLA = new Set(estado.silenciados || []);
-            } else {
-                localStorage.removeItem('noc_sla_state');
-            }
-        }
-    } catch(e) { console.error("Erro ao carregar estado do SLA.", e); }
-}
-
-function salvarEstadoSLA() {
-    const estadoSLA = {
-        alertados: Array.from(chamadosAlertadosSLA),
-        silenciados: Array.from(chamadosSilenciadosSLA),
-        data: new Date().toDateString()
-    };
-    localStorage.setItem('noc_sla_state', JSON.stringify(estadoSLA));
+    // Limpa o lixo antigo da memória local, pois agora somos 100% nuvem!
+    try { localStorage.removeItem('noc_sla_state'); } catch(e) {}
 }
 
 export function iniciarMonitoramentoSLA() {
@@ -39,40 +20,66 @@ export function iniciarMonitoramentoSLA() {
         if (!currentUser || chamadosDoTurno.length === 0) return;
         const agora = Date.now();
         let estadoRecente = {};
-        
+        let ciclosCientes = new Set(); 
+        let ultimosSilenciamentos = {};
+
         chamadosDoTurno.forEach(log => {
-            if (log.nome === currentUser.nome && log.form) {
+            // 1. CORREÇÃO DO BUG FANTASMA: Lemos o status de QUALQUER analista da equipe!
+            if (log.form) {
                 let chave = `${log.form.cliente}-${log.form.host}`;
                 if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
                     estadoRecente[chave] = log;
                 }
             }
+            
+            // 2. Lemos as ações de SLA direto da Nuvem (Firebase)
+            if (log.tipo === 'acao_sla') {
+                if (log.acao === 'ciente') ciclosCientes.add(log.alertaId);
+                if (log.acao === 'silenciar_host') {
+                    if (!ultimosSilenciamentos[log.chave] || log.timestamp > ultimosSilenciamentos[log.chave]) {
+                        ultimosSilenciamentos[log.chave] = log.timestamp;
+                    }
+                }
+            }
         });
 
         for (let chave in estadoRecente) {
-            if (chamadosSilenciadosSLA.has(chave)) continue;
             let log = estadoRecente[chave];
+            
+            // Ignora infraestrutura
             if (log.form.modo === 'infra') continue; 
             
-            let acao = log.assunto.split(' | ')[5] || '';
+            let acao = log.assunto ? log.assunto.split(' | ')[5] || '' : '';
+            let status = log.form.status || '';
+
+            // BARREIRA DO RESOLVIDO GLOBAL: Se o último status for RESOLVIDO, para de alertar!
+            if (status === 'RESOLVIDO' || acao.includes('ENCERRAMENTO')) continue;
+
+            // BARREIRA DO SILENCIAR INTELIGENTE: Se foi silenciado APÓS a última atualização, fica quieto.
+            // Mas se alguém lançar um Follow-Up novo, o relógio volta a contar!
+            if (ultimosSilenciamentos[chave] && ultimosSilenciamentos[chave] > log.timestamp) {
+                continue; 
+            }
+
             if (acao.includes('ABERTURA') || acao.includes('FOLLOW UP')) {
                 let diffMinutos = (agora - log.timestamp) / (1000 * 60);
                 let cicloAtual = Math.floor(diffMinutos / 30); 
                 
                 if (cicloAtual >= 1) {
                     let alertaId = `${chave}-ciclo-${cicloAtual}`;
-                    if (!chamadosAlertadosSLA.has(alertaId)) {
-                        dispararModalSLA(log, diffMinutos, chave);
-                        chamadosAlertadosSLA.add(alertaId);
-                        salvarEstadoSLA(); 
+                    
+                    // Se ninguém deu ciente na NUVEM e não tá na memória local, dispara!
+                    if (!ciclosCientes.has(alertaId) && !chamadosAlertadosSLA.has(alertaId)) {
+                        dispararModalSLA(log, diffMinutos, chave, alertaId);
+                        chamadosAlertadosSLA.add(alertaId); // Marca local pra não repetir o pop-up na mesma hora
                     }
                 }
             }
         }
-    }, 60000);
+    }, 60000); // Roda a cada 60 segundos
 }
 
-function dispararModalSLA(log, minutos, chave) {
+function dispararModalSLA(log, minutos, chave, alertaId) {
     let tempoFormatado = `${Math.floor(minutos)} min`;
     let htmlMensagem = `
         <div style="background: #FEF2F2; border-left: 4px solid var(--its-red); padding: 15px; border-radius: 8px; text-align: center;">
@@ -86,7 +93,7 @@ function dispararModalSLA(log, minutos, chave) {
     let botoesHTML = `
         <div style="display: flex; gap: 10px; margin-top: 20px;">
             <button onclick="silenciarSLA('${chave}')" style="flex: 1; padding: 14px; background: white; color: var(--its-red); border: 2px solid var(--its-red); border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.2s;">🔕 SILENCIAR HOST</button>
-            <button onclick="fecharAlertaBloqueante()" style="flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s;">CIENTE 👍</button>
+            <button onclick="cienteSLA('${alertaId}')" style="flex: 1; padding: 14px; background: var(--its-red); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s;">CIENTE 👍</button>
         </div>
     `;
     filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'sla' });
@@ -136,5 +143,34 @@ function exibirProximoAlerta() {
     document.getElementById('modal-alerta').style.display = 'flex';
 }
 
-window.fecharAlertaBloqueante = function() { filaDeAlertas.shift(); exibirProximoAlerta(); }
-window.silenciarSLA = function(chave) { chamadosSilenciadosSLA.add(chave); salvarEstadoSLA(); fecharAlertaBloqueante(); mostrarToast("🔕 Alertas silenciados.", "info"); }
+window.fecharAlertaBloqueante = function() { 
+    filaDeAlertas.shift(); 
+    exibirProximoAlerta(); 
+}
+
+// ==========================================
+// AÇÕES NA NUVEM (Sincroniza toda a equipe)
+// ==========================================
+
+window.cienteSLA = function(alertaId) {
+    db.ref('historico_noc').push({
+        tipo: 'acao_sla',
+        alertaId: alertaId,
+        nome: currentUser.nome,
+        acao: 'ciente',
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    });
+    fecharAlertaBloqueante();
+}
+
+window.silenciarSLA = function(chave) { 
+    db.ref('historico_noc').push({
+        tipo: 'acao_sla',
+        chave: chave,
+        nome: currentUser.nome,
+        acao: 'silenciar_host',
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    });
+    fecharAlertaBloqueante(); 
+    mostrarToast("🔕 Host silenciado na nuvem para toda a equipe.", "info"); 
+}
