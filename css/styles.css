@@ -554,8 +554,14 @@ body.tema-infra {
 }
 
 /* Efeito Vidro Fosco elegante para o Modo Pro / Dark */
-.pro-mode .action-footer,
+/* Efeito Vidro Fosco para o Modo Dark (Azul Noturno) */
 .dark-mode .action-footer {
-    background: rgba(30, 41, 59, 0.92) !important; /* Grafite translúcido */
+    background: rgba(30, 41, 59, 0.95) !important; 
+    border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Efeito Vidro Fosco para o Modo Pro (Cinza Neutro e Clean) */
+.pro-mode .action-footer {
+    background: rgba(50, 50, 50, 0.95) !important; /* Combina perfeitamente com o fundo #323232 */
     border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
 }
