@@ -369,13 +369,16 @@ body.pro-mode .meta-divider { background: #444; }
    ========================================== */
 
 :root {
-    --modo-cor-principal: #E5003E; /* Vermelho ITS */
-    --modo-cor-fundo: rgba(229, 0, 62, 0.08);
+    /* Novo Vermelho (Idêntico ao do Informe/Logo ITS) */
+    --modo-cor-principal: #DC2626; 
+    --modo-cor-fundo: rgba(220, 38, 38, 0.08); 
+    --watermark-icon: '🌐';
 }
 
 body.tema-infra {
-    --modo-cor-principal: #0284C7; /* Azul Cloud */
+    --modo-cor-principal: #0284C7; /* Azul Cloud (Mantido) */
     --modo-cor-fundo: rgba(2, 132, 199, 0.08);
+    --watermark-icon: '🖥️';
 }
 
 /* 1. Cores APENAS nos botões de Aba (Navegação) */
@@ -525,10 +528,14 @@ body.tema-infra {
    ========================================== */
 .action-footer {
     position: sticky !important;
-    bottom: -1px !important; /* Prega no fundo da tela */
-    z-index: 100 !important; /* Mantém sempre por cima do formulário */
+    bottom: -1px !important; 
+    z-index: 100 !important; 
     
-    /* Respiros para os botões não ficarem espremidos */
+    /* --- RECUPERANDO A ORGANIZAÇÃO E O ESPAÇO --- */
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important; /* O respiro entre a linha de cima e a de baixo */
+    
     padding: 15px 0 15px 0 !important; 
     margin-bottom: 0 !important;
     
@@ -536,8 +543,6 @@ body.tema-infra {
     background: rgba(255, 255, 255, 0.90) !important; 
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
-    
-    /* Linha sutil separando a barra do resto da tela */
     border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
 
