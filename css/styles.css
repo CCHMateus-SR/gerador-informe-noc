@@ -369,9 +369,9 @@ body.pro-mode .meta-divider { background: #444; }
    ========================================== */
 
 :root {
-    /* Novo Vermelho (Idêntico ao do Informe/Logo ITS) */
-    --modo-cor-principal: #DC2626; 
-    --modo-cor-fundo: rgba(220, 38, 38, 0.08); 
+    /* Novo Vermelho Sóbrio (Corporate Dark Red - #B91C1C) */
+    --modo-cor-principal: #B91C1C; 
+    --modo-cor-fundo: rgba(185, 28, 28, 0.08); /* RGB exato do B91C1C para o fundo translúcido */
     --watermark-icon: '🌐';
 }
 
