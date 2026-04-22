@@ -148,12 +148,12 @@
             
             <button type="button" onclick="processarExtratorMagico()" style="width: 100%; background: #2563EB; color: #FFFFFF; border: none; padding: 10px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);" onmouseover="this.style.background='#1D4ED8'" onmouseout="this.style.background='#2563EB'">⚡ Processar e Preencher</button>
         </div>
-        <div class="section-title" onclick="toggleSecao('secao-1', 'icon-1')">
+
+        <div class="section-title sanfona-header" onclick="toggleSanfona('secao-1', this.querySelector('.sanfona-seta'))">
             <span id="label-secao-1" style="display: flex; align-items: center; gap: 8px;">📍 1. Identificação do Alarme</span>
-            <span id="icon-1" style="transition: transform 0.3s; font-size: 12px;">▼</span>
+            <span class="sanfona-seta">▼</span>
         </div>
-        <div class="form-grid" id="secao-1">
-            
+        <div class="form-grid sanfona-conteudo" id="secao-1">
             <div class="input-group">
                 <label>Cliente</label>
                 <input type="text" id="cliente" list="lista-clientes" placeholder="Ex: Libbs" oninput="update()" onclick="abrirDatalist(this)">
@@ -193,11 +193,11 @@
             </div>
         </div>
 
-        <div class="section-title" onclick="toggleSecao('secao-2', 'icon-2')">
+        <div class="section-title sanfona-header" onclick="toggleSanfona('secao-2', this.querySelector('.sanfona-seta'))">
             <span style="display: flex; align-items: center; gap: 8px;">⏱️ 2. SLA e Acompanhamento</span>
-            <span id="icon-2" style="transition: transform 0.3s; font-size: 12px;">▼</span>
+            <span class="sanfona-seta">▼</span>
         </div>
-        <div class="form-grid" id="secao-2">
+        <div class="form-grid sanfona-conteudo" id="secao-2">
             <div class="input-group"><label>Status Atual</label><select id="status" onchange="mudarStatus()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
             
             <div class="input-group" id="grupo-protocolo"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
@@ -254,11 +254,11 @@
             </div>
         </div>
 
-        <div class="section-title" onclick="toggleSecao('secao-3', 'icon-3')">
+        <div class="section-title sanfona-header" onclick="toggleSanfona('secao-3', this.querySelector('.sanfona-seta'))">
             <span style="display: flex; align-items: center; gap: 8px;">🛠️ 3. Tratativa e Diagnóstico</span>
-            <span id="icon-3" style="transition: transform 0.3s; font-size: 12px;">▼</span>
+            <span class="sanfona-seta">▼</span>
         </div>
-        <div class="form-grid" id="secao-3" style="margin-bottom: 10px;">
+        <div class="form-grid sanfona-conteudo" id="secao-3" style="margin-bottom: 10px;">
             <div class="input-group" id="grupo-solucionador"><label id="label-solucionador">Solucionador (Operadora / Analista)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()" onclick="abrirDatalist(this)"></div>
             
             <div class="input-group" id="grupo-obs"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
@@ -313,32 +313,32 @@
                         
                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                             <tr>
-                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-item', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div></td>
                                 <td width="8%"></td>
-                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800;">---</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-host', this)">📋</button><div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800;">---</div></td>
                             </tr>
                             <tr height="15"><td></td></tr>
                             <tr>
-                                 <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 13px; color: #334155; font-weight: 500;">---</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-inicio', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Início Ocorrência</div><div id="v-inicio" style="font-size: 13px; color: #334155; font-weight: 500;">---</div></td>
                                 <td></td>
-                                <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 13px; color: #334155; font-weight: 500;">-</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-f-grid', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Follow-Up</div><div id="v-f-grid" style="font-size: 13px; color: #334155; font-weight: 500;">-</div></td>
                             </tr>
                             <tr height="15"><td></td></tr>
                             <tbody id="v-dynamic-grid"></tbody>
                         </table>
 
                         <div id="statusinfo-container" style="display: none; margin-top: 20px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#1E1E1E" style="padding: 15px; border-radius: 8px; border: 1px solid #333333; border-left: 4px solid #38BDF8;"><div style="font-size: 10px; color: #858585; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">>_ DADOS TÉCNICOS (CENTREON)</div><div id="v-statusinfo" style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #38BDF8; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#1E1E1E" class="box-cirurgica" style="padding: 15px; border-radius: 8px; border: 1px solid #333333; border-left: 4px solid #38BDF8;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-statusinfo', this)">📋</button><div style="font-size: 10px; color: #858585; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">>_ DADOS TÉCNICOS (CENTREON)</div><div id="v-statusinfo" style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #38BDF8; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
                         <div id="pressplay-container" style="display: none; margin-top: 20px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#1E1E1E" style="padding: 15px; border-radius: 8px; border: 1px solid #333333; border-left: 4px solid #22C55E;"><div style="font-size: 10px; color: #858585; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">>_ RETORNO PRESSPLAY</div><div id="v-pressplay" style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #22C55E; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#1E1E1E" class="box-cirurgica" style="padding: 15px; border-radius: 8px; border: 1px solid #333333; border-left: 4px solid #22C55E;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-pressplay', this)">📋</button><div style="font-size: 10px; color: #858585; font-family: 'Segoe UI', sans-serif; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.05em;">>_ RETORNO PRESSPLAY</div><div id="v-pressplay" style="font-family: Consolas, 'Courier New', monospace; font-size: 12px; color: #22C55E; word-break: break-all; line-height: 1.5;">---</div></td></tr></table>
                         </div>
 
-                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 14px; color: #334155; font-weight: 700; border-radius: 0 8px 8px 0;"><span id="v-termino">-</span></td></tr></table>
+                        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-termino" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;">Previsão de Normalização (SLA)</td></tr><tr height="8"><td></td></tr><tr><td bgcolor="#F8FAFC" class="box-cirurgica" style="padding: 15px; border-left: 4px solid #DC2626; font-size: 14px; color: #334155; font-weight: 700; border-radius: 0 8px 8px 0;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-termino', this)">📋</button><span id="v-termino">-</span></td></tr></table>
                         
                         <div id="detalhamento-container">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-desc" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 14px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 25px;"><tr><td id="v-titulo-desc" style="color: #002D5B; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 8px;">Detalhamento</td></tr><tr><td bgcolor="#F8FAFC" class="box-cirurgica" style="padding: 15px; border-left: 4px solid #002D5B; border-radius: 0 8px 8px 0; font-size: 14px; color: #1E293B; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-desc', this)">📋</button><div id="v-desc" style="word-wrap: break-word; overflow-wrap: break-word;">Aguardando atualização técnica...</div></td></tr></table>
                         </div>
 
                         <div id="evidencias-container" style="display: none; margin-top: 25px;">
@@ -346,7 +346,7 @@
                         </div>
 
                         <div id="obs-container" style="display: none; margin-top: 25px;">
-                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#FFFBEB" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 13px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;"><strong>Nota Adicional:</strong> <span id="v-obs"></span></td></tr></table>
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td bgcolor="#FFFBEB" class="box-cirurgica" style="padding: 15px; border: 1px dashed #FCD34D; border-radius: 8px; font-size: 13px; color: #92400E; font-style: italic; line-height: 1.5; word-wrap: break-word; overflow-wrap: break-word;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-obs', this)">📋</button><strong>Nota Adicional:</strong> <span id="v-obs"></span></td></tr></table>
                         </div>
                     </td>
                 </tr>
