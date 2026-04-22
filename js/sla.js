@@ -3,7 +3,7 @@
 // ==========================================
 import { db } from './firebase-config.js';
 import { currentUser } from './auth.js';
-import { startTabBlink, stopTabBlink, tocarSom, mostrarToast } from './ui.js';
+import { startTabBlink, stopTabBlink, mostrarToast } from './ui.js';
 import { chamadosDoTurno } from './dispatch.js'; 
 
 let chamadosAlertadosSLA = new Set(); 
@@ -142,6 +142,10 @@ export function mostrarAlertaBloqueante(mensagemObj) {
                 <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">👀 ${mensagemObj.servico}${hostText}</div>
             </div>`;
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'aviso' });
+   
+    // TOCA O SOM SUAVE DE AVISO
+        window.tocarSomNOC('aviso'); 
+
     } else {
         const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
         htmlMensagem = `
@@ -150,6 +154,9 @@ export function mostrarAlertaBloqueante(mensagemObj) {
                 <div style="font-family: Consolas, monospace; font-size: 11px; color: #0369A1; text-align: center;">${mensagemObj.assunto}</div>
             </div>`;
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: isCritical ? 'critical' : 'default' });
+        
+        // TOCA O BEEP DE ALERTA PARA CHAMADO NOVO
+        window.tocarSomNOC('alerta'); 
     }
     
     startTabBlink('🚨 ALERTA NOC!');
@@ -165,7 +172,6 @@ function exibirProximoAlerta() {
     let proximo = filaDeAlertas[0];
     document.getElementById('texto-alerta').innerHTML = proximo.html;
     document.getElementById('botoes-alerta').innerHTML = proximo.botoes;
-    tocarSom(proximo.tipo);
     document.getElementById('modal-alerta').style.display = 'flex';
 }
 
