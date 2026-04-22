@@ -91,34 +91,35 @@ window.fecharHistorico = function() {
 // FUNÇÕES EXPORTADAS (Usadas pelos outros arquivos JS)
 // ==========================================
 
-export function mostrarToast(mensagem, tipo = 'success', duracao = null) {
-    const container = document.getElementById('toast-container');
-    if(!container) return;
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    
-    // Configura o visual e garante que avisos com botão sejam clicáveis
-    if (tipo === 'info') {
-        toast.style.background = '#3B82F6'; 
-        toast.style.boxShadow = '0 10px 25px rgba(59, 130, 246, 0.3)';
-        toast.style.pointerEvents = 'auto'; 
-    } else if (tipo === 'warning') {
-        toast.classList.add('toast-warning');
-        toast.style.pointerEvents = 'auto';
-    } else {
-        toast.style.pointerEvents = 'none'; // Success não bloqueia clique
+export function mostrarToast(mensagem, tipo = 'info', tempo = 3000) {
+    // 1. Procura ou cria o container na tela
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        document.body.appendChild(container);
     }
+
+    // 2. Cria a notificação
+    const toast = document.createElement('div');
+    toast.className = `toast-premium toast-${tipo}`;
     
-    toast.innerHTML = mensagem;
+    // 3. Injeta a mensagem e a barrinha de tempo (que usa o tempo passado na função!)
+    toast.innerHTML = `
+        <div style="position: relative; z-index: 2;">${mensagem}</div>
+        <div class="toast-progress" style="animation-duration: ${tempo}ms;"></div>
+    `;
+
+    // 4. Joga na tela
     container.appendChild(toast);
-    
-    // MÁGICA DO TEMPO: 10 segundos (10000ms) para info/warning, 3 segundos para success
-    let time = duracao || (tipo === 'success' ? 3000 : 10000);
-    
+
+    // 5. Programa a autodestruição exata quando a barrinha zerar
     setTimeout(() => {
-        toast.style.opacity = '0'; toast.style.transform = 'translateX(-100%)';
-        setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 400);
-    }, time);
+        toast.classList.add('hide'); // Inicia a animação de sumir
+        setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+        }, 400); // Espera o slide de saída terminar para apagar do HTML
+    }, tempo);
 }
 
 // Penduramos no window também, porque alguns botões no HTML chamam o toast diretamente
@@ -138,31 +139,6 @@ export function stopTabBlink() {
     clearInterval(blinkInterval);
     isBlinking = false;
     document.title = originalTitle;
-}
-
-export function tocarSom(tipo) {
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const gainNode = audioCtx.createGain();
-        gainNode.connect(audioCtx.destination);
-
-        if (tipo === 'aviso') {
-            const osc1 = audioCtx.createOscillator(); osc1.type = 'sine'; osc1.frequency.setValueAtTime(880, audioCtx.currentTime); osc1.connect(gainNode);
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc1.start(audioCtx.currentTime); osc1.stop(audioCtx.currentTime + 0.1);
-            const osc2 = audioCtx.createOscillator(); osc2.type = 'sine'; osc2.frequency.setValueAtTime(1108.73, audioCtx.currentTime + 0.15); osc2.connect(gainNode);
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime + 0.15); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-            osc2.start(audioCtx.currentTime + 0.15); osc2.stop(audioCtx.currentTime + 0.4);
-        } else if (tipo === 'sla') {
-            const osc = audioCtx.createOscillator(); osc.type = 'square'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); osc.frequency.setValueAtTime(0, audioCtx.currentTime + 0.15); osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.25);
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-        } else if (tipo === 'critical') {
-            const osc = audioCtx.createOscillator(); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.4); osc.frequency.linearRampToValueAtTime(400, audioCtx.currentTime + 0.8);
-            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.7); gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.8);
-        }
-    } catch(e) {}
 }
 
 // ==========================================
