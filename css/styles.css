@@ -570,3 +570,219 @@ body.tema-infra {
     box-shadow: 0 0 15px rgba(22, 101, 52, 0.5) !important; /* Brilho verde */
     transition: all 0.2s ease !important;
 }
+
+/* ==========================================
+   8. BARRA DE ROLAGEM CUSTOMIZADA (SCROLLBAR)
+   ========================================== */
+/* Define a largura fininha e o fundo transparente */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent; 
+}
+
+/* Cor da "alavanca" no Modo Claro */
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1; 
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8; 
+}
+
+/* Cor da "alavanca" nos Modos Dark e Pro (Camuflada e elegante) */
+body.dark-mode ::-webkit-scrollbar-thumb,
+body.pro-mode ::-webkit-scrollbar-thumb {
+    background: #475569; 
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover,
+body.pro-mode ::-webkit-scrollbar-thumb:hover {
+    background: #64748B; 
+}
+
+/* ==========================================
+   9. MOLDURA DO PREVIEW (SOMBRA DINÂMICA)
+   ========================================== */
+/* Aumentando a sombra e o "flutuar" da folha branca no modo padrão */
+#render {
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+    transition: box-shadow 0.3s ease !important;
+}
+
+/* Sombra mais densa e espalhada para os Modos Noturnos (Dark/Pro) */
+body.dark-mode #render,
+body.pro-mode #render {
+    box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05) !important;
+}
+
+/* ==========================================
+   10. CABEÇALHOS PEGAJOSOS NO HISTÓRICO (STICKY DATES)
+   ========================================== */
+.history-date-label {
+    position: sticky !important;
+    top: -5px !important; /* Gruda quase no topo do painel */
+    z-index: 10 !important; /* Mantém sempre por cima dos cards de chamado */
+    
+    /* Efeito de Vidro Fosco para o Modo Claro */
+    background: rgba(248, 250, 252, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    
+    /* Preenchimento extra para a etiqueta não ficar espremida ao grudar */
+    padding: 8px 10px !important;
+    margin: 10px -5px 10px -5px !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important;
+}
+
+/* Ajuste do Vidro Fosco e Sombra para o Modo Dark */
+body.dark-mode .history-date-label {
+    background: rgba(30, 41, 59, 0.85) !important; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+}
+
+/* Ajuste do Vidro Fosco e Sombra para o Modo Pro */
+body.pro-mode .history-date-label {
+    background: rgba(50, 50, 50, 0.9) !important; /* Mesma cor do fundo do painel Pro */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3) !important;
+}
+
+/* ==========================================
+   11. TOASTS PREMIUM (NOTIFICAÇÕES MODERNAS)
+   ========================================== */
+#toast-container {
+    position: fixed !important;
+    bottom: 25px !important;
+    right: 25px !important;
+    z-index: 99999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    pointer-events: none; /* Deixa o mouse clicar nas coisas atrás se o toast não tiver botão */
+}
+
+.toast-premium {
+    min-width: 300px;
+    max-width: 420px;
+    /* Efeito Vidro Fosco Dark */
+    background: rgba(15, 23, 42, 0.85) !important; 
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    
+    color: #F8FAFC !important;
+    padding: 16px 20px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    position: relative;
+    overflow: hidden; /* Corta a barrinha de progresso certinho nas bordas arredondadas */
+    pointer-events: auto; /* Permite clicar no botão de desfazer */
+    
+    /* Animação de entrada suave */
+    animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.toast-premium.hide {
+    /* Animação de saída */
+    animation: fadeOutRight 0.4s ease forwards;
+}
+
+/* --- A BARRINHA DE PROGRESSO ANIMADA --- */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    transform-origin: left;
+    animation: progressShrink linear forwards;
+}
+
+/* Cores das barrinhas baseadas no tipo de aviso */
+.toast-success .toast-progress { background: #10B981 !important; } /* Verde */
+.toast-warning .toast-progress { background: #F59E0B !important; } /* Laranja */
+.toast-error .toast-progress   { background: #EF4444 !important; } /* Vermelho */
+.toast-info .toast-progress    { background: #3B82F6 !important; } /* Azul */
+
+@keyframes slideInRight {
+    from { transform: translateX(120%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(120%); opacity: 0; }
+}
+
+@keyframes progressShrink {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* ==========================================
+   12. CÓPIA CIRÚRGICA (MICRO-BOTÕES NO PREVIEW)
+   ========================================== */
+.box-cirurgica { position: relative !important; }
+
+.btn-micro-copy {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #CBD5E1;
+    color: #475569;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0; /* Invisível por padrão */
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    z-index: 10;
+}
+
+/* O botão aparece magicamente ao passar o mouse na caixa! */
+.box-cirurgica:hover .btn-micro-copy { opacity: 1; }
+.btn-micro-copy:hover { background: #E2E8F0; color: #0F172A; }
+
+/* ==========================================
+   13. FORMULÁRIO SANFONA (ACCORDION)
+   ========================================== */
+.sanfona-header {
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.2s;
+}
+.sanfona-header:hover { opacity: 0.7; }
+
+/* Animação da setinha girando */
+.sanfona-seta {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 12px;
+    margin-left: 10px;
+}
+.sanfona-seta.fechada { transform: rotate(-90deg); }
+
+/* Esconde e mostra o conteúdo de forma fluida */
+.sanfona-conteudo {
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
+    max-height: 2000px; /* Altura máxima permitida para a animação funcionar */
+    opacity: 1;
+}
+.sanfona-conteudo.fechada {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border: none !important;
+}
