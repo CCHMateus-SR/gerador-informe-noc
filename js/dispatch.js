@@ -264,14 +264,9 @@ function renderizarListaLateral() {
             if (isHoje) textoGrupo = "HOJE / ATUAL";
             else if (isOntem) textoGrupo = `Ontem / ${dataFormatada}`;
 
+            // --- CORREÇÃO: DIV DA DATA LIVRE DE FLEXBOX PARA O STICKY FUNCIONAR ---
             if (textoGrupo !== dataAtualAgrupamento) {
-                html += `
-                <div style="display: flex; align-items: center; gap: 10px; margin: 28px 0 16px 0;">
-                    <div class="history-date-label" style="background: rgba(148, 163, 184, 0.15); border: 1px solid rgba(148, 163, 184, 0.3); border-left: 4px solid var(--modo-cor-principal); padding: 8px 14px; border-radius: 6px; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s ease;">
-                        📅 ${textoGrupo}
-                    </div>
-                    <div style="flex: 1; height: 1px; background: rgba(148, 163, 184, 0.3);"></div>
-                </div>`;
+                html += `<div class="history-date-label" style="border-left: 4px solid var(--modo-cor-principal); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;">📅 ${textoGrupo}</div>`;
                 dataAtualAgrupamento = textoGrupo;
             }
         }
@@ -280,7 +275,6 @@ function renderizarListaLateral() {
             const srvAviso = log.servico ? log.servico.replace(/'/g, "\\'") : '';
             const hstAviso = log.host ? log.host.replace(/'/g, "\\'") : 'Não informado';
             
-            // --- VISUAL "EM ANÁLISE" COM COR DE TEXTO INTELIGENTE (INHERIT) ---
             html += `
             <div class="my-card" style="border-left: 4px solid #000000; padding: 10px 14px; margin-bottom: 12px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -307,7 +301,6 @@ function renderizarListaLateral() {
         const hstSafe = hostLimpo.replace(/'/g, "\\'");
         const srvSafe = servicoResumido.replace(/'/g, "\\'");
 
-        // --- MÁGICA: BADGE DO ITSSM COPIÁVEL E ISOLADO ---
         let badgeItssmHTML = '';
         if (log.form && log.form.itssm) {
             const itssmSafe = log.form.itssm.replace(/'/g, "\\'");
@@ -362,13 +355,10 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     document.getElementById('status').value = dados.status || 'EM ABERTO'; 
     document.getElementById('protocolo').value = dados.protocolo || '';
     
-    // --- MÁGICA 1: HORA ATUAL AUTOMÁTICA NO FOLLOW-UP ---
     const agora = new Date();
     const horaAtualFormatada = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
     document.getElementById('f-grid').value = horaAtualFormatada;
-    // ----------------------------------------------------
 
-    // Herança inteligente de ITSSM e Libbs (Mantendo a regra de ciclo de vida que fizemos antes)
     let itssmHerdado = dados.itssm || '';
     let libbsHerdado = dados.protocoloLibbs || '';
     if (!itssmHerdado || !libbsHerdado) {
@@ -436,7 +426,6 @@ window.update = function() {
     if (avisoCrossTab && vItem !== '') { divAviso.innerText = avisoCrossTab; divAviso.style.display = 'block'; } 
     else { if (divAviso) divAviso.style.display = 'none'; }
     
-    // --- LÓGICA DO CAMPO FANTASMA (PROTOCOLO LIBBS) ---
     const grupoLibbs = document.getElementById('grupo-protocolo-libbs');
     if (grupoLibbs) {
         if (vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
@@ -445,7 +434,6 @@ window.update = function() {
             grupoLibbs.style.display = 'none';
         }
     }
-    // --------------------------------------------------
 
     const vInicio = document.getElementById('inicio').value || '---'; 
     const vProtocolo = document.getElementById('protocolo').value || '---'; 
@@ -526,7 +514,7 @@ window.update = function() {
     let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${corSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
     
     if (modoAtual === 'link') {
-        dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="15"><td></td></tr><tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
+        dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vProtocolo}', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="15"><td></td></tr><tr><td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vSolucionador}', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
     } else {
         dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
     }
@@ -559,7 +547,6 @@ window.trocarModo = function(novoModo) {
         const confirma = confirm("⚠️ ATENÇÃO!\n\nVocê tem dados preenchidos no formulário.\nSe trocar de aba agora, todas as informações não salvas serão perdidas.\n\nDeseja realmente descartar este rascunho e trocar de aba?");
         if (!confirma) return; 
 
-        // --- MÁGICA: SALVAR SNAPSHOT ANTES DE LIMPAR ---
         const elProtLibbs = document.getElementById('protocolo-libbs');
         backupEstadoAba = {
             cliente: document.getElementById('cliente').value,
@@ -624,6 +611,19 @@ window.trocarModo = function(novoModo) {
     renderizarListaLateral(); 
     window.update();
 
+    // ... (código de trocar labels, placeholders e display dos grupos) ...
+    
+    document.getElementById('grupo-protocolo').style.display = modoAtual === 'link' ? 'flex' : 'none';
+    document.getElementById('grupo-pressplay').style.display = modoAtual === 'link' ? 'none' : 'flex'; 
+    document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none'; 
+    document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
+    
+    renderizarListaLateral(); 
+    window.update();
+
+    // --- MÁGICA: REABRIR AS SANFONAS AO TROCAR DE ABA ---
+    if(window.resetarSanfona) window.resetarSanfona();
+
     // Mostra o Toast com botão de Desfazer se havia dados
     if (temDados) {
         const toastResgateAba = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🔄 Aba trocada. Rascunho salvo.</span><button onclick="recuperarDadosAba()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
@@ -631,13 +631,9 @@ window.trocarModo = function(novoModo) {
     }
 }
 
-// ==========================================
-// FUNÇÃO NOVA: RESTAURAR ABA (UNDO)
-// ==========================================
 window.recuperarDadosAba = function() {
     if (!backupEstadoAba) return;
 
-    // 1. Volta para a aba correta
     modoAtual = backupEstadoAba.modoAnterior;
     document.getElementById('btn-modo-link').classList.toggle('active', modoAtual === 'link');
     document.getElementById('btn-modo-infra').classList.toggle('active', modoAtual === 'infra');
@@ -658,7 +654,6 @@ window.recuperarDadosAba = function() {
     document.getElementById('grupo-solucionador').style.display = modoAtual === 'link' ? 'flex' : 'none';
     document.getElementById('macro-template').style.display = modoAtual === 'link' ? 'inline-block' : 'none';
 
-    // 2. Devolve todos os valores
     document.getElementById('cliente').value = backupEstadoAba.cliente;
     document.getElementById('host').value = backupEstadoAba.host;
     document.getElementById('item').value = backupEstadoAba.item;
@@ -682,7 +677,6 @@ window.recuperarDadosAba = function() {
     window.update();
     mostrarToast("✨ Aba e dados restaurados com sucesso!", "success");
 };
-
 
 window.mudarStatus = function() { 
     const status = document.getElementById('status').value; const d = new Date(); 
@@ -797,7 +791,6 @@ function obterAssuntoGerado() {
 function registrarHistoricoNuvem(assunto) {
     if(!currentUser) return;
     
-    // Captura o protocolo Libbs (se existir)
     const elProtLibbs = document.getElementById('protocolo-libbs');
     const valorProtLibbs = elProtLibbs ? elProtLibbs.value : '';
 
@@ -816,15 +809,11 @@ function registrarHistoricoNuvem(assunto) {
     });
 }
 
-// ------------------------------------------
-// MÁGICA: VÍNCULO SILENCIOSO DO ITSSM E LIBBS (HERANÇA)
-// ------------------------------------------
 window.vincularRegistroITSSM = function() {
     const itssm = document.getElementById('itssm').value.trim();
     const elProtLibbs = document.getElementById('protocolo-libbs');
     const libbs = elProtLibbs ? elProtLibbs.value.trim() : '';
 
-    // Agora o botão aceita salvar SÓ o ITSSM, SÓ o Libbs, ou OS DOIS ao mesmo tempo.
     if (!itssm && !libbs) { mostrarToast("⚠️ Digite o número do ITSSM ou Protocolo Libbs primeiro!", "warning"); return; }
     
     const hostAtual = document.getElementById('host').value.toUpperCase().trim();
@@ -842,10 +831,8 @@ window.vincularRegistroITSSM = function() {
                 logsArr.push({ key: child.key, data: child.val() });
             });
             
-            // Ordena os chamados do mais novo para o mais antigo
             logsArr.sort((a, b) => b.data.timestamp - a.data.timestamp);
             
-            // Varre o banco procurando chamados do mesmo ciclo
             for (let i = 0; i < logsArr.length; i++) {
                 const log = logsArr[i];
                 const data = log.data;
@@ -855,17 +842,10 @@ window.vincularRegistroITSSM = function() {
                     const logItem = (data.form.item || '').toUpperCase().trim();
                     
                     if (logHost === hostAtual && logItem === itemAtual) {
-                        
-                        // Vincula o que estiver preenchido na tela do analista
                         if (itssm) updates[`${log.key}/form/itssm`] = itssm;
                         if (libbs) updates[`${log.key}/form/protocoloLibbs`] = libbs;
-                        
                         encontrou = true;
-                        
-                        // BARREIRA: Bateu num Resolvido? Para de espalhar para o passado!
-                        if (data.form.status === 'RESOLVIDO') {
-                            break;
-                        }
+                        if (data.form.status === 'RESOLVIDO') { break; }
                     }
                 }
             }
@@ -898,24 +878,19 @@ function verificarDuplicidade() {
     const buscaStr = `${cliente} | ${host} | ${item}`; 
     
     const AGORA_MS = Date.now();
-    const TRINTA_MINUTOS_MS = 30 * 60 * 1000; // Tempo de folga (30 min)
+    const TRINTA_MINUTOS_MS = 30 * 60 * 1000;
 
     for(let i = ultimosLogsFirebase.length - 1; i >= 0; i--) {
         let log = ultimosLogsFirebase[i];
         if (log.tipo === 'aviso_rapido') continue; 
         
-        // Se bater Cliente, Host, Serviço e a Ação (Ex: Follow Up)
         if(log.assunto && log.assunto.includes(buscaStr) && log.assunto.includes(acao)) {
-            
-            // --- NOVA LÓGICA: SÓ AVISA SE FOR RECENTE (MENOS DE 30 MIN) ---
             const tempoPassado = AGORA_MS - log.timestamp;
-            
             if (tempoPassado < TRINTA_MINUTOS_MS) {
                 if(currentUser && log.nome !== currentUser.nome) { 
                     return confirm(`⚠️ COLISÃO RECENTE!\n\nO analista ${log.nome} enviou um(a) ${acao} idêntico há apenas ${Math.round(tempoPassado/60000)} minutos.\n\nDeseja realmente gerar outro agora?`); 
                 }
             } else {
-                // Se já passou de 30 minutos, o sistema ignora que é "duplicado" e deixa passar direto
                 continue; 
             }
         }
@@ -923,19 +898,43 @@ function verificarDuplicidade() {
     return true;
 }
 
+// --- LIMPEZA DO "A GERAR..." REALIZADA AQUI ---
 window.copyAsImage = function() {
     if (!validarCamposObrigatorios(true)) return;
     const fgrid = document.getElementById('f-grid').value.trim();
     const assinaturaAtual = `${modoAtual}|${document.getElementById('cliente').value.toUpperCase().trim()}|${document.getElementById('host').value.toUpperCase().trim()}|${document.getElementById('status').value}|${fgrid}`;
     
-    if (assinaturaAtual !== ultimaAssinaturaGerada) { if (!verificarDuplicidade()) return; registrarHistoricoNuvem(obterAssuntoGerado()); ultimaAssinaturaGerada = assinaturaAtual; }
+    if (assinaturaAtual !== ultimaAssinaturaGerada) { 
+        if (!verificarDuplicidade()) return; 
+        registrarHistoricoNuvem(obterAssuntoGerado()); 
+        ultimaAssinaturaGerada = assinaturaAtual; 
+    }
 
-    const btn = document.getElementById('btn-copiar-img'); const originalText = btn.innerHTML; btn.innerHTML = '⏳ A GERAR...';
-    const node = document.getElementById('render'); const clone = node.cloneNode(true); clone.style.position = 'absolute'; clone.style.top = '-9999px'; clone.style.left = '-9999px'; clone.style.width = '650px'; clone.style.height = 'auto'; document.body.appendChild(clone);
+    const node = document.getElementById('render'); 
+    const clone = node.cloneNode(true); 
+    clone.style.position = 'absolute'; 
+    clone.style.top = '-9999px'; 
+    clone.style.left = '-9999px'; 
+    clone.style.width = '650px'; 
+    clone.style.height = 'auto'; 
+    document.body.appendChild(clone);
+    
     html2canvas(clone, { scale: 1.2, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
         document.body.removeChild(clone);
-        canvas.toBlob(blob => { try { const item = new ClipboardItem({ "image/png": blob }); navigator.clipboard.write([item]).then(() => { btn.innerHTML = originalText; mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); }); } catch (err) { alert("A cópia de imagem não é suportada."); btn.innerHTML = originalText; } });
-    }).catch(err => { document.body.removeChild(clone); alert("Erro ao gerar a imagem."); btn.innerHTML = originalText; });
+        canvas.toBlob(blob => { 
+            try { 
+                const item = new ClipboardItem({ "image/png": blob }); 
+                navigator.clipboard.write([item]).then(() => { 
+                    mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); 
+                }); 
+            } catch (err) { 
+                alert("A cópia de imagem não é suportada no seu navegador atual."); 
+            } 
+        });
+    }).catch(err => { 
+        document.body.removeChild(clone); 
+        alert("Erro ao gerar a imagem."); 
+    });
 }
 
 window.copyITSSM = function() {
@@ -991,8 +990,6 @@ window.copyITSSM = function() {
     const vObs = document.getElementById('obs').value.trim(); 
     if (vObs) { textoITSSM += `\nObservação:\n${vObs}\n`; }
 
-    // --- MÁGICA PARA A LIBBS: APARECE SEMPRE ---
-    // Removemos a verificação "if(vProtLibbs)" para que a linha apareça mesmo vazia
     if (vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE') {
         textoITSSM += `\nProtocolo Libbs (E-mail): ${vProtLibbs}\n`;
     }
@@ -1044,10 +1041,18 @@ window.limparFormulario = function() {
             inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
             solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, desc: document.getElementById('desc').value, evidencias: document.getElementById('evidencias').checked
         };
-        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
-        document.getElementById('status').value = 'EM ABERTO'; document.getElementById('severidade').value = 'WARNING'; document.getElementById('evidencias').checked = false; document.getElementById('protocolo').classList.remove('shake-error'); ultimaAssinaturaGerada = ''; window.update();
         
-        // Ajustado para 10 segundos!
+        document.querySelectorAll('input[type="text"], textarea').forEach(campo => campo.value = '');
+        document.getElementById('status').value = 'EM ABERTO'; 
+        document.getElementById('severidade').value = 'WARNING'; 
+        document.getElementById('evidencias').checked = false; 
+        document.getElementById('protocolo').classList.remove('shake-error'); 
+        ultimaAssinaturaGerada = ''; 
+        window.update();
+        
+        // --- MÁGICA: REABRIR AS SANFONAS AQUI ---
+        if(window.resetarSanfona) window.resetarSanfona();
+        
         const toastResgate = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🧹 Formulário limpo.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
         mostrarToast(toastResgate, "info", 10000); 
     }
@@ -1129,9 +1134,6 @@ window.abrirHistorico = function() {
     });
 }
 
-// ==========================================
-// 🧠 MOTOR DE CORRELAÇÃO DE EVENTOS (SRE)
-// ==========================================
 window.detectarOperadoraOuGeral = function(texto) {
     if (!texto) return "";
     let srvUpper = texto.toUpperCase();
@@ -1176,9 +1178,6 @@ window.autoPreencherOperadora = function() {
     }
 };
 
-// ==========================================
-// ✨ EXTRATOR MÁGICO DE TABELAS (CENTREON)
-// ==========================================
 window.processarExtratorMagico = function() {
     const raw = document.getElementById('magic-paste-area').value;
     if (!raw.trim()) {
@@ -1246,7 +1245,6 @@ window.processarExtratorMagico = function() {
 
     let hostMemoria = ""; 
 
-    // --- DICIONÁRIO BILÍNGUE (Regex) ---
     const regexStatus = /^(OK|CRITICAL|WARNING|UNKNOWN|UP|DOWN|PENDING|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)$/i;
     const regexStatusLog = /(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)/i;
 
@@ -1313,7 +1311,6 @@ window.processarExtratorMagico = function() {
         }
 
         if (statusEncontradoLinha) {
-            // --- TRADUTOR INTERNO (PT-BR -> EN) ---
             let statusNorm = statusEncontradoLinha.replace('Í', 'I');
             if (statusNorm === 'CRITICO' || statusNorm === 'DOWN') statusNorm = 'CRITICAL';
             else if (statusNorm === 'AVISO') statusNorm = 'WARNING';
