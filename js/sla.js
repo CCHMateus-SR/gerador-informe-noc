@@ -99,6 +99,9 @@ function dispararModalSLA(log, minutos, chave, alertaId) {
     `;
     filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'sla' });
     startTabBlink('⏰ ATUALIZAR LINK!');
+    // --- ENVIA PARA O COFRE ---
+    if(window.salvarNotificacaoNoPainel) window.salvarNotificacaoNoPainel(`⏰ <strong>SLA VENCIDO:</strong> Host ${log.form.host} está há ${tempoFormatado} sem atualização.`, '#EF4444');
+    
     if (!modalAberto) exibirProximoAlerta();
 }
 
@@ -122,6 +125,9 @@ function dispararModalManutencao(log, minutos, chave, alertaId) {
     `;
     filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'default' });
     startTabBlink('🛠️ COBRAR SLA!');
+    // --- ENVIA PARA O COFRE ---
+    if(window.salvarNotificacaoNoPainel) window.salvarNotificacaoNoPainel(`🛠️ <strong>COBRAR OPERADORA:</strong> Chamado do Host ${log.form.host} completou ${horas}h.`, '#6366F1');
+
     if (!modalAberto) exibirProximoAlerta();
 }
 
@@ -136,27 +142,40 @@ export function mostrarAlertaBloqueante(mensagemObj) {
 
     if (mensagemObj.tipo === 'aviso_rapido') {
         const hostText = mensagemObj.host !== 'Não informado' ? ` | Host: <strong>${mensagemObj.host}</strong>` : '';
+        
+        // HTML COMPLETO DE VOLTA AQUI:
         htmlMensagem = `
             <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 15px; border-radius: 8px; text-align: center;">
                 <div style="margin-bottom: 10px; color: #1E293B; font-size: 13px;">👤 <strong>${mensagemObj.nome}</strong> assumiu:</div>
                 <div style="font-family: Consolas, monospace; font-size: 13px; color: #1D4ED8; font-weight: bold;">👀 ${mensagemObj.servico}${hostText}</div>
             </div>`;
+            
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: 'aviso' });
    
-    // TOCA O SOM SUAVE DE AVISO
+        // TOCA O SOM SUAVE DE AVISO
         window.tocarSomNOC('aviso'); 
+        
+        // --- ENVIA PARA O COFRE (SININHO) ---
+        if(window.salvarNotificacaoNoPainel) window.salvarNotificacaoNoPainel(`👀 <strong>EM ANÁLISE:</strong> ${mensagemObj.nome} pegou o serviço: ${mensagemObj.servico}`, '#3B82F6');
 
     } else {
         const isCritical = mensagemObj.form && mensagemObj.form.severidade === 'CRITICAL';
+        
+        // HTML COMPLETO DE VOLTA AQUI:
         htmlMensagem = `
             <div style="background: #E0F2FE; border-left: 4px solid #0EA5E9; padding: 15px; border-radius: 8px;">
                 <div style="margin-bottom: 15px; color: #1E293B; font-size: 13px; text-align: center;">👤 <strong>${mensagemObj.nome}</strong> gerou um novo informe:</div>
                 <div style="font-family: Consolas, monospace; font-size: 11px; color: #0369A1; text-align: center;">${mensagemObj.assunto}</div>
             </div>`;
+            
         filaDeAlertas.push({ html: htmlMensagem, botoes: botoesHTML, tipo: isCritical ? 'critical' : 'default' });
         
         // TOCA O BEEP DE ALERTA PARA CHAMADO NOVO
         window.tocarSomNOC('alerta'); 
+
+        // --- ENVIA PARA O COFRE (SININHO) ---
+        const cor = isCritical ? '#DC2626' : '#0EA5E9';
+        if(window.salvarNotificacaoNoPainel) window.salvarNotificacaoNoPainel(`🚨 <strong>NOVO INFORME:</strong> ${mensagemObj.nome} enviou: <br> <span style="font-family: monospace;">${mensagemObj.assunto}</span>`, cor);
     }
     
     startTabBlink('🚨 ALERTA NOC!');
