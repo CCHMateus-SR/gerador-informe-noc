@@ -213,3 +213,68 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ==========================================
+// CENTRAL DE NOTIFICAÇÕES (SININHO)
+// ==========================================
+let totalNotificacoesNaoLidas = 0;
+
+function iniciarNotificacoes() {
+    const btnSininho = document.getElementById('btn-sininho');
+    const painelNotificacoes = document.getElementById('painel-notificacoes');
+    const contadorNotificacoes = document.getElementById('contador-notificacoes');
+    const btnLimparNotificacoes = document.getElementById('btn-limpar-notificacoes');
+    const listaNotificacoes = document.getElementById('lista-notificacoes');
+
+    if(!btnSininho) return;
+
+    btnSininho.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        painelNotificacoes.classList.toggle('painel-visivel');
+        if(painelNotificacoes.classList.contains('painel-visivel')) {
+            totalNotificacoesNaoLidas = 0;
+            contadorNotificacoes.innerText = totalNotificacoesNaoLidas;
+            contadorNotificacoes.classList.add('badge-oculto');
+        }
+    });
+
+    btnLimparNotificacoes.addEventListener('click', () => {
+        listaNotificacoes.innerHTML = '<p class="notificacao-vazia">Nenhuma notificação nova.</p>';
+        totalNotificacoesNaoLidas = 0;
+        contadorNotificacoes.classList.add('badge-oculto');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (painelNotificacoes.classList.contains('painel-visivel') && !painelNotificacoes.contains(e.target) && !btnSininho.contains(e.target)) {
+            painelNotificacoes.classList.remove('painel-visivel');
+        }
+    });
+}
+
+// Inicia as notificações junto com o sistema (Basta adicionar essa linha dentro do window.onload existente se preferir, ou deixar aqui que ele chama sozinho)
+setTimeout(iniciarNotificacoes, 1000);
+
+window.salvarNotificacaoNoPainel = function(mensagem, corBorda = '#38bdf8') {
+    const painelNotificacoes = document.getElementById('painel-notificacoes');
+    const listaNotificacoes = document.getElementById('lista-notificacoes');
+    if(!listaNotificacoes) return;
+
+    const msgVazia = listaNotificacoes.querySelector('.notificacao-vazia');
+    if(msgVazia) msgVazia.remove();
+
+    const novoItem = document.createElement('div');
+    novoItem.classList.add('item-notificacao');
+    novoItem.style.borderLeftColor = corBorda;
+    
+    const horaExata = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+    novoItem.innerHTML = `<strong>[${horaExata}]</strong> ${mensagem}`;
+
+    listaNotificacoes.prepend(novoItem);
+
+    if(!painelNotificacoes.classList.contains('painel-visivel')) {
+        totalNotificacoesNaoLidas++;
+        const contadorNotificacoes = document.getElementById('contador-notificacoes');
+        contadorNotificacoes.innerText = totalNotificacoesNaoLidas;
+        contadorNotificacoes.classList.remove('badge-oculto');
+    }
+};
