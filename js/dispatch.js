@@ -508,20 +508,106 @@ window.update = function() {
     document.getElementById('v-titulo').innerText = tituloTexto; document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
     document.getElementById('v-host').innerText = vHost || '---'; document.getElementById('v-inicio').innerText = vInicio;
     document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid); document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
+// NOVA REGRA INTELIGENTE: Oculta o SLA no informe de Abertura, SALVO se o analista já tiver preenchido!
+    const tabelaTerminoPreview = document.getElementById('v-titulo-termino').closest('table');
+    
+    // Se for ABERTURA e o campo SLA estiver vazio, esconde do relatório.
+    // Se for FOLLOW-UP/RESOLVIDO, ou se o analista conseguiu a previsão logo na abertura, mostra no relatório!
+    if (status === 'EM ABERTO' && vTermino === '-') {
+        tabelaTerminoPreview.style.display = 'none';
+    } else {
+        tabelaTerminoPreview.style.display = 'table';
+    }
 
     const dynamicGrid = document.getElementById('v-dynamic-grid');
     const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
     let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${corSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
     
+    // REGRA: Se o status for RESOLVIDO, o Status Atual não aparece no grid do informe
+    // REGRA: Se o status for RESOLVIDO, o Status Atual não aparece no grid do informe
+    // REGRA DE ALINHAMENTO: Força o tamanho das caixas para não esticarem no encerramento
     if (modoAtual === 'link') {
-        dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vProtocolo}', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div><div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div></td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td></tr><tr height="15"><td></td></tr><tr><td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vSolucionador}', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div><div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div></td><td></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
+        if (status === 'RESOLVIDO') {
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vProtocolo}', this)">📋</button>
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div>
+                        <div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div>
+                    </td>
+                    <td width="8%"></td>
+                    <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>
+                        ${badgeSeveridadeHTML}
+                    </td>
+                </tr>
+                <tr height="15"><td></td></tr>
+                <tr>
+                    <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vSolucionador}', this)">📋</button>
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div>
+                        <div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div>
+                    </td>
+                    <td width="8%"></td>
+                    <td width="46%"></td> </tr>`;
+        } else {
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vProtocolo}', this)">📋</button>
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Protocolo</div>
+                        <div style="font-size: 15px; color: #0F172A; font-weight: 800;">${vProtocolo}</div>
+                    </td>
+                    <td width="8%"></td>
+                    <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>
+                        ${badgeHTML}
+                    </td>
+                </tr>
+                <tr height="15"><td></td></tr>
+                <tr>
+                    <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('${vSolucionador}', this)">📋</button>
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Solucionador</div>
+                        <div style="font-size: 14px; color: #0F172A; font-weight: 800;">${vSolucionador}</div>
+                    </td>
+                    <td width="8%"></td>
+                    <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>
+                        ${badgeSeveridadeHTML}
+                    </td>
+                </tr>`;
+        }
     } else {
-        dynamicGrid.innerHTML = `<tr><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>${badgeHTML}</td><td width="8%"></td><td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>${badgeSeveridadeHTML}</td></tr>`;
+        // Modo Infra
+        if (status === 'RESOLVIDO') {
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>
+                        ${badgeSeveridadeHTML}
+                    </td>
+                    <td width="8%"></td>
+                    <td width="46%"></td> </tr>`;
+        } else {
+            dynamicGrid.innerHTML = `
+                <tr>
+                    <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Status Atual</div>
+                        ${badgeHTML}
+                    </td>
+                    <td width="8%"></td>
+                    <td width="46%" bgcolor="#F1F5F9" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;">
+                        <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Severidade</div>
+                        ${badgeSeveridadeHTML}
+                    </td>
+                </tr>`;
+        }
     }
 
     if (vStatusInfo) { document.getElementById('statusinfo-container').style.display = 'block'; document.getElementById('v-statusinfo').innerHTML = formatarColchetes(vStatusInfo.replace(/\n/g, '<br>')); } else { document.getElementById('statusinfo-container').style.display = 'none'; }
     if (vPressplay && modoAtual === 'infra') { document.getElementById('pressplay-container').style.display = 'block'; document.getElementById('v-pressplay').innerHTML = formatarColchetes(vPressplay.replace(/\n/g, '<br>')); } else { document.getElementById('pressplay-container').style.display = 'none'; }
-    if (vDesc) { document.getElementById('detalhamento-container').style.display = 'block'; document.getElementById('v-desc').innerHTML = formatarColchetes(vDesc.replace(/\n/g, '<br>')); } else { document.getElementById('detalhamento-container').style.display = modoAtual === 'link' ? 'block' : 'none'; document.getElementById('v-desc').innerHTML = 'Aguardando atualização técnica...'; }
+    if (vDesc) { document.getElementById('detalhamento-container').style.display = 'block'; document.getElementById('v-desc').innerHTML = formatarColchetes(vDesc.replace(/\n/g, '<br>')); } else { document.getElementById('detalhamento-container').style.display = 'none'; }
     document.getElementById('evidencias-container').style.display = temEvidencias ? 'block' : 'none';
     if (vObs) { document.getElementById('obs-container').style.display = 'block'; document.getElementById('v-obs').innerHTML = formatarColchetes(vObs.replace(/\n/g, '<br>')); } else { document.getElementById('obs-container').style.display = 'none'; }
 }
@@ -679,10 +765,28 @@ window.recuperarDadosAba = function() {
 };
 
 window.mudarStatus = function() { 
-    const status = document.getElementById('status').value; const d = new Date(); 
+    const status = document.getElementById('status').value; 
+    const d = new Date(); 
     const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-    if (status === 'RESOLVIDO') { document.getElementById('severidade').value = 'OK'; document.getElementById('termino').value = pt; } 
-    else if (status === 'FOLLOW-UP') { document.getElementById('f-grid').value = pt; }
+    
+    if (status === 'RESOLVIDO') { 
+        document.getElementById('severidade').value = 'OK'; 
+        
+        // A automação do 'termino' foi removida daqui para forçar o preenchimento manual!
+        
+        // NOVA REGRA DE SEGURANÇA: Limpa o campo de Ações/Diagnóstico
+        const descEl = document.getElementById('desc');
+        if (descEl.value.trim() !== '') {
+            descEl.value = '';
+        }
+
+        // ALERTA CONTRA PILOTO AUTOMÁTICO: Lembra o analista do processo correto
+        mostrarToast("⚠️ <strong>ATENÇÃO AO ENCERRAMENTO!</strong><br>Preencha o horário exato da normalização e não esqueça de atualizar os logs do Centreon.", "warning", 8000);
+    } 
+    else if (status === 'FOLLOW-UP') { 
+        document.getElementById('f-grid').value = pt; 
+    }
+    
     window.update();
 }
 
@@ -1335,8 +1439,10 @@ window.processarExtratorMagico = function() {
 
     let clienteDetectado = "";
     if (hostsDetectados.length > 0) {
-        let hostPrincipal = hostsDetectados[0].toUpperCase();
+        // 1. Limpeza de caracteres especiais do Centreon (como a estrela amarela ⭐)
+        let hostPrincipal = hostsDetectados[0].toUpperCase().replace(/[⭐★]/g, '').trim();
 
+        // 2. Regra específica para VEEAM
         if (hostPrincipal.startsWith('ITS-BKP-VEEAM') && servicos.length > 0) {
             const primeiroServico = servicos[0].toUpperCase();
             const partes = primeiroServico.split('-');
@@ -1354,15 +1460,7 @@ window.processarExtratorMagico = function() {
             }
         }
 
-        if (!clienteDetectado) {
-            for (let modo in memoriaNOC) {
-                for (let cli in memoriaNOC[modo]) {
-                    if (memoriaNOC[modo][cli][hostsDetectados[0]]) { clienteDetectado = cli; break; }
-                }
-                if (clienteDetectado) break;
-            }
-        }
-
+        // 3. REGRAS FIXAS E PREFIXOS (Prioridade Máxima sobre a memória)
         if (!clienteDetectado) {
             if (hostPrincipal.includes('LIBBS')) clienteDetectado = 'LIBBS';
             else if (hostPrincipal.includes('AMIGAO') || hostPrincipal.includes('CSD')) clienteDetectado = 'CSD (GRUPO AMIGÃO)';
@@ -1379,6 +1477,16 @@ window.processarExtratorMagico = function() {
                 const clientesPossiveis = Object.keys(logosClientes || {});
                 let match = clientesPossiveis.find(c => c.startsWith(prefixoReal));
                 if (match) clienteDetectado = match;
+            }
+        }
+
+        // 4. MEMÓRIA DO PLANTÃO (Fallback seguro caso o prefixo falhe)
+        if (!clienteDetectado) {
+            for (let modo in memoriaNOC) {
+                for (let cli in memoriaNOC[modo]) {
+                    if (memoriaNOC[modo][cli][hostsDetectados[0]]) { clienteDetectado = cli; break; }
+                }
+                if (clienteDetectado) break;
             }
         }
     }
