@@ -357,7 +357,11 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     
     const agora = new Date();
     const horaAtualFormatada = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-    document.getElementById('f-grid').value = horaAtualFormatada;
+    
+    // GUARDA NO BOLSO: Salva o horário antigo na memória do campo antes de atualizar
+    const fgridEl = document.getElementById('f-grid');
+    fgridEl.dataset.historico = dados.fgrid || '-';
+    fgridEl.value = horaAtualFormatada;
 
     let itssmHerdado = dados.itssm || '';
     let libbsHerdado = dados.protocoloLibbs || '';
@@ -666,6 +670,7 @@ window.trocarModo = function(novoModo) {
     document.getElementById('severidade').value = 'WARNING'; 
     document.getElementById('evidencias').checked = false;
     document.getElementById('protocolo').classList.remove('shake-error');
+    delete document.getElementById('f-grid').dataset.historico;
     ultimaAssinaturaGerada = '';
 
     modoAtual = novoModo;
@@ -768,23 +773,31 @@ window.mudarStatus = function() {
     const status = document.getElementById('status').value; 
     const d = new Date(); 
     const pt = `${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    const fgridEl = document.getElementById('f-grid');
     
     if (status === 'RESOLVIDO') { 
         document.getElementById('severidade').value = 'OK'; 
         
-        // A automação do 'termino' foi removida daqui para forçar o preenchimento manual!
+        // RESTAURAÇÃO MÁGICA: Se puxou do histórico, devolve a hora original do Follow-up!
+        if (fgridEl.dataset.historico) {
+            fgridEl.value = fgridEl.dataset.historico;
+            delete fgridEl.dataset.historico; // Esvazia o bolso
+        }
         
-        // NOVA REGRA DE SEGURANÇA: Limpa o campo de Ações/Diagnóstico
+        // Limpa o campo de Ações/Diagnóstico
         const descEl = document.getElementById('desc');
         if (descEl.value.trim() !== '') {
             descEl.value = '';
         }
 
-        // ALERTA CONTRA PILOTO AUTOMÁTICO: Lembra o analista do processo correto
         mostrarToast("⚠️ <strong>ATENÇÃO AO ENCERRAMENTO!</strong><br>Preencha o horário exato da normalização e não esqueça de atualizar os logs do Centreon.", "warning", 8000);
     } 
     else if (status === 'FOLLOW-UP') { 
-        document.getElementById('f-grid').value = pt; 
+        fgridEl.value = pt; 
+        delete fgridEl.dataset.historico; // Se vai dar novo follow-up real, limpa a memória antiga
+    }
+    else {
+        delete fgridEl.dataset.historico; // Se voltou pra Em Aberto, limpa também
     }
     
     window.update();
@@ -1150,7 +1163,8 @@ window.limparFormulario = function() {
         document.getElementById('status').value = 'EM ABERTO'; 
         document.getElementById('severidade').value = 'WARNING'; 
         document.getElementById('evidencias').checked = false; 
-        document.getElementById('protocolo').classList.remove('shake-error'); 
+        document.getElementById('protocolo').classList.remove('shake-error');
+        delete document.getElementById('f-grid').dataset.historico;
         ultimaAssinaturaGerada = ''; 
         window.update();
         
