@@ -114,7 +114,23 @@
                 <div class="meta-divider"></div>
                 <div id="header-sev-badge" class="meta-sev-badge">🟡 WARNING</div>
             </div>
+            
             <div class="meta-right">
+                <div class="notificacoes-container">
+                    <button id="btn-sininho" class="btn-icone" title="Ver Notificações">
+                        🔔
+                        <span id="contador-notificacoes" class="badge-oculto">0</span>
+                    </button>
+                    <div id="painel-notificacoes" class="painel-oculto">
+                        <div class="painel-header">
+                            <h4>Notificações</h4>
+                            <button id="btn-limpar-notificacoes" class="btn-pequeno">Limpar</button>
+                        </div>
+                        <div id="lista-notificacoes">
+                            <p class="notificacao-vazia">Nenhuma notificação nova.</p>
+                        </div>
+                    </div>
+                </div>
                 <div id="user-display" class="user-badge" style="background: white;">👤 Entrando...</div>
                 <button class="btn-sair" onclick="fazerLogout()">Sair</button>
                 <button class="btn-theme" onclick="cycleTheme()" title="Mudar Tema">☀️</button>
