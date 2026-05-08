@@ -886,7 +886,7 @@ function obterAssuntoGerado() {
     if (severidade === 'OK') { severidade = 'NORMALIZADO'; }
 
     const statusSelect = document.getElementById('status').value;
-    let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+    let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW-UP' : 'ENCERRAMENTO');
     
     let campoDataHoraAlvo = '';
     if (statusSelect === 'EM ABERTO') { campoDataHoraAlvo = document.getElementById('inicio').value.trim(); } 
@@ -991,7 +991,7 @@ function verificarDuplicidade() {
     
     if (!cliente || !host) return true;
 
-    let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW UP' : 'ENCERRAMENTO');
+    let acao = statusSelect === 'EM ABERTO' ? 'ABERTURA' : (statusSelect === 'FOLLOW-UP' ? 'FOLLOW-UP' : 'ENCERRAMENTO');
     const buscaStr = `${cliente} | ${host} | ${item}`; 
     
     const AGORA_MS = Date.now();
