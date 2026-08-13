@@ -312,58 +312,6 @@ body.pro-mode .meta-divider { background: #444; }
     display: none; /* Escondido no monitor grande */
 }
 
-@media screen and (max-width: 1600px) {
-    /* 1. O Formulário e o Preview passam a usar 100% do espaço livre */
-    #form-container, .preview-side {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin-left: 0 !important;
-    }
-
-    /* 2. O botão Hamburger aparece na barra superior */
-    .btn-toggle-historico {
-        display: inline-flex;
-        align-items: center;
-        background: #0284C7;
-        color: white;
-        padding: 6px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 800;
-        font-size: 12px;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-right: 15px;
-        transition: 0.2s;
-    }
-    
-    .btn-toggle-historico:hover {
-        background: #0369A1;
-    }
-
-    /* 3. O painel de histórico vira a gaveta escondida */
-    #history-container {
-        position: fixed;
-        top: 0;
-        left: -400px; /* Joga 400px para fora do monitor, escondendo ele */
-        width: 320px; /* Largura da gaveta */
-        height: 100vh; /* Ocupa 100% da altura da tela */
-        overflow-y: auto; /* <--- OLHA A LINHA NOVA AQUI! */
-        z-index: 9999; /* Fica por cima de absolutamente tudo */
-        transition: left 0.3s ease-in-out; /* Efeito de deslizar suave */
-        box-shadow: 5px 0 25px rgba(0,0,0,0.8);
-        margin: 0 !important; 
-        border-radius: 0; 
-    }
-        
-/* 4. A classe que a Inteligência do JS adiciona para a gaveta aparecer! */
-    #history-container.aberto {
-        left: 0 !important;
-        display: flex !important; 
-        flex-direction: column;
-    }
-}
-
 /* ==========================================
    MOTOR DE CORES CONTEXTUAIS (VERSÃO MINIMALISTA)
    ========================================== */
@@ -572,34 +520,35 @@ body.tema-infra {
 }
 
 /* ==========================================
-   8. BARRA DE ROLAGEM CUSTOMIZADA (SCROLLBAR)
+   BARRA DE ROLAGEM MINIMALISTA (SCROLLBAR)
    ========================================== */
-/* Define a largura fininha e o fundo transparente */
+
+/* Suporte para Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+/* Suporte para Chrome, Edge e Safari */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 5px !important;  /* Deixa a barra bem fininha */
+    height: 5px !important;
 }
+
+/* O fundo (trilho) fica totalmente invisível */
 ::-webkit-scrollbar-track {
-    background: transparent; 
+    background: transparent !important; 
 }
 
-/* Cor da "alavanca" no Modo Claro */
+/* A alavanca (thumb) ganha uma cor neutra, quase invisível */
 ::-webkit-scrollbar-thumb {
-    background: #CBD5E1; 
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8; 
+    background: rgba(255, 255, 255, 0.08) !important; /* Branco com 8% de opacidade */
+    border-radius: 10px !important;
 }
 
-/* Cor da "alavanca" nos Modos Dark e Pro (Camuflada e elegante) */
-body.dark-mode ::-webkit-scrollbar-thumb,
-body.pro-mode ::-webkit-scrollbar-thumb {
-    background: #475569; 
-}
-body.dark-mode ::-webkit-scrollbar-thumb:hover,
-body.pro-mode ::-webkit-scrollbar-thumb:hover {
-    background: #64748B; 
+/* Um leve brilho apenas quando o analista passa o mouse em cima */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2) !important; 
 }
 
 /* ==========================================
@@ -793,23 +742,1252 @@ body.pro-mode .history-date-label {
 }
 
 /* ==========================================
-   14. CENTRAL DE NOTIFICAÇÕES (SININHO)
+   NOVO TIMELINE / INTELIGÊNCIA DE AUSÊNCIA
    ========================================== */
-.notificacoes-container { position: relative; display: flex; align-items: center; margin-right: 15px;}
-#btn-sininho { background: transparent; border: none; font-size: 1.4rem; cursor: pointer; position: relative; padding: 0 5px; transition: 0.2s; }
-#btn-sininho:hover { transform: scale(1.1); }
-#contador-notificacoes { position: absolute; top: -5px; right: -5px; background-color: #EF4444; color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; border: 2px solid #F1F5F9; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-body.dark-mode #contador-notificacoes, body.pro-mode #contador-notificacoes { border-color: #1E293B; }
+.timeline-container { position: relative; display: flex; align-items: center; }
+#btn-timeline { position: relative; }
+
+#contador-notificacoes {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #EF4444;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: bold;
+    border: 2px solid #141415; /* Combina com a barra global escurecida */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 .badge-oculto { display: none !important; }
 
-#painel-notificacoes { position: absolute; top: 45px; right: 0; width: 340px; background-color: #1E293B; border: 1px solid #334155; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999; display: none; flex-direction: column; overflow: hidden;}
+#painel-notificacoes {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza o painel embaixo do botão */
+    width: 360px;
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    z-index: 9999;
+    display: none; /* Fica oculto até clicar */
+    flex-direction: column;
+    overflow: hidden;
+}
 .painel-visivel { display: flex !important; }
-.painel-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #334155; color: #fff; background: #0F172A; }
+
+/* Estilos internos da gaveta (Mantidos do antigo) */
+.painel-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #334155; background: #0F172A; }
 .painel-header h4 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #38bdf8; }
-#btn-limpar-notificacoes { background-color: #334155; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
-#btn-limpar-notificacoes:hover { background-color: #475569; }
+
+.btn-pequeno { background-color: #334155; color: #fff; border: none; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 10px; font-weight: bold; transition: 0.2s; }
+.btn-pequeno:hover { background-color: #475569; }
 
 #lista-notificacoes { max-height: 320px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-.item-notificacao { background-color: #334155; color: #F8FAFC; padding: 10px 12px; border-radius: 6px; font-size: 11px; border-left: 4px solid #38bdf8; line-height: 1.4; box-shadow: inset 0 0 5px rgba(0,0,0,0.1);}
-.item-notificacao strong { color: #94A3B8; font-size: 10px; display: block; margin-bottom: 4px; }
+.item-notificacao { background-color: #334155; color: #F8FAFC; padding: 10px 12px; border-radius: 6px; font-size: 11px; border-left: 4px solid #38bdf8; line-height: 1.4; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
 .notificacao-vazia { color: #64748B; text-align: center; font-size: 12px; margin: 15px 0; font-weight: bold; }
+
+/* ==========================================
+   NOVO LAYOUT 
+   ========================================== */
+body {
+    background-color: #1A1A1C; /* Fundo escuro total */
+    padding-top: 70px; /* Espaço para a barra global */
+    overflow: hidden; /* 🔒 Trava a tela de fundo para a página nunca rolar inteira */
+}
+
+/* 1. Barra Global Superior */
+.global-top-bar {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 60px;
+    background: #141415; border-bottom: 1px solid #333;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 20px; z-index: 1000; box-sizing: border-box;
+}
+.top-left, .top-center, .top-right { display: flex; align-items: center; gap: 12px; }
+.btn-top-action {
+    background: transparent; border: 1px solid #444; color: #FFF;
+    padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer;
+}
+.btn-top-action:hover { background: #333; }
+.btn-acionamentos { border-color: #8B5CF6; color: #A78BFA; }
+
+/* Botão da Gaveta de Histórico */
+.btn-toggle-historico {
+    display: none; /* Escondido em telas gigantes, aparece só no notebook */
+    align-items: center;
+    background: #0284C7;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 11px;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin-right: 10px;
+    transition: 0.2s;
+    letter-spacing: 0.5px;
+}
+.btn-toggle-historico:hover {
+    background: #0369A1;
+}
+
+/* 2. Formulário e Cards */
+.form-side {
+    background: #232325; 
+    border: 1px solid #333; 
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border-top: none;
+    
+    /* 🪄 A MÁGICA DA ROLAGEM INDEPENDENTE AQUI */
+    max-height: calc(100vh - 100px); /* Limita a altura à tela do monitor */
+    overflow-y: auto; /* Cria a barra de rolagem apenas aqui dentro */
+}
+.history-side {
+    background: #232325; border: 1px solid #333; border-radius: 12px; border-top: none;
+}
+
+/* Preview fixo e visível lado a lado */
+.preview-side {
+    display: flex;
+    flex: 1.4;
+    background: #1A1A1C; 
+    padding: 20px;
+    border-radius: 12px;
+    position: sticky;
+    top: 80px;
+    border: 1px solid #333;
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* 3. Abas de Modo e Assumir Análise */
+.form-mode-tabs {
+    display: flex; justify-content: center; gap: 10px; margin-bottom: 25px;
+}
+.form-mode-tabs .mode-btn {
+    background: #1A1A1C; border: 1px solid #444; border-radius: 6px; padding: 10px 30px; color: #888;
+}
+.form-mode-tabs .mode-btn.active {
+    background: #232325; border: 1px solid #38BDF8; color: #38BDF8; box-shadow: inset 0 2px 0 #38BDF8;
+}
+
+.sleek-bar {
+    background: #1A1A1C; border: 1px solid #333; border-radius: 8px;
+    display: flex; align-items: center; padding: 10px 15px; margin-bottom: 15px; gap: 10px;
+}
+
+/* 4. Extrator Mágico Horizontal */
+.extractor-bar input {
+    flex: 1; background: transparent; border: none; color: #FFF; font-family: monospace;
+    font-size: 12px; outline: none; padding: 5px; box-shadow: none;
+}
+.extractor-bar .btn-lixeira {
+    background: #2A2A2C; border: 1px solid #444; border-radius: 4px; padding: 8px 12px; cursor: pointer;
+}
+.extractor-bar .btn-processar {
+    background: #333; border: 1px solid #555; color: #FFF; font-weight: bold; padding: 8px 15px; border-radius: 4px; cursor: pointer;
+}
+
+/* 5. Abas de Seção (Tabs) */
+.section-tabs {
+    display: flex; gap: 10px; background: #1A1A1C; padding: 5px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333;
+}
+.section-tab-btn {
+    flex: 1; background: transparent; border: none; color: #888; padding: 10px;
+    font-size: 11px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s;
+}
+.section-tab-btn:hover { color: #FFF; }
+.section-tab-btn.active {
+    background: #2A2A2C; color: #FFF; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Inputs gerais (Inputs mais escuros) */
+body input, body select, body textarea {
+    background: #1A1A1C !important; border: 1px solid #333 !important; color: #FFF !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+/* 6. Action Footer Sleek */
+.action-footer-sleek {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(26, 26, 28, 0.95); /* Fundo com leve transparência */
+    backdrop-filter: blur(8px); /* Efeito vidro fosco quando o texto rolar por trás */
+    padding: 15px; 
+    border-radius: 8px; 
+    border: 1px solid #333; 
+    margin-top: 20px;
+    
+    /* 📌 A MÁGICA DO RODAPÉ FIXO AQUI */
+    position: sticky;
+    bottom: -1px; /* Gruda no limite de baixo do formulário */
+    z-index: 100; /* Fica sempre por cima do conteúdo rolável */
+}
+.footer-center { display: flex; gap: 8px; }
+.btn-footer-dark {
+    background: #2A2A2C; border: 1px solid #444; color: #CCC; padding: 12px 15px;
+    border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s;
+}
+.btn-footer-dark:hover { background: #333; color: #FFF; }
+.btn-copiar-visual {
+    background: #DC2626; border: none; color: white; padding: 12px 25px;
+    border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; box-shadow: 0 4px 10px rgba(220,38,38,0.3);
+}
+.btn-footer-limpar {
+    background: transparent; border: none; color: #888; display: flex; flex-direction: column; align-items: center; cursor: pointer; font-size: 10px; font-weight: bold;
+}
+.btn-footer-limpar .icon { font-size: 18px; margin-bottom: 2px; }
+
+/* ==========================================
+   RESPONSIVIDADE INTELIGENTE PARA NOTEBOOKS
+   ========================================== */
+
+/* 1. Telas de Notebooks e Telas HD (Largura até 1600px) */
+@media screen and (max-width: 1600px) {
+    body {
+        padding-top: 70px !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+        justify-content: center !important;
+    }
+
+    .container {
+        max-width: 100% !important;
+        gap: 20px !important; /* Espaço entre o formulário e o preview */
+        justify-content: center !important;
+        flex-wrap: nowrap !important; /* Força a ficar lado a lado */
+    }
+
+    .form-side {
+        flex: 1 !important;
+        width: 100% !important;
+        max-width: 580px !important; /* Limita a largura para caber o preview do lado em notebooks */
+        min-width: 400px !important;
+        margin: 0 !important; /* Remove o auto para não centralizar sozinho */
+    }
+
+    /* O Histórico se transforma em uma Gaveta Flutuante */
+    #history-container {
+        position: fixed !important;
+        top: 60px !important;
+        left: -360px !important; /* Esconde fora da tela por padrão */
+        width: 320px !important;
+        height: calc(100vh - 60px) !important;
+        z-index: 9999 !important;
+        transition: left 0.3s ease-in-out !important;
+        border-radius: 0 12px 12px 0 !important;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.7) !important;
+        background: #232325 !important;
+        margin: 0 !important;
+        padding: 20px !important; /* Dá um respiro interno para os cards não colarem na borda */
+        box-sizing: border-box !important; /* Garante que o padding não estoure a largura de 320px */
+    }
+
+    /* Classe ativada ao clicar no botão '☰ HISTÓRICO' */
+    #history-container.aberto {
+        left: 0 !important;
+        display: flex !important;
+        flex-direction: column !important; /* ISSO AQUI ARRUMA TUDO! Força os itens a caírem em cascata */
+    }
+
+    /* Garante que o botão do histórico apareça no topo da tela */
+    .btn-toggle-historico {
+        display: inline-flex !important;
+    }
+
+    /* O Preview volta a ficar do lado no notebook */
+    .preview-side {
+        position: sticky !important;
+        top: 80px !important;
+        left: auto !important;
+        transform: none !important;
+        width: auto !important;
+        flex: 1.2 !important;
+        max-width: 650px !important;
+        display: flex !important;
+        z-index: 10 !important;
+        background: #1A1A1C !important;
+        backdrop-filter: none !important;
+        border-radius: 12px !important;
+        padding: 20px !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+        border: 1px solid #333 !important;
+    }
+
+    /* Encolhe o papel do informe levemente para caber em telas menores de notebook */
+    #render {
+        transform: scale(0.85) !important;
+        transform-origin: top center !important;
+    }
+}
+
+/* 2. Notebooks de 13" e 14" (Displays com resolução 1366x768 ou 1440x900) */
+@media screen and (max-width: 1366px) {
+    .form-side {
+        padding: 20px !important;
+        max-width: 780px !important;
+    }
+
+    .form-grid {
+        gap: 10px !important;
+    }
+
+    /* Ajuste fino dos botões do rodapé para não encavalar */
+    .action-footer-sleek {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+        justify-content: center !important;
+    }
+
+    .footer-center {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+
+    .btn-copiar-visual {
+        width: 100% !important;
+    }
+
+    /* Reduz levemente a escala visual da folha de informe no preview */
+    #render {
+        transform: scale(0.85) !important;
+        transform-origin: top center !important;
+    }
+}
+
+/* ==========================================
+   TRAVA GLOBAL DE TELA E SCROLL INDEPENDENTE
+   ========================================== */
+body {
+    height: 100vh !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+.form-side {
+    height: calc(100vh - 90px) !important; 
+    overflow-y: auto !important; 
+    display: block !important; 
+    position: relative !important;
+    padding-bottom: 20px !important; /* Espaço no fundo para não esmagar o último campo */
+}
+
+.action-footer-sleek {
+    position: sticky !important;
+    bottom: 20px !important; /* 📌 A MÁGICA: Fixa flutuando 20px ACIMA do final da caixa visível */
+    z-index: 999 !important;
+    
+    /* Visual moderno (Doca Flutuante / Glassmorphism) */
+    background: rgba(26, 26, 28, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid #444 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05) !important;
+    margin-top: 30px !important; /* Garante distância dos campos acima quando rolar até o fim */
+}
+
+/* ==========================================
+   MENU DO USUÁRIO (DROPDOWN UNIFICADO)
+   ========================================== */
+.user-menu-container { position: relative; display: flex; align-items: center; }
+
+/* Transforma o crachá de nome num botão com hover */
+.btn-perfil {
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    background: #1A1A1C !important;
+    border: 1px solid #334155 !important;
+    color: #F8FAFC !important;
+}
+.btn-perfil:hover { background: #334155 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important; }
+
+/* A caixa do menu flutuante */
+.user-dropdown {
+    position: absolute;
+    top: 45px; /* Altura exata para ficar logo abaixo do nome */
+    right: 0;
+    width: 220px;
+    background-color: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    z-index: 9999;
+    flex-direction: column;
+    padding: 5px 0;
+    
+    /* 🪄 A MÁGICA QUE FALTOU: Esconder por padrão! */
+    display: none; 
+}
+
+/* Quando o JS avisar que é para abrir, ele força a exibição */
+.user-dropdown.painel-visivel {
+    display: flex !important;
+}
+
+.user-dropdown-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #334155;
+    margin-bottom: 5px;
+    font-size: 10px;
+    color: #94A3B8;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.dropdown-item {
+    background: transparent;
+    border: none;
+    color: #F8FAFC;
+    text-align: left;
+    padding: 10px 15px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+    width: 100%;
+}
+.dropdown-item:hover { background: #334155; color: #38bdf8; }
+
+/* Botão de Sair em Destaque */
+.dropdown-item.text-red { color: #F87171; }
+.dropdown-item.text-red:hover { background: #450a0a; color: #FCA5A5; }
+
+.dropdown-divider { height: 1px; background: #334155; margin: 5px 0; }
+
+/* ==========================================
+   PAINEL DE ANALYTICS / RELATÓRIOS (RADAR)
+   ========================================== */
+.radar-header {
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 20px;
+}
+.radar-kpis { display: flex; gap: 15px; }
+.kpi-box {
+    background: #0F172A; border: 1px solid #334155; border-radius: 8px;
+    padding: 10px 20px; text-align: center; display: flex; flex-direction: column; gap: 5px;
+}
+.kpi-box span { font-size: 18px; font-weight: 900; }
+.kpi-box small { font-size: 10px; color: #64748B; text-transform: uppercase; font-weight: bold; }
+
+.radar-controls {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    background: #1A1A1C; padding: 15px; border-radius: 8px; border: 1px solid #334155;
+    margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+}
+.date-filters { display: flex; align-items: center; gap: 10px; }
+.date-filters label { font-size: 11px; color: #94A3B8; text-transform: uppercase; font-weight: bold; }
+.date-filters input[type="date"] {
+    background: #0F172A !important; border: 1px solid #475569 !important;
+    color: #F8FAFC !important; padding: 8px !important; border-radius: 6px !important; font-size: 12px;
+}
+.btn-filtrar {
+    background: #0284C7; color: white; border: none; padding: 8px 15px;
+    border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;
+}
+.btn-filtrar:hover { background: #0369A1; }
+
+.export-actions { display: flex; gap: 10px; }
+.btn-export-smart {
+    background: #10B981; color: white; border: none; padding: 10px 20px;
+    border-radius: 6px; font-weight: 900; font-size: 12px; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: 0.2s; display: flex; align-items: center; gap: 8px;
+}
+.btn-export-smart:hover { background: #059669; transform: translateY(-2px); }
+.btn-danger-icon {
+    background: transparent; border: 1px solid #EF4444; color: #EF4444; padding: 10px;
+    border-radius: 6px; cursor: pointer; transition: 0.2s;
+}
+.btn-danger-icon:hover { background: #EF4444; color: white; }
+
+.radar-list {
+    max-height: 400px; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 10px;
+}
+
+/* ==========================================
+   DASHBOARD DE GRÁFICOS (CHART.JS)
+   ========================================== */
+.modal-dashboard {
+    width: 1100px !important; /* Aumenta a tela para caber os gráficos confortavelmente */
+    max-width: 95% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important; /* Permite rolar a tela interna do painel */
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Divide em 2 colunas */
+    gap: 20px;
+    margin-bottom: 25px;
+    background: #141415;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+}
+
+.chart-box {
+    background: #1E293B;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #334155;
+    height: 250px; /* Altura fixa para o gráfico não distorcer */
+    position: relative;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.dashboard-select {
+    background: #0F172A;
+    border: 1px solid #475569;
+    color: #F8FAFC;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    flex: 1; /* Faz as caixas esticarem para preencher o espaço */
+    cursor: pointer;
+}
+.dashboard-select:focus { border-color: #38bdf8; }
+
+/* Responsivo para telas menores */
+@media screen and (max-width: 900px) {
+    .dashboard-grid { grid-template-columns: 1fr; /* Vira 1 coluna só em monitores pequenos */ }
+}
+
+/* ==========================================
+   DROPDOWN MULTI-SELECT (FILTROS DO DASHBOARD)
+   ========================================== */
+.multi-select-container { position: relative; flex: 1; min-width: 180px; }
+.btn-ms { display: flex !important; justify-content: space-between; align-items: center; width: 100%; }
+
+.menu-filtro-opcoes {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 100%;
+    background: #1E293B;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 10000;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    display: none; /* Escondido por padrão */
+    flex-direction: column;
+    padding: 5px;
+}
+
+.menu-filtro-opcoes.mostrar-menu { display: flex; }
+
+.ms-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #F8FAFC;
+    font-size: 11px;
+    transition: 0.2s;
+}
+.ms-item:hover { background: #334155; }
+.ms-item input[type="checkbox"] { cursor: pointer; accent-color: #38bdf8; width: 14px; height: 14px; }
+.ms-item-todos { border-bottom: 1px solid #334155; margin-bottom: 5px; font-weight: bold; color: #38bdf8; }
+
+/* ==========================================
+   AJUSTES DE INTERFACE DO DASHBOARD
+   ========================================== */
+
+/* 1. Empurra as caixinhas de KPI para a esquerda para não encostar no "X" */
+.radar-header {
+    padding-right: 45px; 
+}
+
+/* 2. Estilo do novo botão de Apagar o Banco de Dados */
+.btn-danger-text {
+    background: rgba(239, 68, 68, 0.1); /* Fundo vermelho transparente */
+    color: #EF4444; /* Texto vermelho (Alerta) */
+    border: 1px solid #EF4444;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Efeito ao passar o mouse: Fica totalmente vermelho */
+.btn-danger-text:hover {
+    background: #EF4444;
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+}
+
+/* ==========================================
+   PAINEL DE CONFIGURAÇÕES EXTRAS
+   ========================================== */
+.config-container { display: flex; gap: 20px; min-height: 400px; }
+.config-sidebar { width: 200px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #334155; padding-right: 15px; }
+.cfg-tab { background: transparent; border: none; color: #94A3B8; text-align: left; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+.cfg-tab:hover { background: #1E293B; color: #F8FAFC; }
+.cfg-tab.active { background: #0284C7; color: white; }
+
+.config-content { flex: 1; padding-left: 10px; }
+.cfg-input { background: #0F172A; border: 1px solid #475569; color: white; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; }
+.btn-upload { background: #334155; color: white; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; display: inline-block; transition: 0.2s; }
+.btn-upload:hover { background: #475569; }
+.btn-cfg-salvar { background: #10B981; color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; }
+.btn-cfg-salvar:hover { background: #059669; }
+
+.cfg-lista { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; }
+.cfg-lista li { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #1E293B; margin-bottom: 5px; border-radius: 6px; border: 1px solid #334155; }
+.btn-remover-item { background: transparent; color: #EF4444; border: 1px solid #EF4444; border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+.btn-remover-item:hover { background: #EF4444; color: white; }
+
+/* ==========================================
+   🔧 PACOTE DE CORREÇÕES P/ DESKTOP (MONITORES GRANDES)
+   ========================================== */
+
+/* 1. Ancora o Menu de Perfil no lugar correto */
+.user-menu-container {
+    position: relative !important;
+}
+.user-dropdown {
+    position: absolute !important;
+    top: 120% !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 220px !important;
+}
+
+/* 2. Trava o Menu do Radar para não quebrar a tela */
+.multi-select-container {
+    position: relative !important;
+}
+.menu-filtro-opcoes {
+    position: absolute !important;
+    top: 110% !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-height: 220px !important;
+    overflow-y: auto !important;
+    z-index: 99999 !important;
+}
+
+/* 3. Habilita o Scroll do Mouse independente para cada coluna no Modo Desktop */
+@media screen and (min-width: 1024px) {
+    body {
+        overflow: hidden !important; /* Impede a tela inteira de pular */
+    }
+    
+    .container {
+        height: calc(100vh - 85px) !important; /* Altura da tela menos o menu superior */
+        overflow: hidden !important;
+        align-items: flex-start !important;
+    }
+    
+    .history-side, .form-side, .preview-side {
+        height: 100% !important;
+        max-height: 100% !important;
+        overflow-y: auto !important; /* Liga a barra de rolagem interna */
+        padding-bottom: 30px !important; /* Respiro no final da página */
+    }
+    
+    /* Scrollbar minimalista para as colunas */
+    .history-side::-webkit-scrollbar, 
+    .form-side::-webkit-scrollbar, 
+    .preview-side::-webkit-scrollbar {
+        width: 6px;
+    }
+    .history-side::-webkit-scrollbar-thumb, 
+    .form-side::-webkit-scrollbar-thumb, 
+    .preview-side::-webkit-scrollbar-thumb {
+        background-color: #334155;
+        border-radius: 4px;
+    }
+}
+
+/* ========================================================= */
+/* AJUSTES DE PROPORÇÃO DA TELA (PONTO DE EQUILÍBRIO)        */
+/* ========================================================= */
+
+.form-side {
+    flex: 1.3 !important;
+    max-width: 750px !important;
+    min-width: 550px !important;
+}
+
+.preview-side {
+    flex: 1.2 !important;
+    max-width: 700px !important;
+    min-width: 550px !important;
+}
+
+/* Regra para quando o analista estiver usando Notebooks */
+@media screen and (max-width: 1600px) {
+    .form-side {
+        flex: 1.2 !important;
+        max-width: 650px !important;
+        min-width: 500px !important;
+    }
+    .preview-side {
+        flex: 1.1 !important;
+        max-width: 600px !important;
+        min-width: 450px !important;
+    }
+}
+
+/* ========================================================= */
+/* REMOÇÃO DO BURACO INFERIOR E ENCAIXE PERFEITO DA TELA     */
+/* ========================================================= */
+html, body {
+    height: 100vh !important;
+    width: 100vw !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.container {
+    /* Ocupa exatamente a tela inteira descontando só a barra do topo (70px) */
+    height: calc(100vh - 70px) !important; 
+    margin: 0 auto !important;
+    align-items: stretch !important; /* Estica as colunas até o limite inferior */
+}
+
+.form-side, .preview-side, .history-side {
+    height: 100% !important; 
+    max-height: 100% !important;
+    margin-bottom: 0 !important;
+    
+    /* Remove o arredondado de baixo para a caixa "colar" perfeitamente no chão do monitor */
+    border-bottom-left-radius: 0 !important; 
+    border-bottom-right-radius: 0 !important;
+    border-bottom: none !important;
+}
+
+/* ========================================================= */
+/* TEXTAREAS INTELIGENTES (AUTO-EXPANSÍVEIS E COM SCROLL)    */
+/* ========================================================= */
+textarea {
+    field-sizing: content !important; /* Tecnologia nativa para auto-expansão */
+    height: auto !important;          /* Derruba alturas fixas do código antigo */
+    min-height: 42px !important;
+    max-height: 175px !important;     /* Limite para a barra de rolagem aparecer */
+    overflow-y: auto !important;      /* Scroll interno elegante */
+    resize: none !important;
+    line-height: 1.5 !important;
+    box-sizing: border-box !important;
+    
+    /* O GRANDE VILÃO ESTAVA AQUI: Tiramos o 'all' e deixamos só cores na animação! */
+    transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s !important; 
+}
+
+/* ========================================================= */
+/* COMPACTAÇÃO DOS BOTÕES DO EXTRATOR MÁGICO                 */
+/* ========================================================= */
+#magic-extractor-container button,
+#magic-extractor-container button[onclick="processarExtratorMagico()"] {
+    min-width: 0 !important;     /* Remove a trava invisível de 200px */
+    width: auto !important;      /* Faz o botão abraçar apenas o tamanho da palavra */
+    margin: 0 !important;        /* Alinha os botões perfeitamente na barra */
+    padding-left: 20px !important;  /* Mantém uma área de clique confortável */
+    padding-right: 20px !important; 
+}
+
+/* ========================================================= */
+/* ESTILOS DO MÓDULO DE GESTÃO (CARDS DE AUDITORIA)          */
+/* ========================================================= */
+.card-auditoria {
+    background: #0F172A;
+    border: 1px solid #334155;
+    border-left: 4px solid #F59E0B;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-auditoria:hover {
+    background: #1E293B;
+    border-color: #38BDF8;
+    border-left-color: #38BDF8;
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* ========================================================= */
+/* MODO GESTÃO ENTERPRISE (BLINDAGEM ABSOLUTA FINAL)         */
+/* ========================================================= */
+
+/* 1. Trava o corpo da página para não criar rolagem global */
+body.modo-gestao {
+    overflow: hidden !important; 
+}
+
+/* 2. O Workspace Master: Fixo em Tela Cheia! */
+#app-gestao {
+    position: fixed !important;
+    top: 60px !important; 
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 60px) !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    background: #0B1120 !important;
+    z-index: 50 !important;
+}
+
+#app-gestao > div {
+    display: flex !important;
+    gap: 20px !important;
+    width: 100% !important;
+    height: 100% !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+}
+
+/* 3. O Palco Central (Onde as telas vão morar) */
+#gestao-content-area {
+    flex: 1 1 0% !important; 
+    position: relative !important;
+    overflow: hidden !important;
+    background: #0F172A !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5) !important;
+}
+
+/* 4. As Telas (Invisíveis por padrão) */
+.gestao-pane-ativo {
+    display: none !important; 
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    /* 🔥 A MÁGICA: Oblitéra o max-width de 900px do modal antigo! */
+    width: 100% !important;       
+    max-width: 100% !important;   
+    height: 100% !important;
+    padding: 30px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* 5. A Tela Ativa (Acende em modo Flex) */
+.gestao-pane-ativo.is-active {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* --- ESTILOS DO MENU E BOTÕES LATERAIS --- */
+.btn-gestao-menu {
+    background: transparent;
+    color: #94A3B8;
+    border: 1px solid transparent;
+    padding: 14px 15px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.btn-gestao-menu:hover { background: #1E293B; color: #F8FAFC; }
+.btn-gestao-menu.active {
+    background: #F59E0B;
+    color: #0F172A;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+/* ========================================================= */
+/* CORREÇÃO DO SCROLL DOS MÓDULOS NATIVOS (FLEXBOX FIX)      */
+/* ========================================================= */
+
+/* 1. Força as "caixas externas" das tabelas a preencherem o espaço vazio sem estourar o fundo da tela */
+body.modo-gestao #aba-gestao-tracking > div:last-child,
+body.modo-gestao #aba-gestao-base > div:last-child {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important; /* 🔥 A MÁGICA 1: Impede a caixa de vazar da tela */
+}
+
+/* 2. Aplica a barra de rolagem (scroll) diretamente no miolo das listas */
+body.modo-gestao #lista-auditoria-passagens,
+body.modo-gestao #aba-gestao-tracking > div:last-child > div,
+body.modo-gestao #lista-regras-base,
+body.modo-gestao #lista-base-analista,
+body.modo-gestao #conteudo-aceite-passagem,
+body.modo-gestao .radar-list {
+    max-height: none !important;
+    flex: 1 !important;
+    min-height: 0 !important; /* 🔥 A MÁGICA 2: Obriga a barra de rolagem a aparecer */
+    overflow-y: auto !important;
+    padding-right: 5px !important;
+}
+
+/* Oculta os botões e fundos de modais antigos */
+body.modo-gestao .btn-close-modal,
+body.modo-gestao #modal-gestao,
+body.modo-gestao #modal-historico,
+body.modo-gestao #modal-base-analista,
+body.modo-gestao #modal-aceite-passagem {
+    display: none !important;
+}
+
+/* ========================================================= */
+/* 💎 LAPIDAÇÃO DA ÚLTIMA PASSAGEM (TRANSFORMA EM PÁGINA)    */
+/* ========================================================= */
+
+body.modo-gestao #caixa-modal-aceite {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove as margens negativas do modal e alinha tudo elegantemente à esquerda */
+body.modo-gestao #header-modal-aceite {
+    background: transparent !important;
+    border-bottom: 1px solid #334155 !important;
+    margin: 0 0 20px 0 !important;
+    padding: 0 0 15px 0 !important;
+    text-align: left !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+
+body.modo-gestao #titulo-modal-aceite {
+    color: #38BDF8 !important;
+    font-size: 22px !important;
+    text-align: left !important;
+}
+
+body.modo-gestao #subtitulo-modal-aceite {
+    color: #94A3B8 !important;
+    text-align: left !important;
+    margin-top: 5px !important;
+}
+
+/* Estica o conteúdo interno e garante barra de rolagem limpa */
+body.modo-gestao #conteudo-aceite-passagem {
+    padding: 0 !important;
+    max-height: none !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding-right: 10px !important;
+}
+
+/* ========================================================= */
+/* CORREÇÃO DOS FILTROS DO RADAR (Z-INDEX)                   */
+/* ========================================================= */
+body.modo-gestao .advanced-filters .multi-select-container {
+    position: relative;
+    z-index: 9999 !important; /* Força o contêiner do botão a ter prioridade máxima */
+}
+
+body.modo-gestao .menu-filtro-opcoes {
+    z-index: 99999 !important; /* Força a "gaveta" suspensa a abrir por cima dos gráficos do Chart.js */
+}
+
+/* ========================================================= */
+/* CORREÇÃO DO EFEITO SANFONA E SCROLL DA GESTÃO             */
+/* ========================================================= */
+
+/* 1. Impede o formulário do topo (Adicionar Novo) de ser esmagado pela lista */
+body.modo-gestao #aba-gestao-base > div:first-child {
+    flex-shrink: 0 !important;
+}
+
+/* 2. Remove o Flexbox das listas da Sanfona para que o scroll do Chrome não corte o final */
+body.modo-gestao #lista-regras-base,
+body.modo-gestao #lista-base-analista {
+    display: block !important; 
+    padding-bottom: 25px !important; /* Dá um respiro extra no final da lista */
+}
+
+/* Exceção: Permite fechar a Máquina do Tempo e a Lente de Aumento na Gestão */
+body.modo-gestao #modal-auditoria-historica .btn-close-modal,
+body.modo-gestao #modal-lightbox .btn-close-modal {
+    display: block !important;
+}
+
+/* ========================================================= */
+/* EXTENSÃO: REMOÇÃO DA BARRA SUPERIOR E AJUSTE DE PERFIL    */
+/* ========================================================= */
+
+/* 1. Mata a barra superior global inteira no modo Gestão */
+body.modo-gestao .global-top-bar {
+    display: none !important;
+}
+
+/* 2. Zera a distância do topo (antes era 60px por causa da barra) para tela 100% cheia */
+body.modo-gestao #app-gestao {
+    top: 0 !important;
+    height: 100vh !important;
+}
+
+/* 3. Ajusta o botão do usuário para ficar bonitão no menu lateral */
+body.modo-gestao .user-menu-container {
+    width: 100%;
+}
+
+body.modo-gestao .btn-perfil {
+    width: 100%;
+    justify-content: center;
+    background: #0F172A !important;
+    border: 1px solid #475569 !important;
+    padding: 12px !important;
+}
+
+/* 4. O Menu suspenso (Configurações / Sair) agora abre para CIMA, escapando do menu lateral */
+body.modo-gestao .painel-visivel.user-dropdown {
+    position: fixed !important; 
+    bottom: 80px !important;
+    left: 35px !important;
+    top: auto !important;
+    right: auto !important;
+    width: 230px !important;
+    z-index: 999999 !important;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5) !important;
+}
+
+/* Traz o botão "X" de volta na visão da Gestão */
+body.modo-gestao #modal-configuracoes .btn-close-modal {
+    display: block !important;
+}
+
+/* ========================================================= */
+/* CORREÇÃO DO MODAL DE CONFIGURAÇÕES (COM AS CLASSES REAIS) */
+/* ========================================================= */
+
+/* 1. Traz o botão "X" de volta à vida na visão da Gestão */
+body.modo-gestao #modal-config .btn-close-modal {
+    display: block !important;
+}
+
+/* 2. Transforma o Modal num bloco rígido para acabar com o efeito sanfona */
+#modal-config .modal-content {
+    height: 75vh !important;
+    min-height: 550px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+/* 3. O Container interno (Abas + Conteúdo) preenche o espaço livre */
+#modal-config .config-container {
+    flex: 1 !important;
+    min-height: 0 !important;
+    display: flex !important;
+    overflow: hidden !important;
+}
+
+/* 4. A Barra Lateral fica blindada (não esmaga e não estica) */
+#modal-config .config-sidebar {
+    flex-shrink: 0 !important;
+    overflow-y: auto !important;
+}
+
+/* 5. A Área Direita ganha barra de rolagem independente */
+#modal-config .config-content {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    padding-right: 15px !important;
+    height: 100% !important;
+}
+
+/* 6. Transforma a aba visível em um bloco flexível que preenche a altura da tela */
+#modal-config .cfg-panel:not([style*="display: none"]) {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100% !important;
+}
+
+/* 7. Destrava o limite antigo e força as listas a dominarem o espaço vazio */
+#modal-config .cfg-lista {
+    max-height: none !important; /* Anula o max-height: 250px do código antigo */
+    flex: 1 !important;          /* Estica a caixa até o fundo */
+}
+
+/* ========================================================= */
+/* BLOQUEIO DO EFEITO "PISCAR" (FOUC BLOCKER)                */
+/* ========================================================= */
+
+/* Se o script do cabeçalho detectar que é o Gestor ANTES da página carregar, 
+   ele já pinta o fundo de escuro e oblitera o layout do Analista */
+html.is-gestao-loading body {
+    background-color: #0B1120 !important;
+}
+
+html.is-gestao-loading .global-top-bar,
+html.is-gestao-loading #app-analista {
+    display: none !important;
+}
+
+/* ========================================================= */
+/* LAPIDAÇÃO VISUAL DO FORMULÁRIO (ESTILO SOFTWARE)          */
+/* ========================================================= */
+
+/* 1. O Extrator Mágico: Transformando numa "Caixa de Ferramenta" */
+#magic-extractor-container {
+    background: rgba(0, 0, 0, 0.15) !important; 
+    border: 1px dashed #475569 !important; 
+    border-radius: 8px !important;
+    padding: 12px 15px !important;
+    margin-bottom: 25px !important;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.1) !important;
+}
+body.pro-mode #magic-extractor-container { border-color: #555 !important; }
+
+/* 2. O Container das Abas (Removendo a caixa antiga de fundo) */
+.section-tabs {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important; /* Zera a margem para colar no formulário abaixo */
+    gap: 4px !important;
+}
+
+/* 3. O Botão das Abas (Estilo Fichário/Pasta) */
+.section-tab-btn {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid #334155 !important;
+    border-bottom: none !important; /* Tira a borda de baixo para fundir com a tela */
+    border-radius: 8px 8px 0 0 !important; /* Arredonda só o topo */
+    padding: 12px 15px !important;
+    opacity: 0.5;
+    transition: all 0.2s ease !important;
+}
+body.pro-mode .section-tab-btn { border-color: #444 !important; }
+
+/* A Aba Ativa (Acende e se funde com o formulário) */
+.section-tab-btn.active {
+    opacity: 1 !important;
+    background: #1E293B !important; 
+    border-color: #38BDF8 !important; 
+    color: #38BDF8 !important;
+    position: relative;
+    top: 1px; /* Desce um pixel para "apagar" a linha superior do formulário */
+    z-index: 10;
+    box-shadow: none !important;
+}
+body.pro-mode .section-tab-btn.active {
+    background: #282828 !important;
+    border-color: #2D8CEB !important;
+    color: #2D8CEB !important;
+}
+
+/* Opcional: A Aba Ativa do Modo Infraestrutura (Cor Azul) */
+body.tema-infra .section-tab-btn.active {
+    border-color: #0284C7 !important; 
+    color: #0284C7 !important;
+}
+
+/* 4. O Cartão de Conteúdo do Formulário (A "Caixa" Principal) */
+.form-section {
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-top-color: #38BDF8; /* Linha de destaque superior acompanhando a aba ativa */
+    border-radius: 0 8px 8px 8px; /* O topo esquerdo fica reto por causa da aba */
+    padding: 25px 20px 10px 20px; /* Dá um respiro interno para os campos */
+    margin-bottom: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+body.pro-mode .form-section {
+    background: #282828;
+    border-color: #444;
+    border-top-color: #2D8CEB;
+}
+body.tema-infra .form-section {
+    border-top-color: #0284C7;
+}
+
+/* 5. Ajuste fino na distância das etiquetas dos inputs para não colar na borda nova */
+.form-grid label {
+    margin-left: 2px;
+}
+
+/* ========================================================= */
+/* LAPIDAÇÃO DOS CAMPOS DE TEXTO (ESTILO CARDS DO INFORME)   */
+/* ========================================================= */
+
+/* 1. Transforma o fundo das caixas em Cards idênticos ao do relatório */
+.form-section .input-group {
+    background: #0F172A; /* Fundo escuro interno */
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+body.pro-mode .form-section .input-group { background: #1E1E1E; border-color: #444; }
+
+/* 2. Apaga as bordas nativas dos inputs para eles se fundirem com o Card */
+.form-section .input-group input,
+.form-section .input-group select,
+.form-section .input-group textarea {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 5px 0 0 0 !important;
+    color: #38BDF8 !important; /* Azul neon brilhante para os dados digitados */
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+/* 3. Remove a borda azul agressiva do navegador ao clicar */
+.form-section .input-group input:focus,
+.form-section .input-group select:focus,
+.form-section .input-group textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* 4. Ilumina o CARD INTEIRO quando o analista clica dentro dele */
+.form-section .input-group:focus-within {
+    border-color: #38BDF8;
+    background: #1E293B;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+}
+
+/* Foco específico para a aba de Infraestrutura */
+body.tema-infra .form-section .input-group:focus-within {
+    border-color: #0284C7;
+    box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.15);
+}
+
+/* 5. Alinha os Títulos (Labels) dentro do Card */
+.form-section .input-group label {
+    margin-left: 0;
+    font-size: 10px;
+    color: #94A3B8;
+}
+.form-section .input-group .label-flex {
+    margin-bottom: 2px;
+}
