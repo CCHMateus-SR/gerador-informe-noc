@@ -1629,9 +1629,17 @@ window.processarExtratorMagico = function() {
                 const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
                 const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
                 
-                // 🔥 CORREÇÃO 2: Mudança para bancoDeLogos
+                // MÁGICA NOVA: Tira espaços e acentos do que veio do Centreon
+                const prefixoLimpo = prefixoReal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+                
                 const clientesPossiveis = Object.keys(window.bancoDeLogos || {});
-                let match = clientesPossiveis.find(c => c.startsWith(prefixoReal));
+                let match = clientesPossiveis.find(c => {
+                    // Tira espaços e acentos do que está cadastrado no Banco
+                    const cLimpo = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+                    // Verifica se um contém o outro
+                    return cLimpo.startsWith(prefixoLimpo) || prefixoLimpo.startsWith(cLimpo);
+                });
+                
                 if (match) clienteDetectado = match;
             }
         }
