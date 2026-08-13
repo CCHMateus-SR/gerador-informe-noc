@@ -34,6 +34,16 @@ window.salvarLogin = function() {
         return; 
     }
     
+    // --- 🔐 NOVA TRAVA DE SEGURANÇA PARA GESTÃO ---
+    if (turno === "Gestão") {
+        const senha = prompt("🔒 Acesso Restrito. Digite a senha da Gestão:");
+        if (senha !== "adminits") { 
+            alert("❌ Senha incorreta. Acesso negado.");
+            return;
+        }
+    }
+    // ----------------------------------------------
+    
     currentUser = { nome, turno };
     try { localStorage.setItem('noc_user_info', JSON.stringify(currentUser)); } catch(e){}
     
