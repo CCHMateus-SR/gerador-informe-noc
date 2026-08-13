@@ -488,22 +488,33 @@ window.update = function() {
 
     const headerCell = document.getElementById('render-header-cell');
     
+    // 1. Reduz drasticamente o vão branco (padding) do topo e da base
+    headerCell.style.padding = "15px 20px 15px 20px";
+    
     let logoSrc = (window.bancoDeLogos && window.bancoDeLogos[vCliente]) ? window.bancoDeLogos[vCliente] : null;
+
+    // 2. Regra Anti-Duplicação: Se for um chamado da própria ITS, anula a segunda logo
+    if (vCliente === 'ITS' || vCliente === 'ITS SOLUÇÕES' || vCliente === 'ITS SOLUCOES') {
+        logoSrc = null;
+    }
 
     if (logoSrc) { 
         headerCell.innerHTML = `
-        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 90px;">
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 70px;">
             <tr>
                 <td width="50%" align="center" valign="middle">
-                    <img src="Logos/logo-its.png" alt="ITS" style="max-height: 60px; max-width: 180px; width: auto; height: auto; display: inline-block; object-fit: contain;">
+                    <!-- Logo da ITS aumentada para ganhar presença -->
+                    <img src="Logos/logo-its.png" alt="ITS" style="max-height: 65px; max-width: 200px; width: auto; height: auto; display: inline-block; object-fit: contain;">
                 </td>
                 <td width="50%" align="center" valign="middle">
-                    <img src="${logoSrc}" alt="Logo Cliente" style="max-height: 60px; max-width: 180px; width: auto; height: auto; display: inline-block; object-fit: contain;">
+                    <!-- Logo do cliente acompanhando o novo limite -->
+                    <img src="${logoSrc}" alt="Logo Cliente" style="max-height: 65px; max-width: 200px; width: auto; height: auto; display: inline-block; object-fit: contain;">
                 </td>
             </tr>
         </table>`;
     } else { 
-        headerCell.innerHTML = `<img src="Logos/logo-its.png" alt="ITS" style="max-height: 70px; max-width: 250px; width: auto; height: auto; display: block; margin: 0 auto; object-fit: contain;">`;
+        // Quando for a ITS sozinha, ela pode ficar ainda mais em destaque
+        headerCell.innerHTML = `<img src="Logos/logo-its.png" alt="ITS" style="max-height: 75px; max-width: 250px; width: auto; height: auto; display: block; margin: 0 auto; object-fit: contain;">`;
     }
 
     document.getElementById('v-titulo').innerText = tituloTexto; 
@@ -1445,23 +1456,6 @@ window.processarExtratorMagico = function() {
         return; 
     }
 
-    const elProtLibbs = document.getElementById('protocolo-libbs');
-    backupFormulario = {
-        cliente: document.getElementById('cliente').value, host: document.getElementById('host').value, item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
-        statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, status: document.getElementById('status').value,
-        protocolo: document.getElementById('protocolo').value, itssm: document.getElementById('itssm').value, 
-        protocoloLibbs: elProtLibbs ? elProtLibbs.value : '', 
-        inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
-        solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, desc: document.getElementById('desc').value, evidencias: document.getElementById('evidencias').checked
-    };
-    
-    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
-    camposParaLimpar.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-    if (elProtLibbs) elProtLibbs.value = '';
-    document.getElementById('status').value = 'EM ABERTO'; 
-    document.getElementById('severidade').value = 'WARNING'; 
-    document.getElementById('evidencias').checked = false;
-
     let linhas = raw.split('\n').filter(l => l.trim() !== '');
     if (linhas.length === 0) return;
 
@@ -1495,16 +1489,11 @@ window.processarExtratorMagico = function() {
     linhasColunas = linhasColunas.map(cols => {
         return cols.filter(c => {
             let up = c.toUpperCase();
-            return !up.includes('HTTP ACTION LINK') && 
-                   !up.includes('HTTP://') && 
-                   !up.includes('HTTPS://') && 
-                   !up.includes('NOTIFICATION IS DISABLED') && 
-                   !up.includes('NOTIFICATIONS ARE DISABLED');
+            return !up.includes('HTTP ACTION LINK') && !up.includes('HTTP://') && !up.includes('HTTPS://') && !up.includes('NOTIFICATION IS DISABLED') && !up.includes('NOTIFICATIONS ARE DISABLED');
         });
     });
 
     let hostMemoria = ""; 
-
     const regexStatus = /^(OK|CRITICAL|WARNING|UNKNOWN|UP|DOWN|PENDING|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)$/i;
     const regexStatusLog = /(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)/i;
 
@@ -1517,52 +1506,33 @@ window.processarExtratorMagico = function() {
 
         if (cols.length >= 2) {
             let offset = 0;
-            if (cols[0].toLowerCase() === 'vm' || cols[0].trim().length <= 2) {
-                offset = 1;
-            }
+            if (cols[0].toLowerCase() === 'vm' || cols[0].trim().length <= 2) offset = 1;
             
             let item0 = cols[offset];
             let item1 = cols[offset + 1];
 
             if (item1) {
-                const isItem1Status = regexStatus.test(item1.trim());
-                if (isItem1Status) {
+                if (regexStatus.test(item1.trim())) {
                     servicoStr = item0; 
                 } else {
-                    if (item0 && !hostsDetectados.includes(item0)) {
-                        hostsDetectados.push(item0); 
-                    }
-                    hostMemoria = item0;
-                    hostDestaLinha = item0;
-                    servicoStr = item1;
+                    if (item0 && !hostsDetectados.includes(item0)) hostsDetectados.push(item0); 
+                    hostMemoria = item0; hostDestaLinha = item0; servicoStr = item1;
                 }
-            } else {
-                servicoStr = item0;
-            }
+            } else { servicoStr = item0; }
         } else if (cols.length === 1) {
             let linhaTexto = cols[0];
             let matchStatusLinha = linhaTexto.match(/(CRITICAL|WARNING|OK|UNKNOWN|UP|DOWN|CRÍTICO|CRITICO|AVISO|DESCONHECIDO)\s*-\s*(.*)/i);
-            if (matchStatusLinha) {
-                statusStr = matchStatusLinha[0];
-                linhaTexto = linhaTexto.replace(matchStatusLinha[0], '').trim();
-            }
+            if (matchStatusLinha) { statusStr = matchStatusLinha[0]; linhaTexto = linhaTexto.replace(matchStatusLinha[0], '').trim(); }
             servicoStr = linhaTexto.split(/\s+/)[0]; 
         }
 
-        if (servicoStr && !servicos.includes(servicoStr)) { servicos.push(servicoStr); }
-        
-        if (statusStr) { 
-            rawStatusInfos.push({ host: hostDestaLinha, servico: servicoStr, status: statusStr }); 
-        }
+        if (servicoStr && !servicos.includes(servicoStr)) servicos.push(servicoStr); 
+        if (statusStr) rawStatusInfos.push({ host: hostDestaLinha, servico: servicoStr, status: statusStr }); 
 
         let statusEncontradoLinha = "";
-        
         for (let c of cols) {
             let cUp = c.trim().toUpperCase();
-            if (regexStatus.test(cUp)) {
-                statusEncontradoLinha = cUp;
-                break;
-            }
+            if (regexStatus.test(cUp)) { statusEncontradoLinha = cUp; break; }
         }
         
         if (!statusEncontradoLinha) {
@@ -1578,10 +1548,7 @@ window.processarExtratorMagico = function() {
             else if (statusNorm === 'UP') statusNorm = 'OK';
 
             let peso = prioridadeSeveridade[statusNorm] || 0;
-            if (peso > piorSeveridadeNum) {
-                piorSeveridadeNum = peso;
-                severidadeFinal = statusNorm;
-            }
+            if (peso > piorSeveridadeNum) { piorSeveridadeNum = peso; severidadeFinal = statusNorm; }
         }
 
         for (let j = 1; j < cols.length - 1; j++) {
@@ -1607,7 +1574,6 @@ window.processarExtratorMagico = function() {
                 else if (siglaVeeam === 'IGUA') clienteDetectado = 'IGUA HOLDING';
                 else if (siglaVeeam === 'MEUCURSO') clienteDetectado = 'MEUCURSO';
                 else {
-                    // 🔥 CORREÇÃO 1: Mudança para bancoDeLogos
                     const clientesLista = Object.keys(window.bancoDeLogos || {});
                     let match = clientesLista.find(c => c.startsWith(siglaVeeam));
                     if (match) clienteDetectado = match;
@@ -1629,17 +1595,12 @@ window.processarExtratorMagico = function() {
                 const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
                 const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
                 
-                // MÁGICA NOVA: Tira espaços e acentos do que veio do Centreon
                 const prefixoLimpo = prefixoReal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
-                
                 const clientesPossiveis = Object.keys(window.bancoDeLogos || {});
                 let match = clientesPossiveis.find(c => {
-                    // Tira espaços e acentos do que está cadastrado no Banco
                     const cLimpo = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
-                    // Verifica se um contém o outro
                     return cLimpo.startsWith(prefixoLimpo) || prefixoLimpo.startsWith(cLimpo);
                 });
-                
                 if (match) clienteDetectado = match;
             }
         }
@@ -1654,20 +1615,8 @@ window.processarExtratorMagico = function() {
         }
     }
 
-    if (clienteDetectado) { document.getElementById('cliente').value = clienteDetectado; }
-    if (hostsDetectados.length > 0) { document.getElementById('host').value = hostsDetectados.join(' / '); }
-    
-    if (servicos.length > 0) {
-        let novoItem = servicos.join('\n');
-        document.getElementById('item').value = novoItem;
-        if (typeof window.detectarOperadoraOuGeral === 'function') {
-            let opDetectada = window.detectarOperadoraOuGeral(novoItem);
-            if (opDetectada) document.getElementById('solucionador').value = opDetectada;
-        }
-    }
-
+    let textoStatusFormatado = "";
     if (rawStatusInfos.length > 0) {
-        let textoStatusFormatado = "";
         if (rawStatusInfos.length === 1) {
             textoStatusFormatado = rawStatusInfos[0].status;
         } else {
@@ -1677,22 +1626,137 @@ window.processarExtratorMagico = function() {
                 return `[${rotulo}]\n${info.status}`;
             }).join('\n\n');
         }
-        document.getElementById('statusinfo').value = textoStatusFormatado;
     }
-    
-    if (severidadeFinal) { document.getElementById('severidade').value = severidadeFinal; }
 
-    if (menorDuracaoMs !== Infinity) {
-        let dataCalculada = new Date(Date.now() - menorDuracaoMs);
-        const pt = `${dataCalculada.toLocaleDateString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric'})} às ${dataCalculada.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
-        document.getElementById('inicio').value = pt;
+    // 🚀 O NOVO CÉREBRO: Pacote de Dados Extraídos
+    const pacoteExtraido = {
+        cliente: clienteDetectado,
+        hosts: hostsDetectados.join(' / '),
+        servicos: servicos.join('\n'),
+        statusInfo: textoStatusFormatado,
+        severidade: severidadeFinal,
+        duracaoMs: menorDuracaoMs,
+        servicosArray: servicos
+    };
+
+    // 🔎 O DETETIVE DE CORRELAÇÃO: Procura por chamados abertos!
+    let chamadoHerdar = null;
+    let hostAlvo = hostsDetectados.length > 0 ? hostsDetectados[0].toUpperCase().replace(/[⭐★]/g, '').trim() : '';
+    let servicoAlvo = servicos.length > 0 ? servicos[0].split('\n')[0].toUpperCase().trim() : '';
+
+    if (hostAlvo && servicoAlvo && typeof chamadosDoTurno !== 'undefined') {
+        for (let i = chamadosDoTurno.length - 1; i >= 0; i--) {
+            const c = chamadosDoTurno[i];
+            if (c.form && c.form.status !== 'RESOLVIDO') {
+                const h = (c.form.host || '').toUpperCase().replace(/[⭐★]/g, '').trim();
+                const s = (c.form.item || '').split('\n')[0].toUpperCase().trim();
+                if (h === hostAlvo && s === servicoAlvo) { chamadoHerdar = c.form; break; }
+            }
+        }
+    }
+
+    // 🚦 A DECISÃO:
+    if (chamadoHerdar) {
+        document.getElementById('modal-extrator-acao').style.display = 'flex';
+        document.getElementById('btn-extrator-follow').onclick = () => window.aplicarExtraidoNoFormulario(chamadoHerdar, 'FOLLOW-UP', pacoteExtraido);
+        document.getElementById('btn-extrator-encerra').onclick = () => window.aplicarExtraidoNoFormulario(chamadoHerdar, 'RESOLVIDO', pacoteExtraido);
+    } else {
+        window.aplicarExtraidoNoFormulario(null, 'ABERTURA', pacoteExtraido);
+    }
+};
+
+// 🪄 O MOTOR EXECUTOR: Preenche o formulário dependendo da Ação Escolhida
+window.aplicarExtraidoNoFormulario = function(heranca, acaoDesejada, ext) {
+    document.getElementById('modal-extrator-acao').style.display = 'none';
+
+    // Salva backup de segurança caso o analista queira desfazer
+    const elProtLibbs = document.getElementById('protocolo-libbs');
+    window.backupFormulario = {
+        cliente: document.getElementById('cliente').value, host: document.getElementById('host').value, item: document.getElementById('item').value, severidade: document.getElementById('severidade').value,
+        statusinfo: document.getElementById('statusinfo').value, pressplay: document.getElementById('pressplay').value, status: document.getElementById('status').value,
+        protocolo: document.getElementById('protocolo').value, itssm: document.getElementById('itssm').value, protocoloLibbs: elProtLibbs ? elProtLibbs.value : '', 
+        inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value,
+        solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, desc: document.getElementById('desc').value, evidencias: document.getElementById('evidencias').checked
+    };
+
+    // Limpa a tela inteira para receber os novos dados perfeitamente
+    const camposParaLimpar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
+    camposParaLimpar.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    if (elProtLibbs) elProtLibbs.value = '';
+    document.getElementById('evidencias').checked = false;
+
+    if (heranca) {
+        // 🔥 PUXA TODOS OS DADOS DO PASSADO (CORRELAÇÃO)
+        document.getElementById('cliente').value = heranca.cliente || ext.cliente;
+        document.getElementById('host').value = heranca.host || ext.hosts;
+        document.getElementById('item').value = heranca.item || ext.servicos;
+        document.getElementById('inicio').value = heranca.inicio || '';
+        document.getElementById('protocolo').value = heranca.protocolo || '';
+        document.getElementById('itssm').value = heranca.itssm || '';
+        if (elProtLibbs) elProtLibbs.value = heranca.protocoloLibbs || '';
+        document.getElementById('solucionador').value = heranca.solucionador || '';
+        
+        document.getElementById('status').value = acaoDesejada;
+        document.getElementById('statusinfo').value = ext.statusInfo;
+
+        if (acaoDesejada === 'FOLLOW-UP') {
+            document.getElementById('desc').value = heranca.desc || '';
+            document.getElementById('obs').value = heranca.obs || '';
+            document.getElementById('pressplay').value = heranca.pressplay || '';
+            
+            const agora = new Date();
+            document.getElementById('f-grid').value = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+            document.getElementById('severidade').value = ext.severidade || heranca.severidade;
+            document.getElementById('termino').value = heranca.termino || '-';
+            
+            mostrarToast("🟡 Follow-Up preenchido. Dados do chamado puxados!", "warning", 4000);
+        } 
+        else if (acaoDesejada === 'RESOLVIDO') {
+            // Oculta os opcionais para o encerramento, conforme sua regra!
+            document.getElementById('desc').value = '';
+            document.getElementById('obs').value = '';
+            document.getElementById('pressplay').value = '';
+            document.getElementById('f-grid').value = heranca.fgrid || '-';
+            
+            document.getElementById('severidade').value = 'OK';
+
+            // 🧮 A MATEMÁTICA BRILHANTE: Calcula que horas o serviço voltou baseado no log do Centreon!
+            if (ext.duracaoMs !== Infinity) {
+                let horaNormalizacao = new Date(Date.now() - ext.duracaoMs);
+                document.getElementById('termino').value = `${horaNormalizacao.toLocaleDateString('pt-BR')} às ${horaNormalizacao.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+            } else {
+                const agora = new Date();
+                document.getElementById('termino').value = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+            }
+
+            mostrarToast("🟢 Encerramento preenchido. Horário de normalização calculado com precisão!", "success", 5000);
+        }
+    } 
+    else {
+        // 🚀 ABERTURA DE NOVO CHAMADO (Nenhum histórico encontrado)
+        document.getElementById('cliente').value = ext.cliente;
+        document.getElementById('host').value = ext.hosts;
+        document.getElementById('item').value = ext.servicos;
+        document.getElementById('statusinfo').value = ext.statusInfo;
+        document.getElementById('severidade').value = ext.severidade || 'WARNING';
+        document.getElementById('status').value = 'EM ABERTO';
+
+        if (ext.duracaoMs !== Infinity) {
+            let dataInicio = new Date(Date.now() - ext.duracaoMs);
+            document.getElementById('inicio').value = `${dataInicio.toLocaleDateString('pt-BR')} às ${dataInicio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+        }
+
+        if (ext.servicosArray.length > 0 && typeof window.detectarOperadoraOuGeral === 'function') {
+            let op = window.detectarOperadoraOuGeral(ext.servicosArray.join('\n'));
+            if (op) document.getElementById('solucionador').value = op;
+        }
+
+        const msgDesfazer = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🪄 Dados aplicados! Novo Chamado.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
+        mostrarToast(msgDesfazer, "info", 6000);
     }
 
     document.getElementById('magic-paste-area').value = '';
     window.update();
-    
-    const toastMsg = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🪄 Dados aplicados! O chamado antigo foi limpo.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
-    mostrarToast(toastMsg, "info", 10000);
     window.ajustarTodasTextareas();
 };
 
