@@ -1269,6 +1269,7 @@ window.salvarPassagemTurno = async function() {
 
 window.idPassagemPendente = null;
 
+// O Escutador de Passagens Pendentes
 firebase.database().ref('passagens_turno').orderByKey().limitToLast(1).on('value', (snapshot) => {
     if (!snapshot.exists()) return;
 
@@ -1276,13 +1277,23 @@ firebase.database().ref('passagens_turno').orderByKey().limitToLast(1).on('value
         const id = childSnapshot.key;
         const dados = childSnapshot.val();
 
-        const selectLogin = document.getElementById('login-nome');
-        const meuNome = (selectLogin && selectLogin.value) ? selectLogin.value : "";
+        // Lógica blindada para descobrir quem está na frente da tela (Crachá ou Memória)
+        let meuNome = "";
+        const userDisplay = document.getElementById('user-display');
+        if (userDisplay && userDisplay.innerText.includes('👤')) {
+            meuNome = userDisplay.innerText.replace('👤', '').trim();
+        } else {
+            const salvo = localStorage.getItem('noc_user_info');
+            if (salvo) meuNome = JSON.parse(salvo).nome;
+        }
 
+        // Se está aguardando aceite E não fui eu que enviei -> BLOQUEIA A TELA!
         if (dados.aceite && dados.aceite.status === "Aguardando" && dados.responsavel_envio !== meuNome) {
             window.idPassagemPendente = id;
             mostrarTelaDeAceite(dados);
-        } else if (dados.aceite && dados.aceite.status === "Concluído" && window.idPassagemPendente === id) {
+        } 
+        // Se alguém já aceitou E a minha tela ainda estava bloqueada -> LIBERA A TELA!
+        else if (dados.aceite && dados.aceite.status === "Concluído" && window.idPassagemPendente === id) {
             document.getElementById('modal-aceite-passagem').style.display = 'none';
             window.idPassagemPendente = null;
         }
@@ -1746,12 +1757,19 @@ window.mudarAbaGestao = function(aba) {
 window.historicoPassagensCache = []; // Banco de memória local
 
 window.carregarAuditoriaPassagens = async function() {
-    const container = document.getElementById('lista-auditoria-passagens');
-    if (!container) return;
-    container.innerHTML = '<div style="color: #94A3B8; text-align: center; padding: 30px;">⏳ Buscando dados seguros na nuvem...</div>';
+    // Agora o sistema pega as duas caixas (A da Gestão e a do Analista)
+    const containerGestao = document.getElementById('lista-auditoria-passagens');
+    const containerAnalista = document.getElementById('container-lista-turnos-analista'); 
+    
+    const showLoading = () => {
+        const loadingHtml = '<div style="color: #94A3B8; text-align: center; padding: 30px;">⏳ Buscando dados seguros na nuvem...</div>';
+        if (containerGestao) containerGestao.innerHTML = loadingHtml;
+        if (containerAnalista) containerAnalista.innerHTML = loadingHtml;
+    };
+    
+    showLoading();
 
     try {
-        // Busca as últimas 60 passagens geradas no sistema
         const snapshot = await firebase.database().ref('passagens_turno').limitToLast(60).once('value');
         if (snapshot.exists()) {
             window.historicoPassagensCache = [];
@@ -1759,13 +1777,11 @@ window.carregarAuditoriaPassagens = async function() {
                 window.historicoPassagensCache.push({ key: child.key, data: child.val() });
             });
 
-            // Inverte o array (as mais novas ficam no topo)
             window.historicoPassagensCache.reverse();
 
             let html = '';
             window.historicoPassagensCache.forEach(item => {
                 const d = item.data;
-                // Valida se o turno seguinte já assinou a leitura ou se está pendente
                 const statusAceite = (d.aceite && d.aceite.status === "Concluído") 
                     ? `<span style="color: #10B981; font-weight: bold;">✔️ Assumido por ${d.aceite.responsavel_aceite} às ${d.aceite.hora_aceite}</span>` 
                     : `<span style="color: #F59E0B; font-weight: bold;">⏳ Aguardando Aceite</span>`;
@@ -1782,13 +1798,26 @@ window.carregarAuditoriaPassagens = async function() {
                     </div>
                 </div>`;
             });
-            container.innerHTML = html;
+            
+            // Joga os cards de histórico nas duas telas ao mesmo tempo!
+            if (containerGestao) containerGestao.innerHTML = html;
+            if (containerAnalista) containerAnalista.innerHTML = html;
         } else {
-            container.innerHTML = '<div style="color: #64748B; text-align: center; padding: 30px;">Nenhuma passagem registrada no banco de dados.</div>';
+            const emptyHtml = '<div style="color: #64748B; text-align: center; padding: 30px;">Nenhuma passagem registrada no banco de dados.</div>';
+            if (containerGestao) containerGestao.innerHTML = emptyHtml;
+            if (containerAnalista) containerAnalista.innerHTML = emptyHtml;
         }
     } catch (e) {
-        container.innerHTML = '<div style="color: #EF4444; text-align: center; padding: 30px;">Erro de conexão ao buscar os dados.</div>';
+        const errorHtml = '<div style="color: #EF4444; text-align: center; padding: 30px;">Erro de conexão ao buscar os dados.</div>';
+        if (containerGestao) containerGestao.innerHTML = errorHtml;
+        if (containerAnalista) containerAnalista.innerHTML = errorHtml;
     }
+};
+
+// Nova função apenas para abrir a tela da equipe
+window.abrirHistoricoTurnosAnalista = function() {
+    document.getElementById('modal-lista-turnos-analista').style.display = 'flex';
+    carregarAuditoriaPassagens();
 };
 
 // A Mágica de abrir a Passagem antiga
