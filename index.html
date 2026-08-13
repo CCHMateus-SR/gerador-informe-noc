@@ -494,39 +494,53 @@
 
 <!-- NOVA BARRA GLOBAL SUPERIOR -->
 <nav class="global-top-bar">
+    
+    <!-- Esquerda: Identificação do Sistema -->
     <div class="top-left">
         <button class="btn-toggle-historico" onclick="abrirGavetaHistorico()">☰ HISTÓRICO</button>
-
-        <span id="relogio-noc" class="meta-clock">--:--:--</span>
-        <span id="conexao-status" class="status-conn conn-offline">🔴 OFFLINE</span>
-        <div id="header-sev-badge" class="meta-sev-badge">🟡 WARNING</div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-left: 10px;">
+            <span style="font-size: 18px;"></span>
+            <strong style="color: #F8FAFC; font-size: 16px; letter-spacing: 1px;">ITS <span style="color: #38BDF8;">NOC</span></strong>
+        </div>
     </div>
     
-    <div class="top-center">
-        <button id="btn-painel-gestao" class="btn-top-action" onclick="abrirPainelGestao()" style="display: none; background: #F59E0B; border-color: #D97706; color: #FFFBEB; font-weight: 900; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); margin-right: 10px; letter-spacing: 0.5px;">
+    <!-- Centro: Módulos Organizados em Grupos -->
+    <div class="top-center" style="gap: 15px;">
+        
+        <!-- Botão Exclusivo da Gestão -->
+        <button id="btn-painel-gestao" class="btn-top-action" onclick="abrirPainelGestao()" style="display: none; background: #F59E0B; border-color: #D97706; color: #1E293B; font-weight: 900; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); letter-spacing: 0.5px;">
             👑 PAINEL DA GESTÃO
         </button>
-        <button id="btn-top-radar" class="btn-top-action" onclick="abrirHistorico()"> ABRIR RADAR</button>
-        <button class="btn-top-action btn-acionamentos">📞 ACIONAMENTOS</button>
-        <!-- TIMELINE COM INTELIGÊNCIA DE AUSÊNCIA -->
-        <div class="timeline-container">
-            <button class="btn-top-action" id="btn-timeline" onclick="abrirTimeline()">
-                 TIMELINE
-                <span id="contador-notificacoes" class="badge-oculto">0</span>
-            </button>
+
+        <!-- GRUPO 1: Ferramentas Operacionais -->
+        <div style="display: flex; gap: 5px; background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 8px; border: 1px solid #334155;">
+            <button id="btn-top-radar" class="btn-top-action" onclick="abrirHistorico()" style="background: transparent; border: none; color: #F8FAFC;">📡 RADAR</button>
+            
+            <div class="timeline-container">
+                <button class="btn-top-action" id="btn-timeline" onclick="abrirTimeline()" style="background: transparent; border: none; color: #F8FAFC;">
+                     TIMELINE
+                    <span id="contador-notificacoes" class="badge-oculto">0</span>
+                </button>
+            </div>
+            
+            <button id="btn-top-procedimentos" class="btn-top-action" onclick="abrirBaseAnalista()" style="background: transparent; border: none; color: #10B981;">📚 PROCEDIMENTOS</button>
+            
+            <!-- Botão Oculto para o Futuro -->
+            <button class="btn-top-action btn-acionamentos" style="display: none;">📞 ACIONAMENTOS</button>
         </div>
 
-        <!-- 👇 BOTÕES DE PASSAGEM DIVIDIDOS 👇 -->
-        <div class="timeline-container" style="display: flex; gap: 5px;">
-            <button id="btn-top-procedimentos" class="btn-top-action" onclick="abrirBaseAnalista()" style="background: #10B981; border-color: #059669; color: #FFF; font-weight: bold;">📚 PROCEDIMENTOS</button>
-            <button id="btn-top-ler-ultima" class="btn-top-action" onclick="lerUltimaPassagem()" style="background: #0284C7; border-color: #0369A1; color: #E0F2FE; font-weight: bold;">📖 LER ÚLTIMA</button>
-            <button id="btn-top-enviar-passagem" class="btn-top-action" onclick="abrirPassagemTurno()" style="background: #4C1D95; border-color: #5B21B6; color: #EDE9FE; font-weight: bold;">📝 ENVIAR PASSAGEM</button>
+        <!-- GRUPO 2: Passagem de Turno -->
+        <div style="display: flex; gap: 5px; background: rgba(255, 255, 255, 0.03); padding: 4px; border-radius: 8px; border: 1px solid #334155;">
+            <button id="btn-top-ler-ultima" class="btn-top-action" onclick="lerUltimaPassagem()" style="background: transparent; border: none; color: #38BDF8;">📖 LER ÚLTIMA</button>
+            <button id="btn-top-historico-turnos" class="btn-top-action" onclick="abrirHistoricoTurnosAnalista()" style="background: transparent; border: none; color: #94A3B8;">🕰️ TURNOS ANTERIORES</button>
+            
+            <!-- O botão de ação principal continua com destaque -->
+            <button id="btn-top-enviar-passagem" class="btn-top-action" onclick="abrirPassagemTurno()" style="background: #4C1D95; border-color: #5B21B6; color: #EDE9FE; box-shadow: 0 2px 8px rgba(76, 29, 149, 0.5);">📝 ENVIAR PASSAGEM</button>
         </div>
-        <!-- 👆 FIM DOS BOTÕES 👆 -->
     </div>
 
+    <!-- Direita: Perfil do Usuário -->
     <div class="top-right">
-        <!-- MENU UNIFICADO DO USUÁRIO -->
         <div class="user-menu-container">
             <button id="user-display" class="user-badge btn-perfil" onclick="toggleUserMenu(event)">👤 Entrando...</button>
             
@@ -1182,6 +1196,63 @@
 <div id="modal-lightbox" class="modal-overlay" style="z-index: 9999999; display: none; backdrop-filter: blur(10px); cursor: zoom-out;" onclick="fecharLightbox()">
     <button class="btn-close-modal" style="color: white; top: 20px; right: 20px; z-index: 1000; font-size: 24px;" onclick="fecharLightbox()">✖</button>
     <img id="lightbox-img" src="" style="max-width: 95%; max-height: 95vh; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.8); object-fit: contain;">
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL DE LISTA DE TURNOS (VISÃO DO ANALISTA)              -->
+<!-- ========================================================= -->
+<div id="modal-lista-turnos-analista" class="modal-overlay" style="z-index: 99999; display: none; backdrop-filter: blur(5px);">
+    <div class="modal-content modal-dashboard" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <button class="btn-close-modal" onclick="document.getElementById('modal-lista-turnos-analista').style.display='none'">✖</button>
+        
+        <div style="border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin: 0; color: #38BDF8; font-size: 22px;">🕰️ Histórico de Passagens</h3>
+                <p style="font-size: 12px; color: #94A3B8; margin: 5px 0 0 0;">Consulte os registros, alertas e auditorias de plantões anteriores.</p>
+            </div>
+            <button onclick="carregarAuditoriaPassagens()" style="background: transparent; color: #38BDF8; border: 1px solid #38BDF8; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#38BDF8'; this.style.color='#0F172A'" onmouseout="this.style.background='transparent'; this.style.color='#38BDF8'">
+                🔄 ATUALIZAR LISTA
+            </button>
+        </div>
+        
+        <div id="container-lista-turnos-analista" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-right: 5px;">
+            <!-- A lista de turnos será injetada aqui magicamente -->
+        </div>
+    </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL DE DECISÃO DO EXTRATOR MÁGICO (CORRELAÇÃO)          -->
+<!-- ========================================================= -->
+<div id="modal-extrator-acao" class="modal-overlay" style="z-index: 999999; display: none; backdrop-filter: blur(8px);">
+    <div class="modal-content" style="max-width: 500px; width: 95%; background: #0F172A; border: 2px solid #38BDF8; border-radius: 12px; padding: 30px; text-align: center; box-shadow: 0 0 50px rgba(56, 189, 248, 0.3);">
+        
+        <div style="font-size: 50px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #38BDF8);">🔍</div>
+        <h3 style="margin: 0; color: #38BDF8; font-size: 22px; text-transform: uppercase;">Incidente Localizado!</h3>
+        <p style="color: #94A3B8; font-size: 13px; margin: 10px 0 25px 0; line-height: 1.5;">
+            O sistema detectou que já existe um chamado em andamento para este mesmo <strong>Host</strong> e <strong>Serviço</strong> no seu plantão.<br>O que você deseja fazer com os dados recém-coletados?
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            <button id="btn-extrator-follow" style="background: #F59E0B; color: #422006; border: none; padding: 14px; border-radius: 6px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);" onmouseover="this.style.background='#D97706'" onmouseout="this.style.background='#F59E0B'">
+                🟡 REGISTRAR FOLLOW-UP (Atualizar)
+            </button>
+            <button id="btn-extrator-encerra" style="background: #10B981; color: #FFF; border: none; padding: 14px; border-radius: 6px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);" onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10B981'">
+                🟢 ENCERRAR INCIDENTE (Normalizado)
+            </button>
+            <button onclick="document.getElementById('modal-extrator-acao').style.display='none'" style="background: transparent; color: #EF4444; border: 1px solid #EF4444; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; margin-top: 10px; transition: 0.2s;" onmouseover="this.style.background='#EF4444'; this.style.color='#FFF'" onmouseout="this.style.background='transparent'; this.style.color='#EF4444'">
+                ✖ CANCELAR AÇÃO E FECHAR
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- ASSINATURA DO DESENVOLVEDOR (EASTER EGG)                  -->
+<!-- ========================================================= -->
+<div class="dev-signature" title="Criador da V2 do Sistema">
+    &lt;/&gt; with 💡 by Mateus Remédios
 </div>
 
 </body>
