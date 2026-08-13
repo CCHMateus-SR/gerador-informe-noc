@@ -177,3 +177,6 @@ document.addEventListener('click', function(event) {
     // Se passou por todas as barreiras acima, é porque clicou no fundo da tela. Aí sim, fecha!
     painel.classList.remove('aberto');
 });
+
+window.abrirPassagemTurno = () => document.getElementById('modal-passagem').style.display = 'flex';
+window.fecharPassagemTurno = () => document.getElementById('modal-passagem').style.display = 'none';
