@@ -8,13 +8,30 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Biblioteca SheetJS (Para ler as escalas de Excel) -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     
     <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- 🚀 SCRIPT ANTI-PISCAR (FOUC BLOCKER) -->
+    <script>
+        try {
+            // Lê o usuário antes da tela existir
+            const salvo = localStorage.getItem('noc_user_info');
+            if (salvo) {
+                const user = JSON.parse(salvo);
+                if (user.turno === "Gestão") {
+                    // Avisa o navegador para esconder o painel do Analista na raiz
+                    document.documentElement.classList.add('is-gestao-loading');
+                }
+            }
+        } catch(e) {}
+    </script>
 </head>
 <body>
 
 <datalist id="lista-clientes">
-    <option value="838 Soluções"></option><option value="AgroStahl (STAHL)"></option><option value="Atmosphere"></option><option value="Autopass"></option><option value="B-Simple"></option><option value="Banco BS2"></option><option value="Banco Carrefour"></option><option value="Banco Sofisa"></option><option value="Banco Tricury"></option><option value="Base Telco"></option><option value="BrasilAgro (AGRO3)"></option><option value="Carbon"></option><option value="Cogna"></option><option value="Conab"></option><option value="CSD (Grupo Amigão)"></option><option value="Easy-Way"></option><option value="FIDI"></option><option value="Focus Têxtil"></option><option value="Furacão"></option><option value="Galderma Brasil"></option><option value="Grupo Agis"></option><option value="Hotelaria Alba"></option><option value="HidroMares by SGS"></option><option value="Hospital Personal"></option><option value="Saint Matthews"></option><option value="Igua Holding"></option><option value="ITS"></option><option value="ITS-Compliance"></option><option value="Itseg"></option><option value="JMC"></option><option value="Libbs"></option><option value="Linha Uni"></option><option value="Lush"></option><option value="Makro"></option><option value="Makro Food Service"></option><option value="Master"></option><option value="MB Health"></option><option value="MeuCurso"></option><option value="Mindbe"></option><option value="Nava"></option><option value="Netpartners"></option><option value="Opt-Driven"></option><option value="Pizzamigos"></option><option value="Pryor Global"></option><option value="RNP"></option><option value="Saudescolha Benefícios"></option><option value="SGS"></option><option value="Shure"></option><option value="Soluarq"></option><option value="Solver"></option><option value="Strattner"></option><option value="Supper Certo"></option><option value="T4S TECNOLOGIA"></option><option value="Tecnogera (TNG)"></option><option value="Teresa Perez"></option><option value="Visus Engenharia"></option><option value="Viveo"></option>
+    <!-- Agora será preenchido magicamente pelo Firebase! -->
 </datalist>
 
 <datalist id="lista-operadoras">
@@ -31,7 +48,118 @@
     </div>
 </div>
 
-<div id="modal-login" class="modal-overlay">
+<!-- MODAL DE CONFIGURAÇÕES EXTRAS -->
+<div id="modal-config" class="modal-overlay" style="z-index: 9999;">
+    <div class="modal-content" style="width: 700px; max-width: 95%;">
+        <button class="btn-close-modal" onclick="fecharConfiguracoes()">✖</button>
+        
+        <div style="border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #38bdf8; font-size: 22px;">🛠️ Configurações do Sistema</h3>
+            <p style="font-size: 12px; color: #94A3B8; margin: 5px 0 0 0;">Gerencie clientes, analistas e preferências globais.</p>
+        </div>
+
+        <div class="config-container">
+            <!-- Coluna da Esquerda: Abas -->
+            <div class="config-sidebar">
+                <button id="tab-cfg-clientes" class="cfg-tab active" onclick="trocarAbaConfig('clientes')">🏢 Clientes & Logos</button>
+                <button id="tab-cfg-analistas" class="cfg-tab" onclick="trocarAbaConfig('analistas')">👥 Analistas da Equipe</button>
+                <button id="tab-cfg-escalas" class="cfg-tab" onclick="trocarAbaConfig('escalas')">📅 Escalas (Excel)</button>
+            </div>
+
+            <!-- Coluna da Direita: Conteúdo -->
+            <div class="config-content">
+                
+                <!-- ABA CLIENTES -->
+                <div id="cfg-aba-clientes" class="cfg-panel active">
+                    <h4 style="margin-top:0; color:#F8FAFC;">Adicionar Novo Cliente</h4>
+                    <div class="cfg-form-group">
+                        <input type="text" id="cfg-nome-cliente" placeholder="Nome do Cliente (Ex: Libbs)" class="cfg-input">
+                        
+                        <div class="file-upload-wrapper">
+                            <label for="cfg-logo-cliente" class="btn-upload">📎 Anexar Logo (PNG/JPG)</label>
+                            <input type="file" id="cfg-logo-cliente" accept="image/png, image/jpeg" style="display: none;" onchange="mostrarNomeArquivo(this)">
+                            <span id="cfg-file-name" style="font-size: 11px; color: #64748B;">Nenhum arquivo selecionado</span>
+                        </div>
+                        
+                        <button class="btn-cfg-salvar" onclick="salvarNovoCliente()">➕ Salvar Cliente</button>
+                    </div>
+
+                    <h4 style="margin-top:25px; color:#F8FAFC; border-bottom: 1px solid #334155; padding-bottom: 10px;">Clientes Cadastrados</h4>
+                    <ul id="lista-cfg-clientes" class="cfg-lista">
+                        <!-- Preenchido pelo JS -->
+                        <li style="color: #64748B; font-size: 12px; text-align: center;">Carregando banco de dados...</li>
+                    </ul>
+                </div>
+
+                <!-- ABA ANALISTAS -->
+                <div id="cfg-aba-analistas" class="cfg-panel" style="display: none;">
+                    <h4 style="margin-top:0; color:#F8FAFC;">Adicionar Novo Analista</h4>
+                    <div class="cfg-form-group">
+                        <input type="text" id="cfg-nome-analista" placeholder="Nome e Sobrenome" class="cfg-input">
+                        <select id="cfg-turno-analista" class="cfg-input">
+                            <option value="Manhã">Turno da Manhã</option>
+                            <option value="Tarde">Turno da Tarde</option>
+                            <option value="Madrugada">Turno da Madrugada</option>
+                            <option value="Gestão">Gestão</option>
+                        </select>
+                        <button class="btn-cfg-salvar" onclick="salvarNovoAnalista()">➕ Adicionar Analista</button>
+                    </div>
+
+                    <h4 style="margin-top:25px; color:#F8FAFC; border-bottom: 1px solid #334155; padding-bottom: 10px;">Equipe Cadastrada</h4>
+                    <ul id="lista-cfg-analistas" class="cfg-lista">
+                        <!-- Preenchido pelo JS -->
+                        <li style="color: #64748B; font-size: 12px; text-align: center;">Carregando banco de dados...</li>
+                    </ul>
+                </div>
+                <!-- 👇 NOVA ABA DE ESCALAS (EXCEL) AQUI 👇 -->
+            <div id="cfg-aba-escalas" class="cfg-panel" style="display: none;">
+                <h4 style="margin-top: 0; color: #F8FAFC; border-bottom: 1px solid #334155; padding-bottom: 10px;">Upload de Escalas (Excel)</h4>
+                <p style="font-size: 12px; color: #94A3B8; margin-bottom: 20px;">Anexe as planilhas mensais enviadas pela gestão. O sistema lerá os calendários automaticamente.</p>
+                
+                <div id="alerta-escalas-metadados" style="background: #1E293B; border: 1px solid #334155; border-left: 4px solid #0284C7; padding: 12px 15px; border-radius: 6px; margin-bottom: 20px; font-size: 12px; display: none;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                        <span style="font-size: 16px;">📅</span>
+                        <strong style="color: #38BDF8; letter-spacing: 0.5px;">STATUS DO CALENDÁRIO MENSAL</strong>
+                    </div>
+                    <div style="color: #CBD5E1; margin-left: 24px; line-height: 1.6;">
+                        Último processamento: <strong id="meta-data-escala" style="color: #F8FAFC;">-</strong><br>
+                        Realizado por: <strong id="meta-user-escala" style="color: #F8FAFC;">-</strong>
+                    </div>
+                </div>
+                
+                <div style="display: grid; gap: 15px;">
+                    <div style="background: #0F172A; padding: 12px; border-radius: 8px; border: 1px dashed #475569;">
+                        <label style="display: block; font-size: 12px; color: #94A3B8; font-weight: bold; margin-bottom: 5px;">Equipe Infraestrutura (.xlsx)</label>
+                        <input type="file" id="upload-infra" accept=".xlsx, .xls" style="color: #F8FAFC; font-size: 11px; width: 100%;">
+                    </div>
+                    
+                    <div style="background: #0F172A; padding: 12px; border-radius: 8px; border: 1px dashed #475569;">
+                        <label style="display: block; font-size: 12px; color: #94A3B8; font-weight: bold; margin-bottom: 5px;">Equipe DBA (.xlsx)</label>
+                        <input type="file" id="upload-dba" accept=".xlsx, .xls" style="color: #F8FAFC; font-size: 11px; width: 100%;">
+                    </div>
+
+                    <div style="background: #0F172A; padding: 12px; border-radius: 8px; border: 1px dashed #475569;">
+                        <label style="display: block; font-size: 12px; color: #94A3B8; font-weight: bold; margin-bottom: 5px;">Equipe Windows (.xlsx)</label>
+                        <input type="file" id="upload-windows" accept=".xlsx, .xls" style="color: #F8FAFC; font-size: 11px; width: 100%;">
+                    </div>
+
+                    <div style="background: #0F172A; padding: 12px; border-radius: 8px; border: 1px dashed #475569;">
+                        <label style="display: block; font-size: 12px; color: #94A3B8; font-weight: bold; margin-bottom: 5px;">Equipe Linux (.xlsx)</label>
+                        <input type="file" id="upload-linux" accept=".xlsx, .xls" style="color: #F8FAFC; font-size: 11px; width: 100%;">
+                    </div>
+                </div>
+                
+                <button class="btn-cfg-salvar" onclick="processarPlanilhasExcel()" style="width: 100%; margin-top: 20px; background: #3B82F6;">
+                    ⚙️ PROCESSAR E SALVAR NO BANCO
+                </button>
+            </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-login" class="modal-overlay" style="z-index: 9999;">
     <div class="modal-content modal-login-content">
         <img src="Logos/logo-its.png" alt="ITS" width="120" style="margin-bottom: 20px;">
         <h3 style="margin-top: 0; color: #002D5B;">Bem Vindo!</h3>
@@ -41,10 +169,6 @@
             <label style="display: block; margin-bottom: 5px;">Seu Nome Oficial</label>
             <select id="login-nome" style="width: 90%; box-sizing: border-box; padding: 12px; border-radius: 8px; border: 1px solid var(--its-border); font-size: 14px;">
                 <option value="" disabled selected>Selecione na lista...</option>
-                <optgroup label="Gestão"><option value="Geberson Costa">Geberson Costa</option></optgroup>
-                <optgroup label="Turno da Manhã"><option value="Guilherme Ribeiro">Guilherme Ribeiro</option><option value="Lucas Ferreira">Lucas Ferreira</option><option value="Maria Lenira">Maria Lenira</option><option value="Matheus Cavalcante">Matheus Cavalcante</option></optgroup>
-                <optgroup label="Turno da Tarde"><option value="Deleon Lima">Deleon Lima</option><option value="Gabriel Stanzione">Gabriel Stanzione</option><option value="Leonardo Marinello">Leonardo Marinello</option><option value="Luis Mateus">Luis Mateus</option><option value="Mark Leal">Mark Leal</option></optgroup>
-                <optgroup label="Turno da Noite"><option value="Guilherme Pizi">Guilherme Pizi</option><option value="Heitor Andre">Heitor Andre</option><option value="Luciano Francisqueti">Luciano Francisqueti</option><option value="Rodolfo Ferreira">Rodolfo Ferreira</option></optgroup>
             </select>
         </div>
         <div style="text-align: left; margin-bottom: 25px;">
@@ -60,28 +184,376 @@
     </div>
 </div>
 
-<div id="modal-historico" class="modal-overlay">
-    <div class="modal-content">
-        <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div>
-                <h3 style="margin-top: 0; margin-bottom: 5px; color: #002D5B;">📡 Radar do Plantão</h3>
-                <p style="font-size: 13px; color: #64748B; margin: 0;">Relatórios e Avisos da equipe (desde as 07h).</p>
+<!-- MODAL DA TIMELINE -->
+<div id="modal-timeline" class="modal-overlay" style="z-index: 9999;">
+    <div class="modal-content modal-dashboard">
+        <button class="btn-close-modal" onclick="fecharTimeline()">✖</button>
+        
+        <div class="radar-header" style="border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 20px;">
+            <div class="radar-title-area">
+                <h3 style="margin-top: 0; margin-bottom: 5px; color: #38bdf8; font-size: 22px;"> Timeline & Inteligência de Ausência</h3>
+                <p style="font-size: 12px; color: #94A3B8; margin: 0;">Histórico de alertas, quebras de SLA e resumos automáticos do plantão.</p>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <div id="dash-abertos" class="dash-badge dash-aberto">🔴 0</div>
-                <div id="dash-follow" class="dash-badge dash-follow">🟡 0</div>
-                <div id="dash-ok" class="dash-badge dash-ok">🟢 0</div>
-                <button class="btn-export" style="background-color: #10B981; margin-left: 10px;" onclick="exportarParaExcel()">📊 EXPORTAR</button>
-                <button class="btn-export" style="background-color: #0284C7; margin-left: 5px;" onclick="gerarPassagemPlantao()">📋 RESUMO PENDÊNCIAS</button>
-                <button class="btn-export" style="background-color: #DC2626; margin-left: 5px;" onmouseover="this.style.backgroundColor='#991B1B'" onmouseout="this.style.backgroundColor='#DC2626'" onclick="limparHistoricoPlantao()">🗑️ ZERAR RADAR</button>
+            
+            <!-- Botões de Ação reposicionados -->
+            <div class="export-actions" style="display: flex; gap: 10px; align-items: center;">
+                <button id="btn-gerar-resumo" class="btn-export-smart" onclick="gerarResumoAusencia()" style="background: #0284C7; box-shadow: none;">
+                     GERAR RESUMO PÓS-AUSÊNCIA
+                </button>
+                <button id="btn-limpar-notificacoes" class="btn-danger-text">
+                     LIMPAR TIMELINE
+                </button>
             </div>
         </div>
-        <div id="lista-historico" style="max-height: 50vh; overflow-y: auto; padding-right: 5px;"></div>
+
+        <!-- Área onde as notificações vão aparecer -->
+        <div id="lista-notificacoes" style="max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 10px;">
+            <p class="notificacao-vazia" style="color: #64748B; text-align: center; font-size: 14px; margin: 30px 0; font-weight: bold;">Nenhuma notificação nova no radar.</p>
+        </div>
     </div>
 </div>
 
-<div class="container">
+<div id="modal-historico" class="modal-overlay" style="z-index: 9999;">
+    <div class="modal-content modal-dashboard">
+        <button class="btn-close-modal" onclick="fecharHistorico()">✖</button>
+        
+        <div class="radar-header">
+            <div class="radar-title-area">
+                <h3 style="margin-top: 0; margin-bottom: 5px; color: #38bdf8; font-size: 22px;"> Central de Relatórios & Analytics</h3>
+                <p style="font-size: 12px; color: #94A3B8; margin: 0;">Filtre o período desejado para analisar o dashboard interativo.</p>
+            </div>
+            <div class="radar-kpis">
+                <div class="kpi-box"><span id="dash-abertos">🔴 0</span><small>Abertos</small></div>
+                <div class="kpi-box"><span id="dash-follow">🟡 0</span><small>Follow-up</small></div>
+                <div class="kpi-box"><span id="dash-ok">🟢 0</span><small>Resolvidos</small></div>
+            </div>
+        </div>
+
+        <div class="radar-controls">
+            <!-- Linha 1: Filtro de Datas e Botões de Exportar -->
+            <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;">
+                <div class="date-filters">
+                    <label>Período:</label>
+                    <input type="date" id="filtro-data-inicio">
+                    <span style="color: #64748B;">até</span>
+                    <input type="date" id="filtro-data-fim">
+                </div>
+                
+                <div class="export-actions">
+                    <button class="btn-export-smart" onclick="gerarRelatorioInteligente()">
+                        <span class="icon"></span> EXPORTAR DADOS (EXCEL)
+                    </button>
+                    <!-- Novo botão perigoso bem mais claro e óbvio -->
+                    <button class="btn-danger-text" onclick="limparHistoricoPlantao()">
+                         APAGAR BANCO DE DADOS
+                    </button>
+                </div>
+            </div>    
+
+            <!-- Linha 2: Filtros Avançados de Múltipla Seleção (BI) -->
+            <div class="advanced-filters" style="display: flex; gap: 15px; width: 100%;">
+                
+                <!-- Multi-select Cliente -->
+                <div class="multi-select-container">
+                    <button id="btn-filtro-cliente" class="dashboard-select btn-ms" onclick="toggleMenuFiltro('menu-cliente')"> Clientes (Todos) <span>▼</span></button>
+                    <div id="menu-cliente" class="menu-filtro-opcoes painel-oculto">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+                
+                <!-- Multi-select Analista -->
+                <div class="multi-select-container">
+                    <button id="btn-filtro-analista" class="dashboard-select btn-ms" onclick="toggleMenuFiltro('menu-analista')"> Analistas (Todos) <span>▼</span></button>
+                    <div id="menu-analista" class="menu-filtro-opcoes painel-oculto">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+
+                <select id="filtro-severidade" class="dashboard-select">
+                    <option value=""> Todas as Severidades</option>
+                    <option value="CRITICAL">CRITICAL</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="UNKNOWN">UNKNOWN</option>
+                </select>
+
+                <button class="btn-filtrar" onclick="filtrarRadar()" style="width: 140px;"> Analisar Seleção</button>
+            </div>
+        </div> <!-- 🚨 AQUI ESTAVA O PROBLEMA! Faltava essa div fechando o radar-controls -->
+
+        <!-- 🪄 A MÁGICA ENTRA AQUI: Grade de Gráficos -->
+        <div class="dashboard-grid">
+            <div class="chart-box"><canvas id="graficoAnalista"></canvas></div>
+            <div class="chart-box"><canvas id="graficoModo"></canvas></div>
+            <div class="chart-box"><canvas id="graficoCliente"></canvas></div>
+            <div class="chart-box"><canvas id="graficoSeveridade"></canvas></div>
+            <div class="chart-box"><canvas id="graficoHost"></canvas></div>
+            <div class="chart-box"><canvas id="graficoServico"></canvas></div>
+        </div>
+
+        <div id="lista-historico" class="radar-list"></div>
+    </div>
+</div>
+
+<!-- MODAL DE PASSAGEM DE TURNO (VERSÃO ENTERPRISE) -->
+<div id="modal-passagem" class="modal-overlay" style="z-index: 9999; display: none;">
+    <div class="modal-content modal-dashboard" style="max-width: 950px; padding-right: 5px;">
+        <button class="btn-close-modal" onclick="fecharPassagemTurno()">✖</button>
+        
+        <div class="radar-header" style="border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 15px;">
+            <div class="radar-title-area">
+                <h3 style="margin-top: 0; margin-bottom: 5px; color: #A78BFA; font-size: 22px;"> Passagem de Turno</h3>
+                <p style="font-size: 12px; color: #94A3B8; margin: 0;">Responsável Atual: <strong id="passagem-responsavel" style="color: #F8FAFC;">Ninguém assumiu ainda.</strong></p>
+            </div>
+            <div class="export-actions">
+                <button onclick="assumirPassagem()" style="background: #8B5CF6; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3); transition: 0.2s;">
+    Assumir Passagem
+</button>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 15px; max-height: 65vh; overflow-y: auto; padding-right: 15px;" id="scroll-passagem">
+            
+            <!-- 1. Avisos Gerais -->
+            <div style="background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #F8FAFC;">📝 Avisos Gerais (Tratos e Regras)</strong>
+                    <div style="display: flex; gap: 8px;">
+                        <!-- NOVO BOTÃO DE DIVIDIR -->
+                        <button onclick="inserirLinhaDivisoria('passagem-avisos')" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Inserir linha para separar assuntos diferentes" onmouseover="this.style.background='#1E293B'; this.style.color='#F8FAFC'" onmouseout="this.style.background='transparent'; this.style.color='#94A3B8'">
+                            ➖ DIVIDIR AVISO
+                        </button>
+                        <!-- BOTÃO DESTACAR MANTIDO -->
+                        <button onclick="aplicarRealce('passagem-avisos')" style="background: #422006; color: #FCD34D; border: 1px solid #78350F; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Selecione o texto e clique aqui para destacar">
+                            🖍️ DESTACAR TEXTO
+                        </button>
+                    </div>
+                </div>
+                <textarea id="passagem-avisos" rows="1" placeholder="Digite recados gerais... (Dica: Selecione um trecho e clique em 'Destacar Texto')" style="width: 100%; box-sizing: border-box; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; padding: 10px; border-radius: 6px; resize: vertical; font-size: 13px;"></textarea>
+            </div>
+
+            <!-- 2. Avisos Específicos por Cliente -->
+            <div style="background: #1E293B; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <strong class="sanfona-header" onclick="toggleSanfona(this)" style="color: #38BDF8; display: flex; justify-content: space-between; align-items: center;">
+                    <span>🏢 Avisos Específicos por Cliente</span>
+                    <span class="sanfona-seta fechada">▼</span>
+                </strong>
+                
+                <div class="sanfona-conteudo fechada" style="margin-top: 10px;">
+                    <div id="lista-avisos-cliente" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="msg-sem-aviso" style="font-size: 12px; color: #64748B; text-align: center; font-style: italic;">Nenhum aviso específico.</div>
+                    </div>
+                    <button onclick="adicionarLinhaAvisoCliente()" style="display: block; margin: 10px auto 0 auto; padding: 6px 20px; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase;">
+                        ➕ ADICIONAR AVISO CLIENTE
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Paradas Programadas (Com Descrição) -->
+            <div style="background: #1E293B; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <strong class="sanfona-header" onclick="toggleSanfona(this)" style="color: #FCA5A5; display: flex; justify-content: space-between; align-items: center;">
+                    <span>⛔ Paradas Programadas (Manutenções)</span>
+                    <span class="sanfona-seta fechada">▼</span>
+                </strong>
+                
+                <div class="sanfona-conteudo fechada" style="margin-top: 10px;">
+                    <div id="lista-paradas-programadas" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="msg-sem-parada" style="font-size: 12px; color: #64748B; text-align: center; font-style: italic;">Nenhuma parada programada inserida.</div>
+                    </div>
+                    <button onclick="adicionarLinhaParada()" style="display: block; margin: 10px auto 0 auto; padding: 6px 20px; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase;">
+                        ➕ ADICIONAR PARADA
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. Pendências do NOC -->
+            <div style="background: #1E293B; padding: 12px; border-radius: 8px; border: 1px solid #047857;">
+                <strong class="sanfona-header" onclick="toggleSanfona(this)" style="color: #34D399; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📡 Pendências do Turno (Link/Ping/Infra)</span>
+                    <span class="sanfona-seta fechada">▼</span>
+                </strong>
+                
+                <div class="sanfona-conteudo fechada" style="margin-top: 10px;">
+                    <p style="font-size: 10px; color: #A7F3D0; margin-top: 0; margin-bottom: 10px;">O sistema puxou as pendências automáticas. Revise e adicione observações antes de enviar.</p>
+                    <div id="lista-pendencias-passagem" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="msg-sem-pendencia" style="font-size: 12px; color: #64748B; text-align: center; font-style: italic;">Nenhuma pendência ativa no radar no momento.</div>
+                    </div>
+                    <button onclick="adicionarLinhaPendencia()" style="display: block; margin: 10px auto 0 auto; padding: 6px 20px; font-size: 10px; font-weight: bold; cursor: pointer; border-radius: 6px; text-transform: uppercase;">
+                        ➕ ADICIONAR PENDÊNCIA MANUAL
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5. Escalas de Plantão -->
+            <div style="background: #1E293B; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <strong class="sanfona-header" onclick="toggleSanfona(this)" style="color: #D8B4FE; display: flex; justify-content: space-between; align-items: center;">
+                    <span>📞 Escalas de Plantão (Revisão)</span>
+                    <span class="sanfona-seta fechada">▼</span>
+                </strong>
+                
+                <div class="sanfona-conteudo fechada" style="margin-top: 10px;">
+                    <p style="font-size: 10px; color: #E9D5FF; margin-top: 0; margin-bottom: 15px;">Estes são os contatos puxados da planilha para hoje. O sistema calculou o fim do plantão automaticamente.</p>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; display: block; margin-bottom: 4px;">INFRAESTRUTURA</label>
+                            <input type="text" id="escala-infra" style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px;">
+                            <input type="text" id="ate-infra" placeholder="Até..." style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: #94A3B8; border-radius: 4px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; display: block; margin-bottom: 4px;">DBA</label>
+                            <input type="text" id="escala-dba" style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px;">
+                            <input type="text" id="ate-dba" placeholder="Até..." style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: #94A3B8; border-radius: 4px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; display: block; margin-bottom: 4px;">WINDOWS</label>
+                            <input type="text" id="escala-windows" style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px;">
+                            <input type="text" id="ate-windows" placeholder="Até..." style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: #94A3B8; border-radius: 4px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; display: block; margin-bottom: 4px;">LINUX</label>
+                            <input type="text" id="escala-linux" style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px; box-sizing: border-box; margin-bottom: 5px;">
+                            <input type="text" id="ate-linux" placeholder="Até..." style="width: 100%; padding: 8px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: #94A3B8; border-radius: 4px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    <textarea id="escala-obs" rows="1" placeholder="Observações do plantão (Ex: Plantonista DBA avisou que só atende via WhatsApp hoje)..." style="width: 100%; padding: 8px; font-size: 12px; background: #0F172A; border: 1px solid #475569; color: #94A3B8; border-radius: 4px; resize: vertical; box-sizing: border-box;"></textarea>
+                </div>
+            </div>
+
+            <!-- 6. Escalonamento Backup -->
+            <div style="background: #1E293B; padding: 12px; border-radius: 8px; border: 1px solid #334155;">
+                <strong class="sanfona-header" onclick="toggleSanfona(this)" style="color: #FCD34D; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                    <span>⚠️ Hierarquia de Escalonamento </span>
+                    <span class="sanfona-seta fechada">▼</span>
+                </strong>
+                
+                <div class="sanfona-conteudo fechada" style="margin-top: 10px;">
+                    <p style="font-size: 10px; color: #FEF3C7; margin-top: 0; margin-bottom: 15px;">Contatos a serem acionados caso o plantonista principal não atenda.</p>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; text-align: center;">🪟 WINDOWS / DBA</label>
+                            <input type="text" id="esc-win-1" placeholder="1º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                            <input type="text" id="esc-win-2" placeholder="2º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                            <input type="text" id="esc-win-3" placeholder="3º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; text-align: center;">🐧 REDES / LINUX</label>
+                            <input type="text" id="esc-lin-1" placeholder="1º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                            <input type="text" id="esc-lin-2" placeholder="2º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                            <input type="text" id="esc-lin-3" placeholder="3º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                            <label style="color: #94A3B8; font-size: 10px; font-weight: bold; text-align: center;">💾 BACKUP</label>
+                            <input type="text" id="esc-bck-1" placeholder="1º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                            <input type="text" id="esc-bck-2" placeholder="2º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                            <input type="text" id="esc-bck-3" placeholder="3º -" style="padding: 6px; font-size: 11px; background: #0F172A; border: 1px solid #475569; color: white; border-radius: 4px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- FECHAMENTO DE SEGURANÇA DO SCROLL (Sua linha 428 antiga) -->
+
+        <!-- Rodapé da Passagem -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; padding-top: 20px; padding-bottom: 20px; padding-right: 15px; border-top: 1px solid #334155;">
+            <span style="font-size: 11px; color: #64748B;">A passagem será registrada na auditoria do sistema.</span>
+            
+            <button onclick="salvarPassagemTurno()" style="background: #10B981; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); transition: all 0.2s;">
+                 REGISTRAR PASSAGEM NO SISTEMA
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE ACEITE E LEITURA DA PASSAGEM DE TURNO -->
+<div id="modal-aceite-passagem" class="modal-overlay" style="z-index: 999999; display: none; backdrop-filter: blur(10px);">
+    <div id="caixa-modal-aceite" class="modal-content modal-dashboard" style="max-width: 900px; border: 2px solid #EF4444; box-shadow: 0 0 40px rgba(239, 68, 68, 0.4); position: relative;">
+        
+        <!-- Botão Fechar (Só aparece no modo leitura) -->
+        <button id="btn-fechar-leitura" class="btn-close-modal" onclick="document.getElementById('modal-aceite-passagem').style.display='none'" style="display: none; top: 20px; right: 20px; color: white; z-index: 10;">✖</button>
+
+        <!-- Cabeçalho de Alerta / Leitura -->
+        <div id="header-modal-aceite" style="background: #450a0a; padding: 20px; margin: -25px -25px 20px -25px; border-radius: 12px 12px 0 0; text-align: center; border-bottom: 2px solid #EF4444;">
+            <h2 id="titulo-modal-aceite" style="margin: 0; color: #FCA5A5; font-size: 26px;">🚨 ATENÇÃO: NOVA PASSAGEM DE TURNO 🚨</h2>
+            <p id="subtitulo-modal-aceite" style="color: #F8FAFC; margin: 5px 0 0 0; font-size: 14px;">Você não pode operar o Radar até ler e assumir as pendências abaixo.</p>
+        </div>
+
+        <!-- Área onde o JS vai injetar o Resumo -->
+        <div id="conteudo-aceite-passagem" style="max-height: 55vh; overflow-y: auto; padding-right: 10px; display: flex; flex-direction: column; gap: 15px;">
+            <div style="color: #94A3B8; text-align: center;">Carregando dados da passagem...</div>
+        </div>
+
+        <!-- Botão de Assinatura Digital -->
+        <div id="rodape-modal-aceite" style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #334155; text-align: center;">
+            <p style="font-size: 11px; color: #94A3B8; margin-bottom: 15px;">Ao clicar no botão abaixo, seu nome, data e hora serão registrados na auditoria do sistema.</p>
+            
+            <button class="btn-export-smart" onclick="confirmarAceitePassagem()" style="background: #10B981; color: white; border: none; font-size: 15px; padding: 14px 40px; font-weight: 900; width: auto; min-width: 350px; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: 0.2s; display: inline-block;">
+                ☑️ CIENTE E ASSUMINDO O TURNO
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<!-- NOVA BARRA GLOBAL SUPERIOR -->
+<nav class="global-top-bar">
+    <div class="top-left">
+        <button class="btn-toggle-historico" onclick="abrirGavetaHistorico()">☰ HISTÓRICO</button>
+
+        <span id="relogio-noc" class="meta-clock">--:--:--</span>
+        <span id="conexao-status" class="status-conn conn-offline">🔴 OFFLINE</span>
+        <div id="header-sev-badge" class="meta-sev-badge">🟡 WARNING</div>
+    </div>
+    
+    <div class="top-center">
+        <button id="btn-painel-gestao" class="btn-top-action" onclick="abrirPainelGestao()" style="display: none; background: #F59E0B; border-color: #D97706; color: #FFFBEB; font-weight: 900; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); margin-right: 10px; letter-spacing: 0.5px;">
+            👑 PAINEL DA GESTÃO
+        </button>
+        <button id="btn-top-radar" class="btn-top-action" onclick="abrirHistorico()"> ABRIR RADAR</button>
+        <button class="btn-top-action btn-acionamentos">📞 ACIONAMENTOS</button>
+        <!-- TIMELINE COM INTELIGÊNCIA DE AUSÊNCIA -->
+        <div class="timeline-container">
+            <button class="btn-top-action" id="btn-timeline" onclick="abrirTimeline()">
+                 TIMELINE
+                <span id="contador-notificacoes" class="badge-oculto">0</span>
+            </button>
+        </div>
+
+        <!-- 👇 BOTÕES DE PASSAGEM DIVIDIDOS 👇 -->
+        <div class="timeline-container" style="display: flex; gap: 5px;">
+            <button id="btn-top-procedimentos" class="btn-top-action" onclick="abrirBaseAnalista()" style="background: #10B981; border-color: #059669; color: #FFF; font-weight: bold;">📚 PROCEDIMENTOS</button>
+            <button id="btn-top-ler-ultima" class="btn-top-action" onclick="lerUltimaPassagem()" style="background: #0284C7; border-color: #0369A1; color: #E0F2FE; font-weight: bold;">📖 LER ÚLTIMA</button>
+            <button id="btn-top-enviar-passagem" class="btn-top-action" onclick="abrirPassagemTurno()" style="background: #4C1D95; border-color: #5B21B6; color: #EDE9FE; font-weight: bold;">📝 ENVIAR PASSAGEM</button>
+        </div>
+        <!-- 👆 FIM DOS BOTÕES 👆 -->
+    </div>
+
+    <div class="top-right">
+        <!-- MENU UNIFICADO DO USUÁRIO -->
+        <div class="user-menu-container">
+            <button id="user-display" class="user-badge btn-perfil" onclick="toggleUserMenu(event)">👤 Entrando...</button>
+            
+            <div id="painel-user-menu" class="painel-oculto user-dropdown">
+                <div class="user-dropdown-header">
+                    <span>⚙️ PREFERÊNCIAS</span>
+                </div>
+                
+                <button class="dropdown-item" onclick="cycleTheme()">
+                    <span class="icon">🎨</span> Mudar Tema Visual
+                </button>
+                
+                <button class="dropdown-item" onclick="abrirConfiguracoes()">
+                    <span class="icon">🛠️</span> Configurações Extras
+                </button>
+                
+                <div class="dropdown-divider"></div>
+                
+                <button class="dropdown-item text-red" onclick="fazerLogout()">
+                    <span class="icon">✖</span> Sair do Sistema
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container" id="app-analista">
     
     <div class="history-side" id="history-container">
         <h3>🕰️ Histórico</h3>
@@ -103,78 +575,57 @@
     </div>
 
     <div class="form-side" id="form-container">
-        
-        <div class="top-meta-bar">
-           <div class="meta-left">
-                <button class="btn-toggle-historico" onclick="abrirGavetaHistorico()">☰ HISTÓRICO</button>
-                
-                <span id="relogio-noc" class="meta-clock">--:--:--</span>
-                <div class="meta-divider"></div>
-                <span id="conexao-status" class="status-conn conn-offline">🔴 Offline</span>
-                <div class="meta-divider"></div>
-                <div id="header-sev-badge" class="meta-sev-badge">🟡 WARNING</div>
-            </div>
-            
-            <div class="meta-right">
-                <div class="notificacoes-container">
-                    <button id="btn-sininho" class="btn-icone" title="Ver Notificações">
-                        🔔
-                        <span id="contador-notificacoes" class="badge-oculto">0</span>
-                    </button>
-                    <div id="painel-notificacoes" class="painel-oculto">
-                        <div class="painel-header">
-                            <h4>Notificações</h4>
-                            <button id="btn-limpar-notificacoes" class="btn-pequeno">Limpar</button>
-                        </div>
-                        <div id="lista-notificacoes">
-                            <p class="notificacao-vazia">Nenhuma notificação nova.</p>
-                        </div>
-                    </div>
-                </div>
-                <div id="user-display" class="user-badge" style="background: white;">👤 Entrando...</div>
-                <button class="btn-sair" onclick="fazerLogout()">Sair</button>
-                <button class="btn-theme" onclick="cycleTheme()" title="Mudar Tema">☀️</button>
-            </div>
-        </div>
 
-        <div class="header-title-row">
-            <h2 id="titulo-form">Gestão de Link / Ping</h2>
-            <div class="mode-switch-container" style="margin-bottom: 0;">
-                <button id="btn-modo-link" class="mode-btn active" onclick="trocarModo('link')">🌐 Link / Ping</button>
-                <button id="btn-modo-infra" class="mode-btn" onclick="trocarModo('infra')">🖥️ Infra / Aplicações</button>
-            </div>
-        </div>
-        
-        <div class="quick-claim-bar">
-            <span class="quick-claim-title">👀 ASSUMIR ANÁLISE:</span>
-            <input type="text" id="quick-item" placeholder="Serviço (Ex: Disk)...">
-            <input type="text" id="quick-host" placeholder="Host (Opcional)...">
-            <button onclick="enviarAvisoRapido()">📣 AVISAR</button>
-        </div>
+        <!-- MODO DO SISTEMA NO TOPO -->
+<div class="form-mode-tabs">
+    <button id="btn-modo-link" class="mode-btn active" onclick="trocarModo('link')">🌐 LINK / PING</button>
+    <button id="btn-modo-infra" class="mode-btn" onclick="trocarModo('infra')">🖥️ INFRA / APLICAÇÕES</button>
+    
+    <!-- Elemento invisível para o JavaScript não travar -->
+    <span id="titulo-form" style="display: none;"></span>
+</div>
 
-        <div id="magic-extractor-container" style="background: rgba(128, 128, 128, 0.05); border: 1px solid rgba(100, 116, 139, 0.15); border-radius: 8px; padding: 15px; margin-bottom: 15px; transition: all 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <span style="font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; opacity: 0.9;">
-                    🪄 Extrator Mágico <span style="font-size: 9px; font-weight: normal; opacity: 0.6; text-transform: none; letter-spacing: 0;">(Cópia em Massa)</span>
-                </span>
-                <button type="button" onclick="document.getElementById('magic-paste-area').value='';" style="background: transparent; border: 1px solid #64748B; color: inherit; cursor: pointer; font-size: 9px; font-weight: bold; padding: 4px 10px; border-radius: 4px; opacity: 0.7; transition: 0.2s;" onmouseover="this.style.opacity='1'; this.style.background='rgba(100,116,139,0.1)';" onmouseout="this.style.opacity='0.7'; this.style.background='transparent';">LIMPAR</button>
-            </div>
-            
-            <textarea id="magic-paste-area" placeholder="Arraste e copie as várias linhas do Centreon e cole tudo aqui dentro..." style="width: 100%; height: 60px; font-family: monospace; font-size: 11px; padding: 10px; border: 1px solid rgba(100,116,139,0.3); border-radius: 6px; resize: vertical; background: rgba(0,0,0,0.15); color: inherit; margin-bottom: 12px; outline: none; transition: border 0.3s; box-sizing: border-box;" onfocus="this.style.borderColor='#3B82F6'" onblur="this.style.borderColor='rgba(100,116,139,0.3)'"></textarea>
-            
-            <button type="button" onclick="processarExtratorMagico()" style="width: 100%; background: #2563EB; color: #FFFFFF; border: none; padding: 10px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);" onmouseover="this.style.background='#1D4ED8'" onmouseout="this.style.background='#2563EB'">⚡ Processar e Preencher</button>
-        </div>
+<!-- ASSUMIR ANÁLISE -->
+<div class="quick-claim-bar sleek-bar">
+    <span class="quick-claim-title">👀 ASSUMIR ANÁLISE:</span>
+    <input type="text" id="quick-item" placeholder="Serviço (Ex: Disk)...">
+    <input type="text" id="quick-host" placeholder="Host (Opcional)...">
+    <button onclick="enviarAvisoRapido()">📣 AVISAR</button>
+</div>
 
-        <div class="section-title sanfona-header" onclick="toggleSanfona('secao-1', this.querySelector('.sanfona-seta'))">
-            <span id="label-secao-1" style="display: flex; align-items: center; gap: 8px;">📍 1. Identificação do Alarme</span>
-            <span class="sanfona-seta">▼</span>
-        </div>
-        <div class="form-grid sanfona-conteudo" id="secao-1">
+<!-- EXTRATOR MÁGICO COMPACTO -->
+<div id="magic-extractor-container" class="sleek-bar extractor-bar">
+    <span class="magic-icon">🪄</span>
+    
+    <!-- O Segredo: Voltou a ser textarea para aceitar quebras de linha, mas com design de input! -->
+    <textarea id="magic-paste-area" placeholder="Cole os logs do Centreon aqui..." autocomplete="off" style="flex: 1; background: transparent; border: none; color: #FFF; font-family: monospace; font-size: 13px; outline: none; padding: 10px; box-shadow: none; resize: none; height: 40px; overflow: hidden; white-space: nowrap; border-radius: 6px;"></textarea>
+    
+    <!-- Botão Limpar apenas com texto -->
+    <button type="button" onclick="document.getElementById('magic-paste-area').value='';" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">LIMPAR</button>
+    
+    <button type="button" class="btn-processar" onclick="processarExtratorMagico()">⚡ PROCESSAR</button>
+</div>
+
+<!-- NAVEGAÇÃO DAS SEÇÕES (TABS) -->
+<div class="section-tabs">
+    <button type="button" class="section-tab-btn active" onclick="mudarSecao(1)" id="btn-sec-1">
+        <span id="label-secao-1">📍 1. IDENTIFICAÇÃO DO ALARME</span>
+    </button>
+    <button type="button" class="section-tab-btn" onclick="mudarSecao(2)" id="btn-sec-2">🔮 2. SLA E STATUS</button>
+    <button type="button" class="section-tab-btn" onclick="mudarSecao(3)" id="btn-sec-3">🛠️ 3. DIAGNÓSTICO</button>
+</div>
+
+        <div class="form-grid form-section active" id="sec-1">
             <div class="input-group">
                 <label>Cliente</label>
                 <input type="text" id="cliente" list="lista-clientes" placeholder="Ex: Libbs" oninput="update()" onclick="abrirDatalist(this)">
             </div>
-            <div class="input-group"><label id="label-host">Host / Circuito</label><input type="text" id="host" placeholder="Ex: FURACAO_FGT_BELO_HORIZONTE" oninput="update()"></div>
+            
+            <!-- Campo HOST corrigido para Textarea -->
+            <div class="input-group">
+                <label id="label-host">Host / Circuito</label>
+                <textarea id="host" class="textarea-sm" placeholder="Ex: MATRIZ-FW-01&#10;RTR-FILIAL-02" oninput="update()"></textarea>
+            </div>
             
             <div class="input-group">
                 <label>Item Monitorado (Serviço)</label>
@@ -209,11 +660,7 @@
             </div>
         </div>
 
-        <div class="section-title sanfona-header" onclick="toggleSanfona('secao-2', this.querySelector('.sanfona-seta'))">
-            <span style="display: flex; align-items: center; gap: 8px;">⏱️ 2. SLA e Acompanhamento</span>
-            <span class="sanfona-seta">▼</span>
-        </div>
-        <div class="form-grid sanfona-conteudo" id="secao-2">
+        <div class="form-grid form-section" id="sec-2" style="display: none;">
             <div class="input-group"><label>Status Atual</label><select id="status" onchange="mudarStatus()"><option value="EM ABERTO">🔴 Em Aberto (Abertura)</option><option value="FOLLOW-UP">🟡 Follow-Up (Atualização)</option><option value="RESOLVIDO">🟢 Resolvido (Encerramento)</option></select></div>
             
             <div class="input-group" id="grupo-protocolo"><label>Protocolo Operadora</label><input type="text" id="protocolo" placeholder="Ex: 20261234567" oninput="update()"></div>
@@ -270,11 +717,7 @@
             </div>
         </div>
 
-        <div class="section-title sanfona-header" onclick="toggleSanfona('secao-3', this.querySelector('.sanfona-seta'))">
-            <span style="display: flex; align-items: center; gap: 8px;">🛠️ 3. Tratativa e Diagnóstico</span>
-            <span class="sanfona-seta">▼</span>
-        </div>
-        <div class="form-grid sanfona-conteudo" id="secao-3" style="margin-bottom: 10px;">
+        <div class="form-grid form-section" id="sec-3" style="display: none;">
             <div class="input-group" id="grupo-solucionador"><label id="label-solucionador">Solucionador (Operadora / Analista)</label><input type="text" id="solucionador" list="lista-operadoras" placeholder="Selecione ou digite..." oninput="update()" onclick="abrirDatalist(this)"></div>
             
             <div class="input-group" id="grupo-obs"><label>Observação (Opcional)</label><input type="text" id="obs" oninput="update()"></div>
@@ -304,22 +747,39 @@
             </div>
         </div>
         
-        <div class="action-footer">
-            <div class="button-row">
-                <button class="btn-danger-its" onclick="limparFormulario()">🗑️ LIMPAR TUDO</button>
-                <button class="btn-its-history" onclick="abrirHistorico()">📡 ABRIR RADAR</button>
+        <div class="action-footer-sleek" style="display: flex; gap: 8px; flex-wrap: nowrap; align-items: stretch; overflow: hidden;">
+            
+            <!-- Botão Limpar -->
+            <button onclick="limparFormulario()" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 0 15px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s; white-space: nowrap;">
+                LIMPAR
+            </button>
+            
+            <!-- Botões Centrais (Duas Linhas Profissionais) -->
+            <div style="display: flex; gap: 8px; flex: 1; justify-content: center; min-width: 0;">
+                <button class="btn-footer-dark" id="btn-assunto" onclick="copiarAssuntoAcao()" style="flex: 1; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;">
+                    <span style="font-size: 9px; color: #94A3B8; font-weight: 700; line-height: 1; text-transform: uppercase;">✉️ ASSUNTO</span>
+                    <span style="font-size: 12px; font-weight: 900; line-height: 1; color: #F8FAFC;">E-MAIL</span>
+                </button>
+                <button class="btn-footer-dark" id="btn-assunto-itssm" onclick="copiarAssuntoITSSM()" style="flex: 1; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;">
+                    <span style="font-size: 9px; color: #94A3B8; font-weight: 700; line-height: 1; text-transform: uppercase;">✉️ ASSUNTO</span>
+                    <span style="font-size: 12px; font-weight: 900; line-height: 1; color: #F8FAFC;">ITSSM</span>
+                </button>
+                <button class="btn-footer-dark" id="btn-copiar-itssm" onclick="copyITSSM()" style="flex: 1; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;">
+                    <span style="font-size: 9px; color: #94A3B8; font-weight: 700; line-height: 1; text-transform: uppercase;">📝 TEXTO</span>
+                    <span style="font-size: 12px; font-weight: 900; line-height: 1; color: #F8FAFC;">ITSSM</span>
+                </button>
             </div>
-            <div class="button-row" style="margin-bottom: 0;">
-                <button class="btn-copy-subject" id="btn-assunto" onclick="copiarAssuntoAcao(); animarBotaoCopia('btn-assunto')">✉️ ASSUNTO</button>
-                <button class="btn-copy-subject" id="btn-assunto-itssm" onclick="copiarAssuntoITSSM(); animarBotaoCopia('btn-assunto-itssm')" style="border-color: #059669; color: #059669;">✉️ ASSUNTO ITSSM</button>
-                <button class="btn-copy-img" id="btn-copiar-img" onclick="copyAsImage(); animarBotaoCopia('btn-copiar-img')">📸 COPIAR INFORME</button>
-                <button class="btn-copy-itssm" id="btn-copiar-itssm" onclick="copyITSSM(); animarBotaoCopia('btn-copiar-itssm')">📝 TEXTO ITSSM</button>
-            </div>
+            
+            <!-- Botão Principal Vermelho -->
+            <button class="btn-copiar-visual" id="btn-copiar-img" onclick="copyAsImage()" style="padding: 12px 15px; font-size: 11px; white-space: nowrap; flex-shrink: 0;">
+                📸 COPIAR INFORME VISUAL
+            </button>
+            
         </div>
 
     </div>
 
-    <div class="preview-side" style="display: flex;">
+    <div class="preview-side">
         <div id="render" style="background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 650px; margin: 0 auto; align-self: flex-start;">
             <table cellpadding="0" cellspacing="0" border="0" width="100%" style="font-family: 'Segoe UI', Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; overflow: hidden; table-layout: fixed; word-wrap: break-word; overflow-wrap: break-word;">
                 <tr><td id="render-header-cell" align="center" bgcolor="#ffffff" style="padding: 30px 20px 25px 20px; border-top: 8px solid #DC2626;"></td></tr>
@@ -329,9 +789,18 @@
                         
                         <table cellpadding="0" cellspacing="0" border="0" width="100%">
                             <tr>
-                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-item', this)">📋</button><div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Item Monitorado</div><div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div></td>
+                                <!-- ADICIONADO: word-break e overflow-wrap para impedir o esmagamento das colunas -->
+                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1; word-break: break-word; overflow-wrap: break-word;">
+                                    <button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-item', this)">📋</button>
+                                    <div style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Item Monitorado</div>
+                                    <div id="v-item" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div>
+                                </td>
                                 <td width="8%"></td>
-                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1;"><button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-host', this)">📋</button><div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Host</div><div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800;">---</div></td>
+                                <td width="46%" bgcolor="#F1F5F9" class="box-cirurgica" style="padding: 18px; border-radius: 8px; border-bottom: 3px solid #cbd5e1; word-break: break-word; overflow-wrap: break-word;">
+                                    <button class="btn-micro-copy" data-html2canvas-ignore="true" onclick="copiarCirurgico('v-host', this)">📋</button>
+                                    <div id="v-label-host" style="font-size: 9px; color: #64748B; font-weight: 800; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Host</div>
+                                    <div id="v-host" style="font-size: 15px; color: #0F172A; font-weight: 800; line-height: 1.4;">---</div>
+                                </td>
                             </tr>
                             <tr height="15"><td></td></tr>
                             <tr>
@@ -372,7 +841,348 @@
     </div>
 </div>
 
-<script type="module" src="js/main.js"></script>
+<!-- ========================================================= -->
+<!-- NOVO WORKSPACE EM TELA CHEIA DA GESTÃO                    -->
+<!-- ========================================================= -->
+<div id="app-gestao" style="display: none; height: calc(100vh - 60px); padding: 20px; box-sizing: border-box; background: #0B1120;">
+    <div style="display: flex; gap: 20px; height: 100%; width: 100%;">
+        
+        <!-- Menu Lateral Exclusivo -->
+        <div style="width: 260px; background: #0F172A; border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.4); flex-shrink: 0;">
+            <!-- Cabeçalho Laranja Sólido Limpo -->
+            <div style="padding: 30px 20px; background: #D97706; text-align: center; border-bottom: 1px solid #B45309; flex-shrink: 0;">
+                <h3 style="margin: 0; color: #FFFFFF; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Gestão ITS</h3>
+            </div>
+            
+            <!-- Lista de Botões (Agora com flex: 1 para empurrar o rodapé para baixo) -->
+            <div style="display: flex; flex-direction: column; padding: 20px 15px; gap: 8px; overflow-y: auto; flex: 1;">
+                <strong style="color: #64748B; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Módulos Nativos</strong>
+                <button class="btn-gestao-menu active" onclick="ativarPainelGestao('auditoria', this)">🔐 Auditoria de Turnos</button>
+                <button class="btn-gestao-menu" onclick="ativarPainelGestao('tracking', this)">📊 Tracking ITSSM</button>
+                <button class="btn-gestao-menu" onclick="ativarPainelGestao('base', this)">💡 Base de Conhecimento</button>
+
+                <strong style="color: #64748B; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 5px;">Ferramentas Integradas</strong>
+                <button class="btn-gestao-menu" onclick="ativarPainelGestao('radar', this)">📡 Radar Analítico (Histórico)</button>
+                <button class="btn-gestao-menu" onclick="ativarPainelGestao('procedimentos', this)">📚 Visão do Analista (Regras)</button>
+                <button class="btn-gestao-menu" onclick="ativarPainelGestao('ultima', this)">📖 Última Passagem Emitida</button>
+            </div>
+
+            <!-- Rodapé Exclusivo: O JS vai jogar o menu de Perfil aqui dentro! -->
+            <div id="gestao-user-footer" style="background: #1E293B; padding: 15px; border-top: 1px solid #334155; flex-shrink: 0;">
+            </div>
+        </div>
+
+        <!-- Área Central onde os Modais vão "Morar" -->
+        <div id="gestao-content-area" style="flex: 1; background: #0F172A; border: 1px solid #334155; border-radius: 12px; overflow: hidden; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+            <div id="loading-gestao" style="display: flex; height: 100%; align-items: center; justify-content: center; color: #64748B;">Montando Workspace...</div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EXCLUSIVO DA GESTÃO (C-LEVEL) -->
+<div id="modal-gestao" class="modal-overlay" style="z-index: 99999; display: none; backdrop-filter: blur(10px);">
+    <div class="modal-content modal-dashboard" style="max-width: 1100px; border: 2px solid #F59E0B; box-shadow: 0 0 40px rgba(245, 158, 11, 0.25); background: #0F172A;">
+        <button class="btn-close-modal" onclick="fecharPainelGestao()" style="color: #94A3B8; top: 25px; right: 25px;">✖</button>
+
+        <!-- Cabeçalho Premium -->
+        <div style="border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 25px;">
+            <h3 style="margin: 0; color: #FCD34D; font-size: 26px; display: flex; align-items: center; gap: 10px;">👑 Central de Comando (Gestão ITS)</h3>
+            <p style="font-size: 13px; color: #94A3B8; margin: 5px 0 0 0;">Área restrita de auditoria operacional, passagens de turno e rastreamento de produtividade.</p>
+        </div>
+
+        <!-- Abas de Navegação Interna da Gestão -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; background: #1E293B; padding: 8px; border-radius: 8px; border: 1px solid #334155;">
+            <button id="btn-aba-auditoria" onclick="mudarAbaGestao('auditoria')" style="flex: 1; background: #F59E0B; color: #1E293B; border: none; padding: 12px; border-radius: 6px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 13px; text-transform: uppercase;">
+                🔐 Auditoria de Passagens
+            </button>
+            <button id="btn-aba-tracking" onclick="mudarAbaGestao('tracking')" style="flex: 1; background: transparent; color: #94A3B8; border: 1px solid transparent; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 13px; text-transform: uppercase;">
+                📊 Tracking ITSSM
+            </button>
+            <button id="btn-aba-base" onclick="mudarAbaGestao('base')" style="flex: 1; background: transparent; color: #94A3B8; border: 1px solid transparent; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 13px; text-transform: uppercase;">
+                💡 Base de Conhecimento
+            </button>
+        </div>
+
+        <!-- Container das Telas (A Tela Ativa aparece aqui dentro) -->
+        <div id="conteudo-gestao" style="min-height: 450px; background: #1E293B; border: 1px solid #475569; border-radius: 8px; padding: 20px;">
+            
+            <!-- TELA 1: AUDITORIA (Pilar 1) -->
+            <div id="aba-gestao-auditoria" style="display: block;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; color: #F8FAFC; font-size: 16px;">Máquina do Tempo: Histórico de Turnos</h4>
+                    <button onclick="carregarAuditoriaPassagens()" style="background: transparent; color: #38BDF8; border: 1px solid #38BDF8; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='#38BDF8'; this.style.color='#0F172A'" onmouseout="this.style.background='transparent'; this.style.color='#38BDF8'">
+                        🔄 ATUALIZAR LISTA
+                    </button>
+                </div>
+                <div id="lista-auditoria-passagens" style="display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto; padding-right: 5px;">
+                    <!-- A lista será gerada pelo Javascript aqui -->
+                </div>
+            </div>
+
+            <!-- TELA 2: TRACKING (Pilar 2) -->
+            <div id="aba-gestao-tracking" style="display: none;">
+                
+                <!-- Filtros de Busca -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; background: #0F172A; padding: 15px; border-radius: 8px; border: 1px solid #334155; align-items: flex-end; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 130px;">
+                        <label style="color: #94A3B8; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block;">Período Inicial</label>
+                        <input type="date" id="track-data-ini" style="width: 100%; padding: 8px; background: #1E293B; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 12px; color-scheme: dark;">
+                    </div>
+                    <div style="flex: 1; min-width: 130px;">
+                        <label style="color: #94A3B8; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block;">Período Final</label>
+                        <input type="date" id="track-data-fim" style="width: 100%; padding: 8px; background: #1E293B; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 12px; color-scheme: dark;">
+                    </div>
+                    <div style="flex: 2; min-width: 200px;">
+                        <label style="color: #94A3B8; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block;">Filtrar por Analista (Opcional)</label>
+                        <input type="text" id="track-analista" placeholder="Nome do Analista ou deixe vazio para toda a equipe" style="width: 100%; padding: 8px; background: #1E293B; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="carregarTracking()" style="background: #0284C7; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">
+                            🔍 BUSCAR
+                        </button>
+                        <button onclick="exportarTracking()" style="background: #10B981; color: white; border: none; padding: 8px 20px; border-radius: 4px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                            📊 EXPORTAR EXCEL
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPIs do Resultado -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 120px; background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155; text-align: center; border-bottom: 3px solid #0EA5E9;">
+                        <div style="font-size: 26px; font-weight: 900; color: #F8FAFC;" id="kpi-track-total">0</div>
+                        <div style="font-size: 10px; color: #94A3B8; text-transform: uppercase; font-weight: bold; margin-top: 5px; letter-spacing: 0.5px;">Total Informes</div>
+                    </div>
+                    <div style="flex: 1; min-width: 120px; background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155; text-align: center; border-bottom: 3px solid #EF4444;">
+                        <div style="font-size: 26px; font-weight: 900; color: #F8FAFC;" id="kpi-track-aberturas">0</div>
+                        <div style="font-size: 10px; color: #94A3B8; text-transform: uppercase; font-weight: bold; margin-top: 5px; letter-spacing: 0.5px;">Aberturas</div>
+                    </div>
+                    <div style="flex: 1; min-width: 120px; background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155; text-align: center; border-bottom: 3px solid #F59E0B;">
+                        <div style="font-size: 26px; font-weight: 900; color: #F8FAFC;" id="kpi-track-follow">0</div>
+                        <div style="font-size: 10px; color: #94A3B8; text-transform: uppercase; font-weight: bold; margin-top: 5px; letter-spacing: 0.5px;">Follow-ups</div>
+                    </div>
+                    <div style="flex: 1; min-width: 120px; background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155; text-align: center; border-bottom: 3px solid #10B981;">
+                        <div style="font-size: 26px; font-weight: 900; color: #F8FAFC;" id="kpi-track-resolvidos">0</div>
+                        <div style="font-size: 10px; color: #94A3B8; text-transform: uppercase; font-weight: bold; margin-top: 5px; letter-spacing: 0.5px;">Resolvidos</div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Auditoria (Layout Fixo e Proporcional) -->
+                <div style="background: #0F172A; border-radius: 8px; border: 1px solid #334155; overflow: hidden; display: flex; flex-direction: column; flex: 1;">
+                    <div style="overflow-y: auto; flex: 1; min-height: 0;">
+                        
+                        <!-- A MÁGICA: table-layout: fixed OBRIGA as colunas a respeitarem a nossa largura -->
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; color: #CBD5E1; table-layout: fixed;">
+                            <thead style="background: #1E293B; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                <tr>
+                                    <th style="padding: 12px; border-bottom: 1px solid #334155; color: #94A3B8; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 90px;">Data/Hora</th>
+                                    <th style="padding: 12px; border-bottom: 1px solid #334155; color: #94A3B8; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 140px;">Analista</th>
+                                    <th style="padding: 12px; border-bottom: 1px solid #334155; color: #94A3B8; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 110px;">Ação</th>
+                                    <th style="padding: 12px; border-bottom: 1px solid #334155; color: #94A3B8; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 130px;">Cliente</th>
+                                    <th style="padding: 12px; border-bottom: 1px solid #334155; color: #94A3B8; font-weight: bold; text-transform: uppercase; font-size: 10px;">Host / Serviço</th>
+                                    <th style="padding: 12px; border-bottom: 1px solid #334155; color: #94A3B8; font-weight: bold; text-transform: uppercase; font-size: 10px; width: 130px; text-align: center;">ITSSM / Libbs</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-tracking-body">
+                                <tr><td colspan="6" style="text-align: center; padding: 30px; font-style: italic;">Selecione o período acima e clique em <b>Buscar</b> para analisar a produtividade.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- TELA 3: BASE DE CONHECIMENTO (Pilar 3)     -->
+            <!-- ========================================== -->
+            <div id="aba-gestao-base" style="display: none;">
+                
+                <!-- Formulário de Cadastro e Edição -->
+                <div style="background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 20px;">
+                    <h4 id="base-titulo-form" style="margin-top: 0; color: #FCD34D; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                        <span>➕</span> Adicionar Novo Procedimento / Alerta
+                    </h4>
+                    
+                    <input type="hidden" id="base-edit-id" value="">
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="color: #94A3B8; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block;">Cliente Alvo (Opcional)</label>
+                            <input type="text" id="base-cliente" placeholder="Ex: TECNOGERA" style="width: 100%; padding: 8px; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="color: #94A3B8; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block;">Host / Circuito (Opcional)</label>
+                            <input type="text" id="base-host" placeholder="Ex: FGT_GOIANIA" style="width: 100%; padding: 8px; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <div style="flex: 1; min-width: 140px;">
+                            <label style="color: #94A3B8; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: block;">Serviço / Item (Opcional)</label>
+                            <input type="text" id="base-servico" placeholder="Ex: DISK" style="width: 100%; padding: 8px; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+                            <label style="color: #94A3B8; font-size: 11px; font-weight: bold;">Mensagem de Alerta</label>
+                            
+                            <!-- Barra de Ferramentas Rica (Agora o file input tem MULTIPLE) -->
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="aplicarRealce('base-mensagem')" style="background: #422006; color: #FCD34D; border: 1px solid #78350F; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;" title="Selecione o texto e clique para realçar em amarelo">🖍️ DESTACAR TEXTO</button>
+                                
+                                <label for="base-upload-img" style="background: #0284C7; color: white; border: 1px solid #0369A1; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;">📸 ANEXAR IMAGENS</label>
+                                <input type="file" id="base-upload-img" accept="image/png, image/jpeg, image/gif" multiple style="display: none;" onchange="converterImagemBase(this)">
+                            </div>
+                        </div>
+
+                        <!-- Galeria Dinâmica de Preview -->
+                        <div id="base-img-preview-container" style="display: none; flex-direction: column; gap: 10px; background: #0F172A; padding: 10px; border-radius: 6px; border: 1px dashed #38BDF8; margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 11px; color: #38BDF8; font-weight: bold;">📸 Imagens anexadas a este procedimento:</span>
+                                <button onclick="removerTodasImagensBase()" style="color: #EF4444; background: transparent; border: 1px solid #EF4444; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;">✖ REMOVER TODAS</button>
+                            </div>
+                            <div id="base-galeria-preview" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                        </div>
+
+                        <textarea id="base-mensagem" rows="3" placeholder="Ex: ATENÇÃO: Obrigatório executar ação... (Dica: Cole links que eles ficarão clicáveis automaticamente)" style="width: 100%; padding: 10px; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 13px; resize: vertical; box-sizing: border-box; line-height: 1.5;"></textarea>
+                    </div>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                        <button id="btn-salvar-base" onclick="salvarRegraBase()" style="background: #8B5CF6; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 900; font-size: 12px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);">
+                            💾 SALVAR REGRA NA NUVEM
+                        </button>
+                        <button id="btn-cancelar-edit" onclick="cancelarEdicaoBase()" style="display: none; background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer;">
+                            ✖ CANCELAR EDIÇÃO
+                        </button>
+                        <span style="color: #64748B; font-size: 10px; margin-left: auto;">Sincronização imediata com o NOC.</span>
+                    </div>
+                </div>
+
+                <!-- Tabela de Regras Ativas com Busca -->
+                <div style="background: #0F172A; border-radius: 8px; border: 1px solid #334155; overflow: hidden;">
+                    <div style="padding: 15px; border-bottom: 1px solid #334155; background: #1E293B; display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="color: #F8FAFC;">📚 Regras e Procedimentos Ativos</strong>
+                        <input type="text" id="busca-gestao-base" placeholder="🔍 Buscar procedimento..." style="padding: 6px 12px; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; border-radius: 4px; font-size: 11px; width: 250px; outline: none;" onkeyup="renderizarTabelaGestaoBase()">
+                    </div>
+                    <div style="max-height: 250px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px;" id="lista-regras-base">
+                        <!-- Carregado via JS -->
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div> 
+</div> 
+
+<!-- ========================================================= -->
+<!-- MODAL DE ALERTA DE PROCEDIMENTO (ENTERPRISE MAIOR E FIXO) -->
+<!-- ========================================================= -->
+<div id="modal-alerta-procedimento" class="modal-overlay" style="z-index: 999999; display: none; backdrop-filter: blur(8px);">
+    
+    <!-- MÁGICA DO LAYOUT: flex-direction column e max-height 90vh travam o modal na tela -->
+    <div class="modal-content" style="max-width: 850px; width: 95%; background: #0F172A; border: 2px solid #8B5CF6; border-radius: 12px; box-shadow: 0 0 40px rgba(139, 92, 246, 0.5); padding: 0; display: flex; flex-direction: column; max-height: 90vh;">
+        
+        <!-- Cabeçalho (Fixo no topo) -->
+        <div style="flex-shrink: 0; background: linear-gradient(135deg, #4C1D95 0%, #1E1B4B 100%); padding: 20px; border-bottom: 2px solid #8B5CF6; display: flex; align-items: center; gap: 15px;">
+            <span style="font-size: 32px; filter: drop-shadow(0 0 8px #FCD34D);">📣</span>
+            <div>
+                <h3 style="margin: 0; color: #FCD34D; font-size: 18px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 900;">Atualização de Procedimento</h3>
+                <p style="margin: 3px 0 0 0; color: #E0E7FF; font-size: 12px;">Diretriz enviada pela Gestão para este Alarme</p>
+            </div>
+        </div>
+
+        <!-- Corpo da Mensagem (Este é o ÚNICO que rola se o texto/imagem for gigante) -->
+        <div style="flex: 1; overflow-y: auto; padding: 25px;">
+            <div id="proc-tags-alvo" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;"></div>
+
+            <div style="background: #1E293B; border: 1px solid #334155; border-left: 4px solid #FCD34D; border-radius: 8px; padding: 18px; color: #F8FAFC; font-size: 14px; line-height: 1.6; word-break: break-word;" id="proc-texto-mensagem">
+                <!-- Texto inserido dinamicamente -->
+            </div>
+            
+            <!-- Container Dinâmico de Múltiplas Imagens -->
+            <div id="proc-imagens-container" style="display: none; flex-direction: column; gap: 15px; margin-top: 15px; align-items: center;">
+                <!-- Imagens injetadas pelo JS -->
+            </div>
+
+            <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94A3B8;">
+                <span id="proc-autor-data">👤 Cadastrado pela Gestão</span>
+                <span style="color: #A78BFA; font-weight: bold;">⚠️ Leitura Obrigatória</span>
+            </div>
+        </div>
+
+        <!-- Rodapé de Confirmação com Silenciador -->
+        <div style="flex-shrink: 0; background: #1E293B; padding: 15px 25px; border-top: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+            <button id="btn-silenciar-regra" onclick="" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 10px 15px; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.color='#F87171'; this.style.borderColor='#F87171'" onmouseout="this.style.color='#94A3B8'; this.style.borderColor='#475569'">
+                🔕 NÃO AVISAR NOVAMENTE
+            </button>
+            <button onclick="document.getElementById('modal-alerta-procedimento').style.display='none'" style="background: #8B5CF6; color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);" onmouseover="this.style.background='#7C3AED'" onmouseout="this.style.background='#8B5CF6'">
+                ☑️ CIENTE DO PROCEDIMENTO
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL DE PROCEDIMENTOS (VISÃO DO ANALISTA)                -->
+<!-- ========================================================= -->
+<div id="modal-base-analista" class="modal-overlay" style="z-index: 99999; display: none; backdrop-filter: blur(5px);">
+    <div class="modal-content modal-dashboard" style="max-width: 900px; max-height: 85vh; display: flex; flex-direction: column;">
+        <button class="btn-close-modal" onclick="fecharBaseAnalista()">✖</button>
+        
+        <div style="border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 15px;">
+            <h3 style="margin: 0; color: #38BDF8; font-size: 22px;">📚 Base de Conhecimento Ativa</h3>
+            <p style="font-size: 12px; color: #94A3B8; margin: 5px 0 0 0;">Consulte aqui todas as diretrizes e atualizações de procedimentos enviadas pela Gestão.</p>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="busca-base-analista" placeholder="🔍 Buscar por Cliente, Host, Serviço ou palavra-chave..." style="width: 100%; padding: 12px; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; border-radius: 6px; font-size: 13px; outline: none;" onkeyup="renderizarBaseAnalista()">
+        </div>
+        
+        <div id="lista-base-analista" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; padding-right: 5px;">
+            <!-- Preenchido pelo JS -->
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- SCRIPTS GLOBAIS                                                           -->
+<!-- ========================================================================= -->
+
+<!-- Biblioteca de Gráficos (Chart.js via Cloudflare) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <script type="module" src="js/main.js"></script>
+
+<!-- ========================================================= -->
+<!-- MODAL DE AUDITORIA HISTÓRICA (MÁQUINA DO TEMPO)           -->
+<!-- ========================================================= -->
+<div id="modal-auditoria-historica" class="modal-overlay" style="z-index: 9999999; display: none; backdrop-filter: blur(8px);">
+    <div class="modal-content modal-dashboard" style="max-width: 900px; width: 95%; background: #0F172A; border: 2px solid #0284C7; border-radius: 12px; box-shadow: 0 0 40px rgba(2, 132, 199, 0.4); padding: 0; display: flex; flex-direction: column; max-height: 90vh;">
+        
+        <button class="btn-close-modal" onclick="document.getElementById('modal-auditoria-historica').style.display='none'" style="color: white; top: 20px; right: 20px; z-index: 10;">✖</button>
+        
+        <!-- Cabeçalho Azul do Modo Auditoria -->
+        <div style="background: #0F172A; padding: 20px; margin: 0; border-bottom: 2px solid #0284C7; text-align: left; border-radius: 12px 12px 0 0;">
+            <h2 style="margin: 0; color: #38BDF8; font-size: 22px;">🕰️ MÁQUINA DO TEMPO: PASSAGEM HISTÓRICA</h2>
+            <p style="color: #94A3B8; margin: 5px 0 0 0; font-size: 13px;">Modo de auditoria. Você está visualizando um registro do passado.</p>
+        </div>
+        
+        <!-- Área de Conteúdo Flexível -->
+        <div id="conteudo-auditoria-historica" style="padding: 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 15px;">
+            <!-- Preenchido automaticamente pelo Javascript -->
+        </div>
+        
+    </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL LENTE DE AUMENTO (LIGHTBOX PARA IMAGENS)            -->
+<!-- ========================================================= -->
+<div id="modal-lightbox" class="modal-overlay" style="z-index: 9999999; display: none; backdrop-filter: blur(10px); cursor: zoom-out;" onclick="fecharLightbox()">
+    <button class="btn-close-modal" style="color: white; top: 20px; right: 20px; z-index: 1000; font-size: 24px;" onclick="fecharLightbox()">✖</button>
+    <img id="lightbox-img" src="" style="max-width: 95%; max-height: 95vh; border-radius: 8px; box-shadow: 0 0 50px rgba(0,0,0,0.8); object-fit: contain;">
+</div>
 
 </body>
 </html>
