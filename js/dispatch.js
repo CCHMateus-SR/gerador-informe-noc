@@ -1595,10 +1595,8 @@ window.processarExtratorMagico = function() {
 
     let clienteDetectado = "";
     if (hostsDetectados.length > 0) {
-        // 1. Limpeza de caracteres especiais do Centreon (como a estrela amarela ⭐)
         let hostPrincipal = hostsDetectados[0].toUpperCase().replace(/[⭐★]/g, '').trim();
 
-        // 2. Regra específica para VEEAM
         if (hostPrincipal.startsWith('ITS-BKP-VEEAM') && servicos.length > 0) {
             const primeiroServico = servicos[0].toUpperCase();
             const partes = primeiroServico.split('-');
@@ -1609,14 +1607,14 @@ window.processarExtratorMagico = function() {
                 else if (siglaVeeam === 'IGUA') clienteDetectado = 'IGUA HOLDING';
                 else if (siglaVeeam === 'MEUCURSO') clienteDetectado = 'MEUCURSO';
                 else {
-                    const clientesLista = Object.keys(logosClientes || {});
+                    // 🔥 CORREÇÃO 1: Mudança para bancoDeLogos
+                    const clientesLista = Object.keys(window.bancoDeLogos || {});
                     let match = clientesLista.find(c => c.startsWith(siglaVeeam));
                     if (match) clienteDetectado = match;
                 }
             }
         }
 
-        // 3. REGRAS FIXAS E PREFIXOS (Prioridade Máxima sobre a memória)
         if (!clienteDetectado) {
             if (hostPrincipal.includes('LIBBS')) clienteDetectado = 'LIBBS';
             else if (hostPrincipal.includes('AMIGAO') || hostPrincipal.includes('CSD')) clienteDetectado = 'CSD (GRUPO AMIGÃO)';
@@ -1630,13 +1628,14 @@ window.processarExtratorMagico = function() {
                 const prefixo = hostPrincipal.split('-')[0].toUpperCase(); 
                 const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
                 const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
-                const clientesPossiveis = Object.keys(logosClientes || {});
+                
+                // 🔥 CORREÇÃO 2: Mudança para bancoDeLogos
+                const clientesPossiveis = Object.keys(window.bancoDeLogos || {});
                 let match = clientesPossiveis.find(c => c.startsWith(prefixoReal));
                 if (match) clienteDetectado = match;
             }
         }
 
-        // 4. MEMÓRIA DO PLANTÃO (Fallback seguro caso o prefixo falhe)
         if (!clienteDetectado) {
             for (let modo in memoriaNOC) {
                 for (let cli in memoriaNOC[modo]) {
@@ -1648,7 +1647,6 @@ window.processarExtratorMagico = function() {
     }
 
     if (clienteDetectado) { document.getElementById('cliente').value = clienteDetectado; }
-    
     if (hostsDetectados.length > 0) { document.getElementById('host').value = hostsDetectados.join(' / '); }
     
     if (servicos.length > 0) {
@@ -1688,7 +1686,7 @@ window.processarExtratorMagico = function() {
     const toastMsg = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🪄 Dados aplicados! O chamado antigo foi limpo.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
     mostrarToast(toastMsg, "info", 10000);
     window.ajustarTodasTextareas();
-}
+};
 
 // ==========================================
 // INTELIGÊNCIA DE AUSÊNCIA (TIMELINE)
