@@ -88,25 +88,11 @@ function renderSugestoes(campoId, valores) {
     container.innerHTML = html;
 }
 
-const itsLogoUrl = "Logos/logo-its.png"; 
-const logosClientes = {
-    "838 SOLUÇÕES": "Logos/logo-838-solucoes.png", "AGROSTAHL (STAHL)": "Logos/logo-agrostahl.png", "ATMOSPHERE": "Logos/logo-atmosphere.png",
-    "AUTOPASS": "Logos/logo-autopass.png", "B-SIMPLE": "Logos/logo-b-simple.png", "BANCO BS2": "Logos/logo-banco-bs2.png", "BANCO CARREFOUR": "Logos/logo-banco-carrefour.png",
-    "BANCO SOFISA": "Logos/logo-banco-sofisa.png", "BANCO TRICURY": "Logos/logo-banco-tricury.png", "BASE TELCO": "Logos/logo-base-telco.png", "BRASILAGRO (AGRO3)": "Logos/logo-brasilagro.png",
-    "CARBON": "Logos/logo-carbon.png", "COGNA": "Logos/logo-cogna.png", "CONAB": "Logos/logo-conab.png", "CSD (GRUPO AMIGÃO)": "Logos/logo-csd.png", "EASY-WAY": "Logos/logo-easy-way.png",
-    "FIDI": "Logos/logo-fidi.png", "FOCUS TÊXTIL": "Logos/logo-focus-textil.png", "FURACÃO": "Logos/logo-furacao.png", "GALDERMA BRASIL": "Logos/logo-galderma.png", "GRUPO AGIS": "Logos/logo-grupo-agis.png",
-    "HOTELARIA ALBA": "Logos/logo-hotelaria-alba.png", "HIDROMARES BY SGS": "Logos/logo-hidromares.png", "HOSPITAL PERSONAL": "Logos/logo-hospital-personal.png", "SAINT MATTHEWS": "Logos/logo-saint-matthews.png",
-    "IGUA HOLDING": "Logos/logo-igua-holding.png", "ITS": "Logos/logo-its-cliente.png", "ITS-COMPLIANCE": "Logos/logo-its-compliance.png", "ITSEG": "Logos/logo-itseg.png", "JMC": "Logos/logo-jmc.png",
-    "LIBBS": "Logos/logo-libbs.png", "LINHA UNI": "Logos/logo-linha-uni.png", "LUSH": "Logos/logo-lush.png", "MAKRO": "Logos/logo-makro.png", "MAKRO FOOD SERVICE": "Logos/logo-makro-food.png",
-    "MASTER": "Logos/logo-master.png", "MB HEALTH": "Logos/logo-mb-health.png", "MEUCURSO": "Logos/logo-meucurso.png", "MINDBE": "Logos/logo-mindbe.png", "NAVA": "Logos/logo-nava.png",
-    "NETPARTNERS": "Logos/logo-netpartners.png", "OPT-DRIVEN": "Logos/optdriven.png", "PIZZAMIGOS": "Logos/logo-pizzamigos.png", "PRYOR GLOBAL": "Logos/logo-pryor-global.png", "RNP": "Logos/logo-rnp.png",
-    "SAUDESCOLHA BENEFÍCIOS": "Logos/logo-saudescolha.png", "SGS": "Logos/logo-sgs.png", "SHURE": "Logos/logo-shure.png", "SOLUARQ": "Logos/logo-soluarq.png", "SOLVER": "Logos/logo-solver.png",
-    "STRATTNER": "Logos/logo-strattner.png", "SUPPER CERTO": "Logos/logo-supper-certo.png", "T4S TECNOLOGIA": "Logos/logo-t4s.png", "TECNOGERA (TNG)": "Logos/logo-tecnogera.png",
-    "TERESA PEREZ": "Logos/logo-teresa-perez.png", "VISUS ENGENHARIA": "Logos/logo-visus.png", "VIVEO": "Logos/logo-viveo.png"
-};
+const itsLogoUrl = "Logos/logo-its.png";
 
 export function iniciarBancoDeDados() {
-    db.ref('historico_noc').orderByChild('timestamp').on('value', (snapshot) => {
+    // 🔥 A TRAVA: Baixa APENAS os últimos 300 chamados para a memória, em vez do banco todo!
+    db.ref('historico_noc').orderByChild('timestamp').limitToLast(300).on('value', (snapshot) => {
         chamadosDoTurno = [];
         if(snapshot.exists()) { snapshot.forEach(child => { chamadosDoTurno.push(child.val()); }); }
         renderizarListaLateral();
@@ -395,6 +381,7 @@ window.carregarChamadoParaFormulario = function(timestampStr) {
     ultimaAssinaturaGerada = ''; 
     window.update();
     mostrarToast("✅ Dados carregados e horário de Follow-Up atualizado!");
+    window.ajustarTodasTextareas();
 }
 
 function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span style="color: #DC2626; font-weight: bold;">$&</span>'); }
@@ -402,8 +389,8 @@ function formatarColchetes(texto) { return texto.replace(/\[.*?\]/g, '<span styl
 window.update = function() {
     const severidade = document.getElementById('severidade').value;
     const status = document.getElementById('status').value;
-    const vCliente = document.getElementById('cliente').value.toUpperCase().trim(); 
-    const vHost = document.getElementById('host').value.toUpperCase().trim(); 
+    const vCliente = document.getElementById('cliente').value.toUpperCase().trim();
+    const vHost = document.getElementById('host').value.toUpperCase().trim();
     const vItem = document.getElementById('item').value.trim() || '---';
     
     const itemLower = vItem.toLowerCase();
@@ -462,9 +449,6 @@ window.update = function() {
     let itensSugeridos = [];
     if (vCliente && hostLimpo && memoriaNOC[modoAtual] && memoriaNOC[modoAtual][vCliente] && memoriaNOC[modoAtual][vCliente][hostLimpo]) { itensSugeridos = Array.from(memoriaNOC[modoAtual][vCliente][hostLimpo]); }
     renderSugestoes('item', itensSugeridos.filter(i => i !== itemLimpo));
-
-    document.getElementById('v-host').innerText = vHost || '---';
-    document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
     
     let corSeveridade = '#64748B'; let sevTextHeader = '⚪ UNKNOWN';
     if(severidade === 'CRITICAL') { corSeveridade = '#DC2626'; sevTextHeader = '🚨 CRITICAL'; }
@@ -503,20 +487,36 @@ window.update = function() {
     else { bgColor = '#FEF3C7'; textColor = '#92400E'; badgeTexto = 'FOLLOW-UP'; tituloTexto = `${prefixoTitulo} | Follow-up de Incidente`; }
 
     const headerCell = document.getElementById('render-header-cell');
-    if (logosClientes[vCliente]) { 
-        headerCell.innerHTML = `<table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 100px;"><tr><td width="50%" align="center" valign="middle"><img src="${itsLogoUrl}" alt="ITS" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td><td width="50%" align="center" valign="middle"><img src="${logosClientes[vCliente]}" alt="Logo Cliente" style="height: 80px; max-width: 260px; width: auto; display: inline-block;"></td></tr></table>`;
+    
+    let logoSrc = (window.bancoDeLogos && window.bancoDeLogos[vCliente]) ? window.bancoDeLogos[vCliente] : null;
+
+    if (logoSrc) { 
+        headerCell.innerHTML = `
+        <table cellpadding="0" cellspacing="0" border="0" width="100%" style="table-layout: fixed; min-height: 90px;">
+            <tr>
+                <td width="50%" align="center" valign="middle">
+                    <img src="Logos/logo-its.png" alt="ITS" style="max-height: 60px; max-width: 180px; width: auto; height: auto; display: inline-block; object-fit: contain;">
+                </td>
+                <td width="50%" align="center" valign="middle">
+                    <img src="${logoSrc}" alt="Logo Cliente" style="max-height: 60px; max-width: 180px; width: auto; height: auto; display: inline-block; object-fit: contain;">
+                </td>
+            </tr>
+        </table>`;
     } else { 
-        headerCell.innerHTML = `<img src="${itsLogoUrl}" alt="ITS" style="height: 90px; max-width: 300px; width: auto; display: block; margin: 0 auto;">`;
+        headerCell.innerHTML = `<img src="Logos/logo-its.png" alt="ITS" style="max-height: 70px; max-width: 250px; width: auto; height: auto; display: block; margin: 0 auto; object-fit: contain;">`;
     }
 
-    document.getElementById('v-titulo').innerText = tituloTexto; document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
-    document.getElementById('v-host').innerText = vHost || '---'; document.getElementById('v-inicio').innerText = vInicio;
-    document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid); document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
-// NOVA REGRA INTELIGENTE: Oculta o SLA no informe de Abertura, SALVO se o analista já tiver preenchido!
-    const tabelaTerminoPreview = document.getElementById('v-titulo-termino').closest('table');
+    document.getElementById('v-titulo').innerText = tituloTexto; 
     
-    // Se for ABERTURA e o campo SLA estiver vazio, esconde do relatório.
-    // Se for FOLLOW-UP/RESOLVIDO, ou se o analista conseguiu a previsão logo na abertura, mostra no relatório!
+    // AQUI OCORRE A QUEBRA DE LINHAS NO INFORME E O FIM DO ESMAGAMENTO!
+    document.getElementById('v-item').innerHTML = vItem.replace(/\n/g, '<br>');
+    document.getElementById('v-host').innerHTML = vHost.replace(/\n/g, '<br>') || '---'; 
+    
+    document.getElementById('v-inicio').innerText = vInicio;
+    document.getElementById('v-f-grid').innerHTML = formatarColchetes(vFgrid); 
+    document.getElementById('v-termino').innerHTML = formatarColchetes(vTermino);
+
+    const tabelaTerminoPreview = document.getElementById('v-titulo-termino').closest('table');
     if (status === 'EM ABERTO' && vTermino === '-') {
         tabelaTerminoPreview.style.display = 'none';
     } else {
@@ -527,9 +527,6 @@ window.update = function() {
     const badgeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${bgColor}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: ${textColor}; font-family: 'Segoe UI', Arial, sans-serif;">${badgeTexto}</td></tr></table>`;
     let badgeSeveridadeHTML = `<table cellpadding="0" cellspacing="0" border="0" bgcolor="${corSeveridade}" style="border-radius: 6px;"><tr><td style="padding: 4px 12px; font-size: 11px; font-weight: 800; color: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif;">${displaySeveridade}</td></tr></table>`;
     
-    // REGRA: Se o status for RESOLVIDO, o Status Atual não aparece no grid do informe
-    // REGRA: Se o status for RESOLVIDO, o Status Atual não aparece no grid do informe
-    // REGRA DE ALINHAMENTO: Força o tamanho das caixas para não esticarem no encerramento
     if (modoAtual === 'link') {
         if (status === 'RESOLVIDO') {
             dynamicGrid.innerHTML = `
@@ -583,7 +580,6 @@ window.update = function() {
                 </tr>`;
         }
     } else {
-        // Modo Infra
         if (status === 'RESOLVIDO') {
             dynamicGrid.innerHTML = `
                 <tr>
@@ -614,7 +610,7 @@ window.update = function() {
     if (vDesc) { document.getElementById('detalhamento-container').style.display = 'block'; document.getElementById('v-desc').innerHTML = formatarColchetes(vDesc.replace(/\n/g, '<br>')); } else { document.getElementById('detalhamento-container').style.display = 'none'; }
     document.getElementById('evidencias-container').style.display = temEvidencias ? 'block' : 'none';
     if (vObs) { document.getElementById('obs-container').style.display = 'block'; document.getElementById('v-obs').innerHTML = formatarColchetes(vObs.replace(/\n/g, '<br>')); } else { document.getElementById('obs-container').style.display = 'none'; }
-}
+};
 
 function isFormularioSujo() {
     const camposParaChecar = ['cliente', 'host', 'item', 'statusinfo', 'pressplay', 'protocolo', 'itssm', 'protocolo-libbs', 'inicio', 'f-grid', 'termino', 'solucionador', 'obs', 'desc'];
@@ -1189,16 +1185,144 @@ window.desfazerLimpeza = function() {
     backupFormulario = null; window.update(); mostrarToast("✅ Informações restauradas com sucesso!", "success");
 }
 
-window.exportarParaExcel = function() {
-    if (chamadosDoTurno.length === 0) { mostrarToast("Não há dados neste plantão para exportar.", "warning"); return; }
-    let csvContent = "data:text/csv;charset=utf-8,Data/Hora,Analista,Turno,Modulo,Acao,Cliente,Host,Servico,Severidade,Status,Protocolo,ITSSM,Protocolo Libbs,SLA Previsto\n";
-    chamadosDoTurno.forEach(log => {
+// ==========================================
+// MOTOR DE ANALYTICS E EXPORTAÇÃO INTELIGENTE
+// ==========================================
+let chamadosFiltradosRadar = [];
+
+window.filtrarRadar = function() {
+    const dataInicio = document.getElementById('filtro-data-inicio').value;
+    const dataFim = document.getElementById('filtro-data-fim').value;
+    const pSeveridade = document.getElementById('filtro-severidade').value;
+    
+    // Captura em formato de Lista (Array) quem está marcado
+    const chkClientes = Array.from(document.querySelectorAll('.chk-cliente:checked')).map(el => el.value);
+    const chkAnalistas = Array.from(document.querySelectorAll('.chk-analista:checked')).map(el => el.value);
+    
+    // Verifica quantos existem no total para saber se o usuário marcou "Todos"
+    const totalClientes = document.querySelectorAll('.chk-cliente').length;
+    const totalAnalistas = document.querySelectorAll('.chk-analista').length;
+
+    chamadosFiltradosRadar = chamadosDoTurno.slice(-200); 
+
+    if (dataInicio && dataFim) {
+        const start = new Date(dataInicio + "T00:00:00").getTime();
+        const end = new Date(dataFim + "T23:59:59").getTime();
+        chamadosFiltradosRadar = chamadosDoTurno.filter(log => log.timestamp >= start && log.timestamp <= end);
+    }
+
+    // Filtra Clientes (Se tiver alguém desmarcado)
+    if (chkClientes.length > 0 && chkClientes.length < totalClientes) {
+        chamadosFiltradosRadar = chamadosFiltradosRadar.filter(log => log.form && chkClientes.includes(log.form.cliente));
+    }
+
+    // Filtra Analistas (Se tiver alguém desmarcado)
+    if (chkAnalistas.length > 0 && chkAnalistas.length < totalAnalistas) {
+        chamadosFiltradosRadar = chamadosFiltradosRadar.filter(log => chkAnalistas.includes(log.nome));
+    }
+
+    // Filtro de Severidade (Mantido igual)
+    if (pSeveridade) {
+        chamadosFiltradosRadar = chamadosFiltradosRadar.filter(log => log.form && log.form.severidade === pSeveridade);
+    }
+
+    renderizarListaRadar(chamadosFiltradosRadar);
+    renderizarDashboardGraficos(chamadosFiltradosRadar);
+    
+    // Oculta os menus ao aplicar
+    document.querySelectorAll('.menu-filtro-opcoes').forEach(m => m.classList.remove('mostrar-menu'));
+    mostrarToast(`🔍 ${chamadosFiltradosRadar.length} registros analisados.`, 'info');
+};
+
+function renderizarListaRadar(logs) {
+    const listaHtml = document.getElementById('lista-historico'); 
+    listaHtml.innerHTML = '';
+    
+    if(logs.length === 0) { 
+        listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento no período selecionado.</div>'; 
+        return; 
+    }
+    
+    let html = ''; 
+    let qtdAbertos = 0, qtdFollow = 0, qtdOk = 0;
+    
+    // Renderiza a lista de trás pra frente (mais novos primeiro)
+    [...logs].reverse().forEach(item => {
+        // Lógica dos contadores baseada na última ação do assunto
+        const acao = item.assunto ? item.assunto.split(' | ')[5] || '' : '';
+        if (acao.includes('ABERTURA')) qtdAbertos++;
+        else if (acao.includes('FOLLOW')) qtdFollow++;
+        else if (acao.includes('ENCERRAMENTO')) qtdOk++;
+
+        if (item.tipo === 'aviso_rapido') {
+            html += `<div class="log-item" style="border-left-color: #3B82F6; background: #1E293B;"><div class="log-time"><span style="color: #94A3B8;">🕒 ${item.hora} 👀 EM ANÁLISE</span><span style="color:#38bdf8;">👤 ${item.nome}</span></div><span class="log-subject" style="color: #F8FAFC;">Serviço: ${item.servico} | Host: ${item.host}</span></div>`;
+        } else {
+            const corBorda = (item.form && item.form.modo === 'infra') ? '#0284C7' : 'var(--its-red)'; 
+            html += `<div class="log-item" style="border-left-color: ${corBorda}; background: #1E293B;"><div class="log-time"><span style="color: #94A3B8;">🕒 ${item.hora}</span><span style="color:#38bdf8;">👤 ${item.nome}</span></div><span class="log-subject" style="color: #F8FAFC;">${item.assunto}</span></div>`;
+        }
+    });
+    
+    listaHtml.innerHTML = html;
+    
+    // Atualiza os KPIs
+    document.getElementById('dash-abertos').innerText = `🔴 ${qtdAbertos}`;
+    document.getElementById('dash-follow').innerText = `🟡 ${qtdFollow}`;
+    document.getElementById('dash-ok').innerText = `🟢 ${qtdOk}`;
+}
+
+// O Novo Exportar Robusto
+window.gerarRelatorioInteligente = function() {
+    let baseDeDados = chamadosFiltradosRadar.length > 0 ? chamadosFiltradosRadar : chamadosDoTurno;
+    
+    if (baseDeDados.length === 0) { 
+        mostrarToast("Não há dados para exportar.", "warning"); 
+        return; 
+    }
+    
+    // O segredo do Excel ler acentos perfeitos: \uFEFF
+    let csvContent = "\uFEFF"; 
+    
+    // Cabeçalho Robusto
+    csvContent += "Data/Hora;Analista;Modulo;Ação;Status Atual (Pendência?);Cliente;Host;Serviço;Severidade;Protocolo;ITSSM;SLA Previsto;Observação\n";
+    
+    baseDeDados.forEach(log => {
         if (log.tipo === 'aviso_rapido' || !log.form) return; 
-        const partesAssunto = log.assunto ? log.assunto.split(' | ') : []; const acao = partesAssunto[5] ? partesAssunto[5].trim() : ''; const servicoLimpo = log.form.item ? log.form.item.split('\n')[0] : ''; 
-        let row = [ log.hora, log.nome, log.turno, log.form.modo === 'infra' ? 'Infra' : 'Link', acao, log.form.cliente || '-', log.form.host || '-', servicoLimpo, log.form.severidade || '-', log.form.status || '-', log.form.protocolo || '-', log.form.itssm || '-', log.form.protocoloLibbs || '-', log.form.termino || '-' ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(","); 
+        
+        const dataFormatada = new Date(log.timestamp).toLocaleDateString('pt-BR') + ' ' + log.hora;
+        const partesAssunto = log.assunto ? log.assunto.split(' | ') : []; 
+        const acao = partesAssunto[5] ? partesAssunto[5].trim() : ''; 
+        const servicoLimpo = log.form.item ? log.form.item.split('\n')[0] : ''; 
+        
+        // Identifica se é uma pendência ativa baseada no último status reportado
+        const statusAtual = log.form.status || '-';
+        const flagPendencia = (statusAtual !== 'RESOLVIDO') ? `[PENDENTE] ${statusAtual}` : statusAtual;
+
+        // Limpa as quebras de linha para não bugar as linhas do Excel
+        const obsLimpa = (log.form.obs || '').replace(/(\r\n|\n|\r)/gm, " ");
+
+        // Usamos ponto e vírgula (;) porque o Excel no Brasil reconhece isso como separador de colunas padrão!
+        let row = [
+            dataFormatada, log.nome, log.form.modo === 'infra' ? 'Infra' : 'Link', 
+            acao, flagPendencia, log.form.cliente || '-', log.form.host || '-', 
+            servicoLimpo, log.form.severidade || '-', log.form.protocolo || '-', 
+            log.form.itssm || '-', log.form.termino || '-', obsLimpa
+        ].map(e => `"${String(e).replace(/"/g, '""')}"`).join(";"); 
+        
         csvContent += row + "\n";
     });
-    const encodedUri = encodeURI(csvContent); const link = document.createElement("a"); link.setAttribute("href", encodedUri); link.setAttribute("download", `relatorio_noc_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link); mostrarToast("📊 Relatório exportado com sucesso!", "success");
+    
+    // Processo de Download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Relatorio_ITS_Analytics_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    mostrarToast("📊 Relatório Inteligente Exportado com Sucesso!", "success");
 }
 
 window.gerarPassagemPlantao = function() {
@@ -1236,20 +1360,38 @@ window.limparHistoricoPlantao = function() {
 
 window.abrirHistorico = function() {
     document.getElementById('modal-historico').style.display = 'flex';
-    const listaHtml = document.getElementById('lista-historico'); listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">📡 Buscando radar contínuo...</div>';
-    db.ref('historico_noc').orderByChild('timestamp').once('value', (snapshot) => {
-        if(!snapshot.exists()) { listaHtml.innerHTML = '<div style="text-align:center; padding: 20px; color: #94A3B8;">Nenhum evento registrado no radar.</div>'; return; }
-        let html = ''; const logs = []; snapshot.forEach(child => { logs.push(child.val()); });
-        logs.reverse().forEach(item => {
-            if (item.tipo === 'aviso_rapido') {
-                html += `<div class="log-item" style="border-left-color: #3B82F6; background: #EFF6FF;"><div class="log-time"><span>🕒 ${item.hora} 👀 EM ANÁLISE</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject" style="color: #1D4ED8;">Serviço: ${item.servico} | Host: ${item.host}</span></div>`;
-            } else {
-                const corBorda = (item.form && item.form.modo === 'infra') ? '#0284C7' : 'var(--its-red)'; const modoLabel = (item.form && item.form.modo === 'infra') ? '🖥️' : '🌐';
-                html += `<div class="log-item" style="border-left-color: ${corBorda};"><div class="log-time"><span>🕒 ${item.hora} ${modoLabel}</span><span style="color:#0EA5E9;">👤 ${item.nome} (${item.turno})</span></div><span class="log-subject">${item.assunto}</span></div>`;
-            }
-        });
-        listaHtml.innerHTML = html;
+    
+    const inputInicio = document.getElementById('filtro-data-inicio');
+    const inputFim = document.getElementById('filtro-data-fim');
+    if(inputInicio) inputInicio.value = '';
+    if(inputFim) inputFim.value = '';
+    
+    const clientes = new Set();
+    const analistas = new Set();
+    chamadosDoTurno.forEach(log => {
+        if (log.nome) analistas.add(log.nome);
+        if (log.form && log.form.cliente && log.form.cliente !== '-') clientes.add(log.form.cliente);
     });
+
+    // 🪄 Cria a lista de Checkboxes de Clientes
+    const menuCliente = document.getElementById('menu-cliente');
+    menuCliente.innerHTML = `<label class="ms-item ms-item-todos"><input type="checkbox" id="chk-todos-cliente" checked onchange="toggleTodosFiltro('cliente', this)"> (Selecionar Todos)</label>`;
+    Array.from(clientes).sort().forEach(c => {
+        menuCliente.innerHTML += `<label class="ms-item"><input type="checkbox" class="chk-cliente" value="${c}" checked onchange="verificarFiltroUnico('cliente')"> ${c}</label>`;
+    });
+
+    // 🪄 Cria a lista de Checkboxes de Analistas
+    const menuAnalista = document.getElementById('menu-analista');
+    menuAnalista.innerHTML = `<label class="ms-item ms-item-todos"><input type="checkbox" id="chk-todos-analista" checked onchange="toggleTodosFiltro('analista', this)"> (Selecionar Todos)</label>`;
+    Array.from(analistas).sort().forEach(a => {
+        menuAnalista.innerHTML += `<label class="ms-item"><input type="checkbox" class="chk-analista" value="${a}" checked onchange="verificarFiltroUnico('analista')"> ${a}</label>`;
+    });
+    
+    // Reseta os nomes dos botões
+    document.getElementById('btn-filtro-cliente').innerHTML = '🏢 Clientes (Todos) <span>▼</span>';
+    document.getElementById('btn-filtro-analista').innerHTML = '👤 Analistas (Todos) <span>▼</span>';
+
+    if (typeof window.filtrarRadar === 'function') { window.filtrarRadar(); }
 }
 
 window.detectarOperadoraOuGeral = function(texto) {
@@ -1544,5 +1686,302 @@ window.processarExtratorMagico = function() {
     window.update();
     
     const toastMsg = `<div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%;"><span>🪄 Dados aplicados! O chamado antigo foi limpo.</span><button onclick="desfazerLimpeza()" style="background: rgba(255,255,255,0.2); border: 1px solid white; color: white; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; transition: 0.2s;">↩️ DESFAZER</button></div>`;
-    mostrarToast(toastMsg, "info", 10000); 
+    mostrarToast(toastMsg, "info", 10000);
+    window.ajustarTodasTextareas();
 }
+
+// ==========================================
+// INTELIGÊNCIA DE AUSÊNCIA (TIMELINE)
+// ==========================================
+window.filtroTimelineAtivo = 'todos'; // Variável global para controlar o filtro
+
+window.gerarResumoAusencia = function() {
+    if (!chamadosDoTurno || chamadosDoTurno.length === 0) {
+        if (typeof window.mostrarToast === 'function') window.mostrarToast("Aguarde, ainda sincronizando os dados do radar...", "warning");
+        return;
+    }
+
+    let estadoRecente = {};
+    let abertos = [];
+    let followup = [];
+    
+    // Reseta o filtro sempre que gerar um novo resumo
+    window.filtroTimelineAtivo = 'todos'; 
+
+    // 1. Filtra só os chamados de LINK e guarda sempre o ÚLTIMO status conhecido de cada Host
+    chamadosDoTurno.forEach(log => {
+        if (log.form && (log.form.modo === 'link' || !log.form.modo)) {
+            let chave = `${log.form.cliente}-${log.form.host}`;
+            if (!estadoRecente[chave] || log.timestamp > estadoRecente[chave].timestamp) {
+                estadoRecente[chave] = log;
+            }
+        }
+    });
+
+    // 2. Separa quem está sangrando agora (Ignora os Resolvidos)
+    for (let chave in estadoRecente) {
+        let log = estadoRecente[chave];
+        if (log.form.status === 'EM ABERTO') abertos.push(log);
+        else if (log.form.status === 'FOLLOW-UP') followup.push(log);
+    }
+
+    // Ordenação: Do mais recente para o mais antigo
+    abertos.sort((a, b) => b.timestamp - a.timestamp);
+    followup.sort((a, b) => b.timestamp - a.timestamp);
+
+    const listaNotificacoes = document.getElementById('lista-notificacoes');
+    if (listaNotificacoes) listaNotificacoes.innerHTML = ''; 
+
+    // 3. Monta o Cabeçalho Turbinado com KPIs (AGORA CLICÁVEIS)
+    let htmlResumo = `
+    <div style="padding: 15px; background: #0F172A; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">
+        <div>
+            <strong style="color: #38BDF8; font-size: 14px;">📡 Resumo Operacional (Link/Ping)</strong><br>
+            <span style="font-size: 11px; color: #94A3B8;">Panorama de pendências ativas neste exato momento.</span>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button id="btn-filtro-abertos" onclick="filtrarTimeline('aberto')" style="cursor: pointer; background: #450a0a; color: #fca5a5; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 900; border: 1px solid #7f1d1d; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: 0.2s;">🔴 ${abertos.length} ABERTOS</button>
+            <button id="btn-filtro-followup" onclick="filtrarTimeline('followup')" style="cursor: pointer; background: #422006; color: #fcd34d; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 900; border: 1px solid #78350f; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: 0.2s;">🟡 ${followup.length} FOLLOW-UP</button>
+        </div>
+    </div>`;
+
+    if (abertos.length === 0 && followup.length === 0) {
+        htmlResumo += `<div class="item-notificacao" style="border-left-color: #10B981; background: #064E3B; margin-top: 10px; padding: 15px;">
+            <strong style="color: #34D399; font-size: 14px;">✅ TUDO NORMALIZADO</strong><br>
+            <span style="color: #A7F3D0; font-size: 12px;">Nenhum incidente de Link/Ping pendente ou sem solução no radar atual! Bom trabalho.</span>
+        </div>`;
+    } else {
+        const tempoDecorrido = (ts) => {
+            const diffMinutos = Math.floor((Date.now() - ts) / 60000);
+            
+            if (diffMinutos < 60) return `${diffMinutos}m`;
+
+            const meses = Math.floor(diffMinutos / 43200); 
+            let resto = diffMinutos % 43200;
+            
+            const dias = Math.floor(resto / 1440); 
+            resto = resto % 1440;
+            
+            const horas = Math.floor(resto / 60);
+            const minutos = resto % 60;
+
+            if (meses > 0) {
+                let txtMeses = meses === 1 ? 'mês' : 'meses';
+                let txtDias = dias === 1 ? 'dia' : 'dias';
+                return `${meses} ${txtMeses} e ${dias} ${txtDias}`;
+            } else if (dias > 0) {
+                let txtDias = dias === 1 ? 'dia' : 'dias';
+                return `${dias} ${txtDias} e ${horas}h`;
+            } else {
+                return `${horas}h ${minutos}m`;
+            }
+        };
+
+        const gerarCardInterativo = (log, corFundo, corBorda, corTexto, icone, tipo, classeFiltro) => {
+            const hostSafe = (log.form.host || '').replace(/'/g, "\\'");
+            const cliSafe = (log.form.cliente || '').replace(/'/g, "\\'");
+            const timer = tempoDecorrido(log.timestamp);
+            const temSLA = log.form.termino && log.form.termino !== '-';
+            const dataFormatada = new Date(log.timestamp).toLocaleDateString('pt-BR');
+            
+            return `
+            <div class="item-notificacao ${classeFiltro}" style="background: #1E293B; border: 1px solid #334155; border-left: 4px solid ${corBorda}; margin-bottom: 12px; padding: 15px; border-radius: 8px; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='${corBorda}'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='#334155'; this.style.transform='none';">
+                
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="background: ${corFundo}; color: ${corTexto}; padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 900; text-transform: uppercase; border: 1px solid ${corBorda};">${icone} ${tipo}</span>
+                        <span style="font-size: 11px; color: #94A3B8; font-weight: bold; background: #0F172A; padding: 3px 8px; border-radius: 4px;">⏳ Há ${timer}</span>
+                    </div>
+                    
+                    <button onclick="fecharTimeline(); carregarChamadoParaFormulario('${log.timestamp}')" style="background: #0284C7; color: white; border: none; padding: 6px 15px; border-radius: 6px; font-size: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); text-transform: uppercase; letter-spacing: 0.5px;" onmouseover="this.style.background='#0369A1'" onmouseout="this.style.background='#0284C7'">
+                        🔄 Puxar para Análise
+                    </button>
+                </div>
+                
+                <div style="font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <strong style="color: #38bdf8; cursor: pointer; border-bottom: 1px dashed #38bdf8; padding-bottom: 2px;" onclick="copiarTextoInline(event, '${cliSafe}')" title="Copiar Cliente">${log.form.cliente}</strong> 
+                    <span style="color: #475569;">|</span> 
+                    <span style="color: #F8FAFC; cursor: pointer; font-weight: bold;" onclick="copiarTextoInline(event, '${hostSafe}')" title="Copiar Host">🖥️ ${log.form.host}</span>
+                </div>
+                
+                <div style="font-size: 11px; color: #64748B; background: #0F172A; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #1E293B;">
+                    <span>👤 Atualizado por: <strong style="color: #E2E8F0;">${log.nome}</strong> em ${dataFormatada} às ${log.hora}</span>
+                    ${temSLA ? `<span style="color: #F59E0B; font-weight: bold; display: flex; align-items: center; gap: 4px;">🎯 Previsão SLA: ${log.form.termino}</span>` : '<span style="color: #64748B; font-style: italic;">Sem previsão (Verificar)</span>'}
+                </div>
+            </div>`;
+        };
+
+        // Injetando as classes 'card-aberto' e 'card-followup'
+        abertos.forEach(log => {
+            htmlResumo += gerarCardInterativo(log, '#450a0a', '#EF4444', '#fca5a5', '🔴', 'CRÍTICO', 'card-aberto');
+        });
+
+        followup.forEach(log => {
+            htmlResumo += gerarCardInterativo(log, '#422006', '#F59E0B', '#fcd34d', '🟡', 'FOLLOW-UP', 'card-followup');
+        });
+    }
+
+    if (listaNotificacoes) listaNotificacoes.innerHTML = htmlResumo;
+    window.totalNotificacoesNaoLidas = 0;
+    
+    const badge = document.getElementById('contador-notificacoes');
+    if (badge) badge.classList.add('badge-oculto');
+
+    localStorage.setItem('noc_timeline_html', htmlResumo);
+    localStorage.setItem('noc_timeline_count', 0);
+};
+
+window.filtrarTimeline = function(tipo) {
+    const btnAbertos = document.getElementById('btn-filtro-abertos');
+    const btnFollowup = document.getElementById('btn-filtro-followup');
+    const cardsAbertos = document.querySelectorAll('.card-aberto');
+    const cardsFollowup = document.querySelectorAll('.card-followup');
+
+    // Se clicar no botão que já está ativo, ele desfaz o filtro (mostra todos)
+    if (window.filtroTimelineAtivo === tipo) {
+        window.filtroTimelineAtivo = 'todos';
+    } else {
+        window.filtroTimelineAtivo = tipo;
+    }
+
+    // Aplica as regras visuais
+    if (window.filtroTimelineAtivo === 'todos') {
+        cardsAbertos.forEach(c => c.style.display = 'block');
+        cardsFollowup.forEach(c => c.style.display = 'block');
+        btnAbertos.style.opacity = '1';
+        btnFollowup.style.opacity = '1';
+    } else if (window.filtroTimelineAtivo === 'aberto') {
+        cardsAbertos.forEach(c => c.style.display = 'block');
+        cardsFollowup.forEach(c => c.style.display = 'none');
+        btnAbertos.style.opacity = '1';
+        btnFollowup.style.opacity = '0.3'; // Apaga o botão amarelo
+    } else if (window.filtroTimelineAtivo === 'followup') {
+        cardsAbertos.forEach(c => c.style.display = 'none');
+        cardsFollowup.forEach(c => c.style.display = 'block');
+        btnAbertos.style.opacity = '0.3'; // Apaga o botão vermelho
+        btnFollowup.style.opacity = '1';
+    }
+};
+
+// ==========================================
+// MOTOR DE RENDERIZAÇÃO DOS GRÁFICOS (CHART.JS)
+// ==========================================
+let chartsInstancias = {}; // Guarda as instâncias para poder apagar antes de recriar
+
+window.renderizarDashboardGraficos = function(logs) {
+    if (logs.length === 0) return;
+
+    // 1. Limpa os gráficos antigos da memória para evitar sobreposição bugada
+    Object.keys(chartsInstancias).forEach(key => {
+        if (chartsInstancias[key]) chartsInstancias[key].destroy();
+    });
+
+    // 2. Função Ninja de Agrupamento e Contagem
+    const agrupar = (arr, fn) => arr.reduce((acc, obj) => {
+        if (!obj.form) return acc;
+        const key = fn(obj);
+        if (key && key !== '-') acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+
+    // 3. Monta as fatias da pizza baseadas na base de dados
+    const dadosAnalista = agrupar(logs, l => l.nome.split(' ')[0]); // Pega só o primeiro nome
+    const dadosCliente = agrupar(logs, l => l.form.cliente);
+    const dadosSeveridade = agrupar(logs, l => l.form.severidade);
+    const dadosModo = agrupar(logs, l => l.form.modo === 'infra' ? 'Infraestrutura' : 'Link de Dados');
+    const dadosHost = agrupar(logs, l => l.form.host);
+    const dadosServico = agrupar(logs, l => l.form.item ? l.form.item.split('\n')[0].substring(0, 25) + '...' : 'Indefinido'); // Pega só o começo do nome do serviço para não vazar a tela
+
+    // 4. Configuração de Design Universal Escuro
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    const paletaCores = ['#38bdf8', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#6366f1', '#14b8a6', '#f43f5e', '#84cc16'];
+
+    // 5. Função de criação do gráfico (Barra ou Rosca)
+    const criarGrafico = (id, tipo, dados, titulo) => {
+        const ctx = document.getElementById(id);
+        if (!ctx) return;
+        
+        // Pega as Chaves (nomes) e Valores (quantidades) ordenados do maior para o menor
+        let entradas = Object.entries(dados).sort((a, b) => b[1] - a[1]).slice(0, 10); // Pega só o Top 10 para gráficos de barra
+        const labels = entradas.map(e => e[0]);
+        const values = entradas.map(e => e[1]);
+
+        chartsInstancias[id] = new Chart(ctx.getContext('2d'), {
+            type: tipo,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Registros',
+                    data: values,
+                    backgroundColor: paletaCores,
+                    borderWidth: 0,
+                    borderRadius: tipo === 'bar' ? 4 : 0 // Arredonda a pontinha da barra
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: tipo !== 'bar', position: 'right', labels: { boxWidth: 10, font: { size: 10 } } },
+                    title: { display: true, text: titulo, color: '#F8FAFC', font: { size: 14, weight: 'bold' } }
+                },
+                scales: tipo === 'bar' ? { 
+                    y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
+                    x: { ticks: { maxRotation: 45, minRotation: 45, font: {size: 9} } }
+                } : {}
+            }
+        });
+    };
+
+    // 6. Desenha os 6 gráficos na tela
+    criarGrafico('graficoAnalista', 'bar', dadosAnalista, 'Atendimentos por Analista (Top 10)');
+    criarGrafico('graficoModo', 'doughnut', dadosModo, 'Tipo de Incidente (Infra vs Link)');
+    criarGrafico('graficoCliente', 'bar', dadosCliente, 'Top 10 Clientes Afetados');
+    criarGrafico('graficoSeveridade', 'doughnut', dadosSeveridade, 'Distribuição de Severidade');
+    criarGrafico('graficoHost', 'bar', dadosHost, 'Top 10 Hosts/Circuitos com Queda');
+    criarGrafico('graficoServico', 'bar', dadosServico, 'Itens Monitorados mais Críticos');
+};
+
+// ==========================================
+// CONTROLES DOS FILTROS DE MÚLTIPLA SELEÇÃO
+// ==========================================
+window.toggleMenuFiltro = function(idMenu) {
+    document.querySelectorAll('.menu-filtro-opcoes').forEach(m => {
+        if(m.id !== idMenu) m.classList.remove('mostrar-menu');
+    });
+    document.getElementById(idMenu).classList.toggle('mostrar-menu');
+};
+
+window.toggleTodosFiltro = function(tipo, obj) {
+    const estado = obj.checked;
+    document.querySelectorAll(`.chk-${tipo}`).forEach(chk => chk.checked = estado);
+    atualizarLabelFiltro(tipo);
+};
+
+window.verificarFiltroUnico = function(tipo) {
+    const todos = document.querySelectorAll(`.chk-${tipo}`);
+    const marcados = document.querySelectorAll(`.chk-${tipo}:checked`);
+    document.getElementById(`chk-todos-${tipo}`).checked = (todos.length === marcados.length);
+    atualizarLabelFiltro(tipo);
+};
+
+window.atualizarLabelFiltro = function(tipo) {
+    const todos = document.querySelectorAll(`.chk-${tipo}`);
+    const marcados = document.querySelectorAll(`.chk-${tipo}:checked`);
+    const btn = document.getElementById(`btn-filtro-${tipo}`);
+    const icone = tipo === 'cliente' ? '🏢' : '👤';
+    
+    if (marcados.length === todos.length || marcados.length === 0) {
+        btn.innerHTML = `${icone} ${tipo === 'cliente' ? 'Clientes' : 'Analistas'} (Todos) <span>▼</span>`;
+    } else {
+        btn.innerHTML = `${icone} <b>${marcados.length} Selecionado(s)</b> <span>▼</span>`;
+    }
+};
+
+// Fecha os menus se o usuário clicar fora
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.multi-select-container')) {
+        document.querySelectorAll('.menu-filtro-opcoes').forEach(m => m.classList.remove('mostrar-menu'));
+    }
+});
