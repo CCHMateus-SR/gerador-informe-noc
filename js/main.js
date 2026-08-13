@@ -700,7 +700,7 @@ dbConfigAnalistas.on('value', (snapshot) => {
     if (selectLogin) {
         selectLogin.innerHTML = `
             <option value="" disabled selected>Selecione na lista...</option>
-            <option value="Gestão ITS">👑 Gestão ITS (Master)</option>
+            <option value="Gestão ITS">Gestão ITS</option>
         `;
     }
     
