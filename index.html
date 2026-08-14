@@ -73,15 +73,22 @@
                 <div id="cfg-aba-clientes" class="cfg-panel active">
                     <h4 style="margin-top:0; color:#F8FAFC;">Adicionar Novo Cliente</h4>
                     <div class="cfg-form-group">
-                        <input type="text" id="cfg-nome-cliente" placeholder="Nome do Cliente (Ex: Libbs)" class="cfg-input">
+                        <!-- ID Invisível para o sistema saber quem estamos editando -->
+                        <input type="hidden" id="cfg-edit-cliente-id" value="">
                         
-                        <div class="file-upload-wrapper">
-                            <label for="cfg-logo-cliente" class="btn-upload">📎 Anexar Logo (PNG/JPG)</label>
+                        <input type="text" id="cfg-nome-cliente" placeholder="Nome Oficial (Ex: Casas Pernambucanas)" class="cfg-input">
+                        <input type="text" id="cfg-apelidos-cliente" placeholder="Siglas no Centreon separadas por vírgula (Ex: CS-PERNAMBUCAS, CASAP)" class="cfg-input" style="margin-top: 10px;">
+                        
+                        <div class="file-upload-wrapper" style="margin-top: 10px;">
+                            <label for="cfg-logo-cliente" class="btn-upload">📎 Anexar Nova Logo (Opcional)</label>
                             <input type="file" id="cfg-logo-cliente" accept="image/png, image/jpeg" style="display: none;" onchange="mostrarNomeArquivo(this)">
                             <span id="cfg-file-name" style="font-size: 11px; color: #64748B;">Nenhum arquivo selecionado</span>
                         </div>
                         
-                        <button class="btn-cfg-salvar" onclick="salvarNovoCliente()">➕ Salvar Cliente</button>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button class="btn-cfg-salvar" onclick="salvarNovoCliente()" style="flex: 1;">➕ Salvar Cliente</button>
+                            <button id="btn-cancelar-edit-cliente" onclick="limparFormularioCliente()" style="display: none; background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">✖ CANCELAR</button>
+                        </div>
                     </div>
 
                     <h4 style="margin-top:25px; color:#F8FAFC; border-bottom: 1px solid #334155; padding-bottom: 10px;">Clientes Cadastrados</h4>
@@ -317,15 +324,20 @@
             <div style="background: #1E293B; padding: 15px; border-radius: 8px; border: 1px solid #334155;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                     <strong style="color: #F8FAFC;">📝 Avisos Gerais (Tratos e Regras)</strong>
-                    <div style="display: flex; gap: 8px;">
-                        <!-- NOVO BOTÃO DE DIVIDIR -->
-                        <button onclick="inserirLinhaDivisoria('passagem-avisos')" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Inserir linha para separar assuntos diferentes" onmouseover="this.style.background='#1E293B'; this.style.color='#F8FAFC'" onmouseout="this.style.background='transparent'; this.style.color='#94A3B8'">
-                            ➖ DIVIDIR AVISO
-                        </button>
-                        <!-- BOTÃO DESTACAR MANTIDO -->
-                        <button onclick="aplicarRealce('passagem-avisos')" style="background: #422006; color: #FCD34D; border: 1px solid #78350F; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Selecione o texto e clique aqui para destacar">
-                            🖍️ DESTACAR TEXTO
-                        </button>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        
+                        <!-- BOTÕES SVGs LIMPOS (DESFAZER/REFAZER) -->
+                        <div style="display: flex; gap: 6px; border-right: 1px solid #475569; padding-right: 10px; margin-right: 4px;">
+                            <button type="button" onclick="desfazerTexto('passagem-avisos')" style="background: transparent; color: #94A3B8; border: none; padding: 0; cursor: pointer; transition: 0.2s; display: flex; align-items: center;" title="Desfazer (Ctrl+Z)" onmouseover="this.style.color='#38BDF8'" onmouseout="this.style.color='#94A3B8'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                            </button>
+                            <button type="button" onclick="refazerTexto('passagem-avisos')" style="background: transparent; color: #94A3B8; border: none; padding: 0; cursor: pointer; transition: 0.2s; display: flex; align-items: center;" title="Refazer (Ctrl+Y)" onmouseover="this.style.color='#38BDF8'" onmouseout="this.style.color='#94A3B8'">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+                            </button>
+                        </div>
+
+                        <button onclick="inserirLinhaDivisoria('passagem-avisos')" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Inserir linha para separar assuntos diferentes" onmouseover="this.style.background='#1E293B'; this.style.color='#F8FAFC'" onmouseout="this.style.background='transparent'; this.style.color='#94A3B8'">➖ DIVIDIR AVISO</button>
+                        <button onclick="aplicarRealce('passagem-avisos')" style="background: #422006; color: #FCD34D; border: 1px solid #78350F; padding: 4px 10px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Selecione o texto e clique aqui para destacar">🖍️ DESTACAR TEXTO</button>
                     </div>
                 </div>
                 <textarea id="passagem-avisos" rows="1" placeholder="Digite recados gerais... (Dica: Selecione um trecho e clique em 'Destacar Texto')" style="width: 100%; box-sizing: border-box; background: #0F172A; border: 1px solid #475569; color: #F8FAFC; padding: 10px; border-radius: 6px; resize: vertical; font-size: 13px;"></textarea>
@@ -549,8 +561,8 @@
                     <span>⚙️ PREFERÊNCIAS</span>
                 </div>
                 
-                <button class="dropdown-item" onclick="cycleTheme()">
-                    <span class="icon">🎨</span> Mudar Tema Visual
+                <button id="btn-mudar-tema" class="dropdown-item" onclick="cycleTheme()" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="texto-btn-tema"><span class="icon">🌙</span> Tema Visual: <strong>Escuro</strong></div>
                 </button>
                 
                 <button class="dropdown-item" onclick="abrirConfiguracoes()">
