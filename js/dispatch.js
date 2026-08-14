@@ -812,24 +812,53 @@ window.mudarStatus = function() {
 
 window.inserirMacro = function(valor) {
     if(!valor) return;
-    const desc = document.getElementById('desc'); const statusAtual = document.getElementById('status').value; const severidadeAtual = document.getElementById('severidade').value;
+    const desc = document.getElementById('desc'); 
+    const statusAtual = document.getElementById('status').value; 
+    const severidadeAtual = document.getElementById('severidade').value;
     let texto = "";
+
     switch(valor) {
         case 'padrao':
-            if (statusAtual === 'EM ABERTO') { texto = "Ações Iniciais: Identificamos a indisponibilidade de comunicação com o host acima e imediatamente acionamos a operadora responsável para análise técnica.\n\nNo momento, aguardamos o diagnóstico inicial e a previsão de normalização (SLA). Enviaremos atualizações assim que houver novidades."; } 
-            else if (statusAtual === 'FOLLOW-UP') { texto = "Atualização de Status: Em novo contato com a operadora, fomos informados de que [descrever a atualização, ex: há uma falha massiva na região / o técnico está em deslocamento para o local].\n\nA previsão de normalização informada pela operadora é para as [HH: MM]. Continuamos monitorando o circuito de perto e cobraremos agilidade na tratativa."; } 
-            else if (statusAtual === 'RESOLVIDO') { texto = "Resolução e Diagnóstico: Informamos que o serviço de comunicação foi restabelecido e encontra-se estável.\n\nSegundo o parecer técnico da operadora, a falha foi ocasionada por [causa raiz, ex: rompimento de fibra óptica na região / travamento do equipamento, sendo necessário reset físico].\n\nO incidente está encerrado. Permanecemos à disposição em caso de novas intermitências."; }
-            if (severidadeAtual === 'INTERMITENTE') { texto = texto.replace("indisponibilidade de comunicação", "instabilidade e perda de pacotes na comunicação").replace("foi restabelecido", "foi estabilizado"); }
+            if (statusAtual === 'EM ABERTO') {
+                if (severidadeAtual === 'INTERMITENTE') {
+                    texto = "Ações Iniciais: Detectamos instabilidade e perda de pacotes neste circuito. Realizamos os testes iniciais e acionamos o suporte da operadora com as evidências coletadas para análise de rota/saturação.\n\nAguardamos o diagnóstico preliminar e o prazo (SLA) para estabilização.";
+                } else {
+                    texto = "Ações Iniciais: Detectamos a perda total de comunicação com o equipamento de borda. Após nossos testes iniciais (Ping/Traceroute), isolamos a falha na rede da operadora e abrimos o chamado técnico.\n\nNo momento, estamos cobrando um diagnóstico preliminar e o prazo previsto de normalização (SLA).";
+                }
+            } 
+            else if (statusAtual === 'FOLLOW-UP') { 
+                texto = "Atualização de Status: Em novo contato com o suporte da operadora, fomos informados que a equipe técnica segue atuando na falha [descrever a atualização brevemente, ex: analisando os alarmes no concentrador / deslocando equipe].\n\nContinuamos monitorando o circuito ativamente e cobrando agilidade na tratativa."; 
+            } 
+            else if (statusAtual === 'RESOLVIDO') { 
+                texto = "Resolução e Diagnóstico: O serviço de comunicação foi totalmente restabelecido e encontra-se estável em nossa monitoração.\n\nSegundo o parecer da operadora, a falha foi solucionada após [inserir a causa raiz, ex: reset físico / ajuste lógico na porta / reparo do rompimento].\n\nIncidente encerrado. O NOC permanece à disposição."; 
+            }
             break;
-        case 'fibra': texto = "Identificamos indícios de rompimento de fibra ótica na região. A equipe técnica de campo da operadora já foi acionada e encontra-se em deslocamento para realizar o mapeamento e reparo físico no trecho afetado."; break;
-        case 'eletrica': texto = "Identificamos que o equipamento encontra-se indisponível devido a uma provável falha massiva no fornecimento de energia elétrica na região (incidente com a concessionária local). Aguardamos o restabelecimento da energia comercial para normalização do serviço."; break;
-        case 'pos_reparo': texto = "Informamos que o serviço de comunicação foi restabelecido. Contudo, o NOC manterá o circuito em acompanhamento de estabilidade e verificação de métricas antes do encerramento definitivo do incidente."; break;
-        case 'n2': texto = "O incidente foi escalonado para a equipe de Engenharia (N2) da operadora, que está realizando análises aprofundadas no backbone e em rotas alternativas para identificar a causa raiz da instabilidade."; break;
-        case 'validacao': texto = "A operadora informa que os testes apontam normalidade no circuito. Solicitamos, por gentileza, que a equipe local valide a disponibilidade dos serviços e acesso às aplicações internas para seguirmos com o encerramento."; break;
+        case 'fibra': 
+            texto = "A operadora confirmou um rompimento de fibra óptica na região, impactando este circuito. Uma equipe de campo (emenda/fusão) já foi despachada para identificar o ponto exato da ruptura e iniciar o reparo físico.\n\nSeguiremos acompanhando o deslocamento e cobrando o SLA."; 
+            break;
+        case 'eletrica': 
+            texto = "Em análise preliminar, identificamos que a indisponibilidade foi causada por uma falha massiva no fornecimento de energia elétrica na região (incidente com a concessionária comercial).\n\nO NOC manterá o monitoramento ativo para validar o retorno do link assim que a energia for restabelecida."; 
+            break;
+        case 'pos_reparo': 
+            texto = "O serviço de comunicação normalizou, porém o NOC manterá este circuito em 'Acompanhamento Pós-Reparo' nas próximas horas. O objetivo é garantir a estabilidade e a ausência de novas perdas de pacotes antes de efetivarmos o encerramento do chamado."; 
+            break;
+        case 'n2': 
+            texto = "Devido à complexidade da falha, a operadora escalonou o incidente para a equipe de Engenharia Avançada (N2/N3). Eles estão investigando os equipamentos de core (Backbone) para identificar a causa raiz da anomalia.\n\nEstamos atuando em conjunto para acelerar o diagnóstico final."; 
+            break;
+        case 'validacao': 
+            texto = "A operadora concluiu os reparos e nossos testes internos do NOC mostram que o circuito encontra-se UP e respondendo perfeitamente."; 
+            break;
     }
+
     if (desc.value.trim() !== "") {
-        if(confirm("Substituir o texto atual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { desc.value = texto; } else { desc.value = desc.value + "\n\n" + texto; }
-    } else { desc.value = texto; }
+        if(confirm("Substituir o texto atual pela nova macro? (OK = Substituir, Cancelar = Adicionar ao final)")) { 
+            desc.value = texto; 
+        } else { 
+            desc.value = desc.value + "\n\n" + texto; 
+        }
+    } else { 
+        desc.value = texto; 
+    }
     window.update();
 }
 
@@ -926,10 +955,17 @@ function registrarHistoricoNuvem(assunto) {
         inicio: document.getElementById('inicio').value, fgrid: document.getElementById('f-grid').value, termino: document.getElementById('termino').value, desc: document.getElementById('desc').value, 
         solucionador: document.getElementById('solucionador').value, obs: document.getElementById('obs').value, evidencias: document.getElementById('evidencias').checked 
     };
+    
+    // Salva no banco e captura a "Chave" do registro gerado
     db.ref('historico_noc').push({
         tipo: 'relatorio', nome: currentUser.nome, turno: currentUser.turno, assunto: assunto,
         hora: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
         timestamp: firebase.database.ServerValue.TIMESTAMP, form: formData 
+    }).then((snap) => {
+        // GATILHO DA JANELA DE ARREPENDIMENTO: Dispara a notificação com a chave de exclusão!
+        if(typeof window.dispararContagemDesfazer === 'function') {
+            window.dispararContagemDesfazer(snap.key);
+        }
     });
 }
 
@@ -1050,6 +1086,17 @@ window.copyAsImage = function() {
                 const item = new ClipboardItem({ "image/png": blob }); 
                 navigator.clipboard.write([item]).then(() => { 
                     mostrarToast("📸 IMAGEM HD COPIADA E GUARDADA NO HISTÓRICO!", "success"); 
+
+                    // 🚀 GATILHO DA TRAVA DE VÍNCULO (APENAS AQUI E NO TEXTO)
+                    const vCli = document.getElementById('cliente').value.toUpperCase().trim();
+                    const vHst = document.getElementById('host').value.toUpperCase().trim();
+                    const isLibbs = (vCli === 'LIBBS' && vHst !== 'LIBBS-DIGIBEE');
+                    const elAlvo = isLibbs ? document.getElementById('protocolo-libbs') : document.getElementById('itssm');
+
+                    if (elAlvo && elAlvo.value.trim() === '') {
+                        setTimeout(() => { window.lembreteVinculoITSSM(isLibbs); }, 500);
+                    }
+
                 }); 
             } catch (err) { 
                 alert("A cópia de imagem não é suportada no seu navegador atual."); 
@@ -1126,6 +1173,14 @@ window.copyITSSM = function() {
         document.execCommand("copy"); 
         document.body.removeChild(tempTextarea); 
         mostrarToast("📝 TEXTO ITSSM COPIADO COM SUCESSO!", "info"); 
+
+        // 🚀 GATILHO DA TRAVA DE VÍNCULO (APENAS AQUI E NA IMAGEM)
+        const isLibbs = (vCliente === 'LIBBS' && vHost !== 'LIBBS-DIGIBEE');
+        const campoAlvo = isLibbs ? vProtLibbs : vItssm;
+        
+        if (campoAlvo === '') {
+            setTimeout(() => { window.lembreteVinculoITSSM(isLibbs); }, 500);
+        }
     } catch(e) {}
 }
 
@@ -1146,10 +1201,17 @@ window.copiarAssuntoITSSM = function() {
     const itemRaw = document.getElementById('item').value.trim(); const servico = formatarServicoInteligente(itemRaw);
     const assuntoITSSM = `${host} - ${servico}`; 
     
+    // COMO ESSE BOTÃO NÃO REGISTRA NO HISTÓRICO, REMOVEMOS O ALERTA DAQUI!
+    
     if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(assuntoITSSM).then(() => { mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); }).catch(err => { console.error("Erro na API Clipboard: ", err); });
+        navigator.clipboard.writeText(assuntoITSSM).then(() => { 
+            mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
+        }).catch(err => { console.error("Erro na API Clipboard: ", err); });
     } else {
-        try { const tempInput = document.createElement("input"); tempInput.value = assuntoITSSM; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); } catch(e) {}
+        try { 
+            const tempInput = document.createElement("input"); tempInput.value = assuntoITSSM; document.body.appendChild(tempInput); tempInput.select(); document.execCommand("copy"); document.body.removeChild(tempInput); 
+            mostrarToast("✉️ ASSUNTO ITSSM COPIADO COM SUCESSO!", "info"); 
+        } catch(e) {}
     }
 }
 
@@ -1564,6 +1626,7 @@ window.processarExtratorMagico = function() {
     if (hostsDetectados.length > 0) {
         let hostPrincipal = hostsDetectados[0].toUpperCase().replace(/[⭐★]/g, '').trim();
 
+        // 1. Regra específica do VEEAM (Mantida intacta)
         if (hostPrincipal.startsWith('ITS-BKP-VEEAM') && servicos.length > 0) {
             const primeiroServico = servicos[0].toUpperCase();
             const partes = primeiroServico.split('-');
@@ -1581,30 +1644,66 @@ window.processarExtratorMagico = function() {
             }
         }
 
+        // ==========================================
+        // O NOVO CÉREBRO DINÂMICO (HÍBRIDO)
+        // ==========================================
+        
+        // 2. Dicionário Inteligente (Nativo + Banco de Dados)
         if (!clienteDetectado) {
-            if (hostPrincipal.includes('LIBBS')) clienteDetectado = 'LIBBS';
-            else if (hostPrincipal.includes('AMIGAO') || hostPrincipal.includes('CSD')) clienteDetectado = 'CSD (GRUPO AMIGÃO)';
-            else if (hostPrincipal.includes('AGIS')) clienteDetectado = 'GRUPO AGIS';
-            else if (hostPrincipal.includes('STAHL')) clienteDetectado = 'AGROSTAHL (STAHL)';
-            else if (hostPrincipal.includes('FURACAO')) clienteDetectado = 'FURACÃO';
-            else if (hostPrincipal.startsWith('TPG') || hostPrincipal.startsWith('TP-') || hostPrincipal.startsWith('TP_')) clienteDetectado = 'TERESA PEREZ';
-            else if (hostPrincipal.startsWith('ALBA')) clienteDetectado = 'HOTELARIA ALBA';
-            else if (hostPrincipal.startsWith('TNG')) clienteDetectado = 'TECNOGERA (TNG)';
-            else {
-                const prefixo = hostPrincipal.split('-')[0].toUpperCase(); 
-                const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
-                const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
-                
-                const prefixoLimpo = prefixoReal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
-                const clientesPossiveis = Object.keys(window.bancoDeLogos || {});
-                let match = clientesPossiveis.find(c => {
-                    const cLimpo = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
-                    return cLimpo.startsWith(prefixoLimpo) || prefixoLimpo.startsWith(cLimpo);
-                });
-                if (match) clienteDetectado = match;
+            
+            // BASE NATIVA: Mantém os clientes antigos funcionando automaticamente sem o gestor precisar recadastrar!
+            let dicionarioMisto = {
+                "CSD (GRUPO AMIGÃO)": ["AMIGAO", "CSD"],
+                "GRUPO AGIS": ["AGIS"],
+                "AGROSTAHL (STAHL)": ["STAHL", "AGROSTAHL"],
+                "FURACÃO": ["FURACAO"],
+                "TERESA PEREZ": ["TPG", "TP-", "TP_"],
+                "HOTELARIA ALBA": ["ALBA"],
+                "TECNOGERA (TNG)": ["TNG"],
+                "HOSPITAL PERSONAL": ["PERSONAL", "HPERSONAL"],
+                "LIBBS": ["LIBBS"]
+            };
+
+            // MESCLA MÁGICA: Junta a base nativa com tudo o que a Gestão adicionar/editar lá na tela de Configurações
+            if (window.bancoDeApelidos) {
+                for (const [nomeDb, siglasDb] of Object.entries(window.bancoDeApelidos)) {
+                    if (dicionarioMisto[nomeDb]) {
+                        // Se o cliente já existe na base, junta as siglas novas com as velhas
+                        dicionarioMisto[nomeDb] = [...new Set([...dicionarioMisto[nomeDb], ...siglasDb])];
+                    } else {
+                        // Se é um cliente totalmente novo, adiciona no cérebro
+                        dicionarioMisto[nomeDb] = siglasDb;
+                    }
+                }
+            }
+
+            // O robô varre o dicionário fundido e faz o match com precisão absoluta
+            for (const [nomeOficial, apelidos] of Object.entries(dicionarioMisto)) {
+                if (apelidos.some(apelido => hostPrincipal.includes(apelido))) {
+                    clienteDetectado = nomeOficial;
+                    break; 
+                }
             }
         }
 
+        // 3. Fallback Mágico: Tenta adivinhar cortando o primeiro pedaço do nome do Host
+        if (!clienteDetectado) {
+            const prefixo = hostPrincipal.split('-')[0].toUpperCase(); 
+            const prefixoUnder = hostPrincipal.split('_')[0].toUpperCase();
+            const prefixoReal = prefixo.length < prefixoUnder.length ? prefixo : prefixoUnder;
+            
+            const prefixoLimpo = prefixoReal.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+            const clientesPossiveis = Object.keys(window.bancoDeLogos || {});
+            
+            let match = clientesPossiveis.find(c => {
+                const cLimpo = c.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, "");
+                return cLimpo.startsWith(prefixoLimpo) || prefixoLimpo.startsWith(cLimpo);
+            });
+            
+            if (match) clienteDetectado = match;
+        }
+
+        // 4. Última esperança: Procurar na memória de chamados anteriores
         if (!clienteDetectado) {
             for (let modo in memoriaNOC) {
                 for (let cli in memoriaNOC[modo]) {
@@ -1692,10 +1791,17 @@ window.aplicarExtraidoNoFormulario = function(heranca, acaoDesejada, ext) {
     document.getElementById('evidencias').checked = false;
 
     if (heranca) {
-        // 🔥 PUXA TODOS OS DADOS DO PASSADO (CORRELAÇÃO)
+        // 🔥 PUXA TODOS OS DADOS DO PASSADO E FAZ A MESCLA INTELIGENTE
         document.getElementById('cliente').value = heranca.cliente || ext.cliente;
         document.getElementById('host').value = heranca.host || ext.hosts;
-        document.getElementById('item').value = heranca.item || ext.servicos;
+        
+        // 🚀 A MÁGICA DA CORREÇÃO AQUI: Mescla os serviços antigos com os novos!
+        let itensAntigos = (heranca.item || '').split('\n').map(s => s.trim()).filter(s => s !== '');
+        let itensNovos = (ext.servicos || '').split('\n').map(s => s.trim()).filter(s => s !== '');
+        let itensMesclados = [...new Set([...itensAntigos, ...itensNovos])].join('\n');
+        
+        document.getElementById('item').value = itensMesclados || ext.servicos;
+        
         document.getElementById('inicio').value = heranca.inicio || '';
         document.getElementById('protocolo').value = heranca.protocolo || '';
         document.getElementById('itssm').value = heranca.itssm || '';
@@ -1715,7 +1821,7 @@ window.aplicarExtraidoNoFormulario = function(heranca, acaoDesejada, ext) {
             document.getElementById('severidade').value = ext.severidade || heranca.severidade;
             document.getElementById('termino').value = heranca.termino || '-';
             
-            mostrarToast("🟡 Follow-Up preenchido. Dados do chamado puxados!", "warning", 4000);
+            mostrarToast("🟡 Follow-Up preenchido. Serviços mesclados com sucesso!", "warning", 4000);
         } 
         else if (acaoDesejada === 'RESOLVIDO') {
             // Oculta os opcionais para o encerramento, conforme sua regra!
@@ -2061,3 +2167,169 @@ document.addEventListener('click', (e) => {
         document.querySelectorAll('.menu-filtro-opcoes').forEach(m => m.classList.remove('mostrar-menu'));
     }
 });
+
+// ==========================================
+// MOTOR DE LEMBRETE DE VINCULAÇÃO ITSSM
+// ==========================================
+window.assinaturaLembreteITSSM = ""; // Guarda qual foi o último chamado avisado
+
+window.lembreteVinculoITSSM = function(isLibbs) {
+    
+    // 🔥 A TRAVA INTELIGENTE: Cria uma "digital" do chamado atual
+    const hostAtual = document.getElementById('host').value.trim();
+    const servicoAtual = document.getElementById('item').value.trim();
+    const assinaturaAtual = `${hostAtual}|${servicoAtual}`;
+
+    // Se for exatamente o mesmo chamado, ele aborta para não irritar o analista 2 vezes!
+    if (window.assinaturaLembreteITSSM === assinaturaAtual) return;
+    window.assinaturaLembreteITSSM = assinaturaAtual; 
+
+    let modal = document.getElementById('modal-lembrete-itssm');
+    
+    // Se o modal não existir, injeta ele no HTML automaticamente
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'modal-lembrete-itssm';
+        modal.className = 'modal-overlay';
+        modal.style.zIndex = '999999';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 480px; background: #0F172A; border: 2px solid #10B981; border-radius: 12px; padding: 30px; text-align: center; box-shadow: 0 0 50px rgba(16, 185, 129, 0.3);">
+                <div style="font-size: 50px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #10B981);">📋</div>
+                <h3 style="margin: 0; color: #10B981; font-size: 24px; text-transform: uppercase; font-weight: 900;">Ticket Copiado!</h3>
+                <p id="txt-lembrete-itssm" style="color: #CBD5E1; font-size: 14px; margin: 15px 0 25px 0; line-height: 1.6;">
+                    <!-- Texto injetado pelo JS -->
+                </p>
+                <button onclick="fecharLembreteITSSM()" style="background: #10B981; color: white; border: none; padding: 14px 30px; border-radius: 6px; font-weight: 900; font-size: 14px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); width: 100%; text-transform: uppercase;">
+                    Ok, Não vou esquecer! 🔗
+                </button>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    const idCampo = isLibbs ? "protocolo-libbs" : "itssm";
+    const nomeCampo = isLibbs ? "Protocolo Libbs (E-mail)" : "Nº REGISTRO ITSSM";
+    
+    document.getElementById('txt-lembrete-itssm').innerHTML = `Vá ao sistema externo, gere o ticket e <strong>volte aqui obrigatoriamente</strong> para colar o número no campo <b style="color: #38BDF8;">${nomeCampo}</b> e clicar em <b style="color: #10B981;">🔗 VINCULAR</b>.`;
+    
+    // Pula automaticamente para a Aba 2 para o analista ver o campo
+    window.mudarSecao(2); 
+
+    // Injeta a animação CSS de "piscar" se ela não existir
+    if (!document.getElementById('style-piscar-itssm')) {
+        const style = document.createElement('style');
+        style.id = 'style-piscar-itssm';
+        style.innerHTML = `
+            @keyframes piscarVerde {
+                0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); border-color: #10B981; }
+                70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); border-color: #34D399; }
+                100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); border-color: #10B981; }
+            }
+            .piscar-borda-verde {
+                animation: piscarVerde 1.5s infinite !important;
+                border: 1px solid #10B981 !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Faz o campo específico pulsar!
+    const campoAlvo = document.getElementById(idCampo);
+    const grupoAlvo = campoAlvo ? campoAlvo.closest('.input-group') : null;
+    if (grupoAlvo) {
+        grupoAlvo.classList.add('piscar-borda-verde');
+    }
+    
+    modal.style.display = 'flex';
+};
+
+// Função para Fechar o Modal e Preparar o Campo
+window.fecharLembreteITSSM = function() {
+    document.getElementById('modal-lembrete-itssm').style.display = 'none';
+    
+    const vClienteCheck = document.getElementById('cliente').value.toUpperCase().trim();
+    const vHostCheck = document.getElementById('host').value.toUpperCase().trim();
+    const isLibbsCheck = (vClienteCheck === 'LIBBS' && vHostCheck !== 'LIBBS-DIGIBEE');
+    
+    const idCampo = isLibbsCheck ? 'protocolo-libbs' : 'itssm';
+    const campoAlvo = document.getElementById(idCampo);
+    const grupoAlvo = campoAlvo ? campoAlvo.closest('.input-group') : null;
+    
+    if (campoAlvo && grupoAlvo) {
+        // Já joga o cursor de digitação lá dentro para facilitar
+        campoAlvo.focus();
+        
+        // Remove a animação piscante assim que ele começar a digitar o número
+        campoAlvo.addEventListener('input', function removerBrilho() {
+            grupoAlvo.classList.remove('piscar-borda-verde');
+            campoAlvo.removeEventListener('input', removerBrilho);
+        });
+    }
+};
+
+// ==========================================
+// MOTOR DE DESFAZER REGISTRO NA NUVEM (UNDO 60s)
+// ==========================================
+window.dispararContagemDesfazer = function(keyBanco) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toastId = 'undo-' + keyBanco;
+    const div = document.createElement('div');
+    div.id = toastId;
+    
+    // Visual flutuante e sofisticado com barrinha na base
+    div.style.cssText = 'background: #0F172A; border: 1px solid #334155; border-left: 4px solid #10B981; padding: 15px; border-radius: 8px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); position: relative; overflow: hidden; width: 340px; pointer-events: auto; transform: translateX(0); opacity: 1; transition: all 0.4s ease;';
+    
+    div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; z-index: 2;">
+            <div style="display: flex; flex-direction: column;">
+                <strong style="color: #F8FAFC; font-size: 13px; margin-bottom: 2px;">✅ Salvo no Histórico</strong>
+                <span style="color: #94A3B8; font-size: 11px;">1 min para reverter a ação, se quiser.</span>
+            </div>
+            <button onclick="desfazerRegistroNuvem('${keyBanco}', '${toastId}')" style="background: rgba(239, 68, 68, 0.15); color: #F87171; border: 1px solid #EF4444; padding: 6px 12px; border-radius: 6px; font-weight: 900; font-size: 10px; cursor: pointer; transition: 0.2s; letter-spacing: 0.5px;" onmouseover="this.style.background='#EF4444'; this.style.color='#FFF'" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)'; this.style.color='#F87171'">
+                ↩️ CANCELAR
+            </button>
+        </div>
+        <!-- Barra de Progresso Animada -->
+        <div style="position: absolute; bottom: 0; left: 0; height: 4px; background: #10B981; width: 100%; transition: width 60s linear;" id="bar-${toastId}"></div>
+    `;
+
+    container.appendChild(div);
+
+    // Dá o play na animação da barrinha de tempo (60 segundos secando)
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const bar = document.getElementById('bar-' + toastId);
+            if (bar) bar.style.width = '0%';
+        }, 50);
+    });
+
+    // Após 60 segundos exatos, remove o Toast se ninguém clicou
+    setTimeout(() => {
+        const toastEl = document.getElementById(toastId);
+        if (toastEl) {
+            toastEl.style.opacity = '0';
+            toastEl.style.transform = 'translateX(100%)';
+            setTimeout(() => toastEl.remove(), 400);
+        }
+    }, 60000);
+};
+
+window.desfazerRegistroNuvem = function(keyBanco, toastId) {
+    // Apaga o registro diretamente na nuvem (Firebase) usando a variável 'db'
+    db.ref('historico_noc/' + keyBanco).remove().then(() => {
+        
+        if (typeof window.mostrarToast === 'function') {
+            window.mostrarToast("🗑️ Registro cancelado e removido do Radar/Histórico!", "warning");
+        }
+        
+        // Remove a caixinha da tela imediatamente
+        const toastEl = document.getElementById(toastId);
+        if (toastEl) toastEl.remove();
+        
+    }).catch(err => {
+        console.error("Erro ao desfazer na nuvem: ", err);
+        alert("Erro ao tentar desfazer: " + err.message);
+    });
+};
