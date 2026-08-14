@@ -1660,6 +1660,12 @@ window.processarExtratorMagico = function() {
         document.getElementById('modal-extrator-acao').style.display = 'flex';
         document.getElementById('btn-extrator-follow').onclick = () => window.aplicarExtraidoNoFormulario(chamadoHerdar, 'FOLLOW-UP', pacoteExtraido);
         document.getElementById('btn-extrator-encerra').onclick = () => window.aplicarExtraidoNoFormulario(chamadoHerdar, 'RESOLVIDO', pacoteExtraido);
+        
+        // O GATILHO DO BOTÃO IGNORAR: Passa herança nula (null) e força ABERTURA
+        const btnIgnorar = document.getElementById('btn-extrator-ignorar');
+        if (btnIgnorar) {
+            btnIgnorar.onclick = () => window.aplicarExtraidoNoFormulario(null, 'ABERTURA', pacoteExtraido);
+        }
     } else {
         window.aplicarExtraidoNoFormulario(null, 'ABERTURA', pacoteExtraido);
     }
