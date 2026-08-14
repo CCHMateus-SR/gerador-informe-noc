@@ -2585,40 +2585,270 @@ window.refazerTexto = function(elemento) {
 };
 
 // ==========================================
-// MOTOR DE TEXTO DINÂMICO DO TEMA VISUAL
+// MOTOR DEFINITIVO DO TEMA VISUAL (ESCURO / CLARO / PRO)
 // ==========================================
 
-// 1. Interceptamos a função original para rodar a nossa mágica junto com ela
-if (typeof window.cycleTheme === 'function' && !window.temaInterceptado) {
-    const temaOriginal = window.cycleTheme;
-    
+window.temasDisponiveis = ['tema-escuro', 'tema-claro', 'tema-pro'];
+
+// 1. A Função que faz a troca oficial
+if (!window.temaInterceptado) {
     window.cycleTheme = function() {
-        temaOriginal(); // O sistema troca a cor normalmente
-        window.atualizarTextoBotaoTema(); // Nós atualizamos a palavra!
+        let temaAtual = localStorage.getItem('noc_theme') || 'tema-escuro';
+        let proximoIndex = (window.temasDisponiveis.indexOf(temaAtual) + 1) % window.temasDisponiveis.length;
+        let novoTema = window.temasDisponiveis[proximoIndex];
+
+        document.body.classList.remove('tema-escuro', 'tema-claro', 'tema-pro', 'light-theme', 'light-mode');
+        document.body.classList.add(novoTema);
+        localStorage.setItem('noc_theme', novoTema);
+
+        window.atualizarTextoBotaoTema();
     };
     window.temaInterceptado = true;
 }
 
-// 2. A inteligência que lê o sistema e escreve no botão
+// 2. A inteligência do botão
 window.atualizarTextoBotaoTema = function() {
     const textoBtn = document.getElementById('texto-btn-tema');
     if (!textoBtn) return;
-
-    // Varre o sistema (memória e classes) para descobrir onde parou
-    const bodyClass = document.body.className || '';
-    const temaSalvo = localStorage.getItem('theme') || localStorage.getItem('noc_theme') || '';
-    const rastreador = (bodyClass + ' ' + temaSalvo).toLowerCase();
+    const temaAtual = localStorage.getItem('noc_theme') || 'tema-escuro';
     
-    if (rastreador.includes('claro') || rastreador.includes('light')) {
+    if (temaAtual === 'tema-claro') {
         textoBtn.innerHTML = '<span class="icon">☀️</span> Tema Visual: <strong style="color: #F59E0B;">Claro</strong>';
-    } else if (rastreador.includes('pro')) {
+    } else if (temaAtual === 'tema-pro') {
         textoBtn.innerHTML = '<span class="icon">🚀</span> Tema Visual: <strong style="color: #10B981;">PRO</strong>';
     } else {
         textoBtn.innerHTML = '<span class="icon">🌙</span> Tema Visual: <strong style="color: #38BDF8;">Escuro</strong>';
     }
 };
 
-// 3. Roda assim que o site abre para sincronizar o botão com o tema que o usuário já tinha salvo
+// 3. Ao carregar: Aplica CSS Mágico "Eye Care Light Mode"
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(window.atualizarTextoBotaoTema, 500);
+    
+    if (!document.getElementById('css-tema-claro-v17')) {
+        // Limpeza implacável das versões anteriores
+        ['', '-v2', '-v3', '-v4', '-v5', '-v6', '-v7', '-v8', '-v9', '-v10', '-v11', '-v12', '-v13', '-v14', '-v15', '-v16'].forEach(v => {
+            let old = document.getElementById('css-tema-claro' + v);
+            if (old) old.remove();
+        });
+
+        const style = document.createElement('style');
+        style.id = 'css-tema-claro-v17';
+        style.innerHTML = `
+            /* FUNDO PRINCIPAL - BRANCO QUENTE/AMARELADO (Eye Care) */
+            body.tema-claro { background-color: #FDFBF7 !important; color: #1E293B !important; }
+
+            /* LATERAL DIREITA (FUNDO PRETO DO INFORME) */
+            body.tema-claro .preview-side { background-color: #FDFBF7 !important; border-left: 1px solid #E2E8F0 !important; }
+            body.tema-claro .dev-signature { color: #94A3B8 !important; }
+
+            /* PAINEIS E MODAIS BASE */
+            body.tema-claro .form-side, body.tema-claro .history-side, body.tema-claro .modal-content, 
+            body.tema-claro .config-sidebar, body.tema-claro .config-content, body.tema-claro #conteudo-gestao { 
+                background-color: #FFFFFF !important; border-color: #E2E8F0 !important; box-shadow: 0 10px 30px rgba(0,0,0,0.06) !important; 
+            }
+
+            /* BURACO NEGRO DO HISTÓRICO */
+            body.tema-claro .my-card [style*="color: #E2E8F0"], body.tema-claro .my-card [style*="color: rgb(226, 232, 240)"],
+            body.tema-claro .my-card [style*="color: #CBD5E1"], body.tema-claro .my-card [style*="color: rgb(203, 213, 225)"],
+            body.tema-claro .my-card [style*="color: #F8FAFC"], body.tema-claro .my-card [style*="color: rgb(248, 250, 252)"],
+            body.tema-claro .my-card [style*="color: white"], body.tema-claro .my-card [style*="color: #FFFFFF"],
+            body.tema-claro .my-card [style*="color: rgb(255, 255, 255)"],
+            body.tema-claro .my-card [style*="color: #94A3B8"], body.tema-claro .my-card [style*="color: rgb(148, 163, 184)"],
+            body.tema-claro .my-card [style*="color: #64748B"], body.tema-claro .my-card [style*="color: rgb(100, 116, 139)"] { 
+                color: #0F172A !important; font-weight: 800 !important; 
+            }
+
+            body.tema-claro .tabs-container { background-color: #F1F5F9 !important; border: 1px solid #CBD5E1 !important; border-radius: 8px !important; padding: 4px !important; display: flex !important; gap: 4px !important; }
+            body.tema-claro .tab-btn { background-color: transparent !important; color: #64748B !important; border: none !important; font-weight: 700 !important; border-radius: 6px !important; flex: 1 !important; box-shadow: none !important; }
+            body.tema-claro .tab-btn:hover { background-color: #E2E8F0 !important; }
+            body.tema-claro .tab-btn.active { background-color: #FFFFFF !important; color: #DC2626 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; font-weight: 900 !important; }
+
+            /* ---------------------------------------------------- */
+            /* 💥 V17: ABAS ANTI-PULO (GEOMETRIA TRAVADA) 💥 */
+            /* ---------------------------------------------------- */
+            body.tema-claro .section-tabs { 
+                border-bottom: 1px solid #0284C7 !important; 
+                gap: 4px !important; 
+            }
+            body.tema-claro .section-tab-btn { 
+                background-color: transparent !important; 
+                color: #64748B !important; 
+                
+                /* TRAVA DE GEOMETRIA: As bordas existem, mas são invisíveis! */
+                border-top: 3px solid transparent !important; 
+                border-left: 1px solid transparent !important; 
+                border-right: 1px solid transparent !important; 
+                border-bottom: 1px solid #0284C7 !important; 
+                
+                border-radius: 8px 8px 0 0 !important; 
+                font-weight: 800 !important; /* TRAVA DE FONTE: Fica sempre "gorda", evitando que o texto expanda */
+                margin-bottom: -1px !important; 
+                transition: all 0.2s ease !important; 
+            }
+            body.tema-claro .section-tab-btn:hover { 
+                background-color: #E2E8F0 !important; 
+                color: #334155 !important; 
+            }
+            body.tema-claro .section-tab-btn span { color: inherit !important; } 
+            
+            body.tema-claro .section-tab-btn.active { 
+                background-color: #F1F5F9 !important; 
+                color: #0284C7 !important; 
+                
+                /* As bordas ganham cor, mas o tamanho total de pixels é EXATAMENTE o mesmo! */
+                border-top: 3px solid #0284C7 !important; 
+                border-left: 1px solid #CBD5E1 !important; 
+                border-right: 1px solid #CBD5E1 !important; 
+                border-bottom: 1px solid #F1F5F9 !important; /* Borracha da linha base */
+                
+                font-weight: 800 !important; /* Mesma fonte, sem pulo! */
+            }
+
+            /* CAMPOS DE TEXTO E FORMULÁRIO GERAL */
+            body.tema-claro .form-section { background-color: #F1F5F9 !important; padding: 20px !important; border: 1px solid #CBD5E1 !important; border-top: none !important; border-radius: 0 0 8px 8px !important; }
+            body.tema-claro .input-group { background-color: #FFFFFF !important; border: 1px solid #E2E8F0 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.02) !important; }
+            body.tema-claro .input-group label { color: #334155 !important; font-weight: 800 !important; margin-bottom: 8px !important; display: block; }
+            
+            body.tema-claro input:not([type="checkbox"]):not([type="file"]), body.tema-claro textarea, body.tema-claro select { 
+                background-color: #F1F5F9 !important; color: #0F172A !important; border: 1px solid transparent !important; border-radius: 6px !important; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05) !important; transition: all 0.2s ease !important;
+            }
+            body.tema-claro input::placeholder, body.tema-claro textarea::placeholder { color: #94A3B8 !important; }
+            body.tema-claro input:focus, body.tema-claro textarea:focus, body.tema-claro select:focus { background-color: #FFFFFF !important; border: 1px solid #0284C7 !important; box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important; }
+
+            /* ---------------------------------------------------- */
+            /* 💥 V17: EXTRATOR MÁGICO IMUNE AO JS (NEUTRO) 💥 */
+            /* ---------------------------------------------------- */
+            body.tema-claro #magic-extractor-container { 
+                background-color: #FFFFFF !important; 
+                /* Força TODAS as bordas a ficarem cinzas, impedindo o Javascript de pintá-las de azul/vermelho */
+                border: 1px solid #CBD5E1 !important; 
+                border-left: 1px solid #CBD5E1 !important; 
+                border-right: 1px solid #CBD5E1 !important;
+                border-top: 1px solid #CBD5E1 !important;
+                border-bottom: 1px solid #CBD5E1 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important; 
+            }
+            body.tema-claro .extractor-bar #magic-paste-area { background-color: #F8FAFC !important; border: 1px solid transparent !important; box-shadow: inset 0 1px 2px rgba(0,0,0,0.03) !important; transition: all 0.2s ease !important;}
+            body.tema-claro .extractor-bar #magic-paste-area:focus { background-color: #FFFFFF !important; border: 1px solid #0284C7 !important; }
+            body.tema-claro .quick-claim-title { color: #334155 !important; }
+            body.tema-claro .quick-claim-bar button { background-color: #F59E0B !important; color: #FFFFFF !important; border: none !important; font-weight: bold; }
+            body.tema-claro .extractor-bar button[onclick*="value="] { background-color: #F1F5F9 !important; color: #475569 !important; border: 1px solid #CBD5E1 !important; }
+            body.tema-claro .btn-processar { background-color: #DC2626 !important; color: #FFFFFF !important; border: none !important; }
+
+            /* BOTÕES DE MODOS (LINK=VERMELHO | INFRA=AZUL) */
+            body.tema-claro .form-mode-tabs { border-color: #CBD5E1 !important; }
+            body.tema-claro .mode-btn { background-color: #F8FAFC !important; color: #475569 !important; border: 1px solid #E2E8F0 !important; font-weight: bold; transition: all 0.2s ease !important; }
+            body.tema-claro .mode-btn:hover { background-color: #E2E8F0 !important; }
+            body.tema-claro #btn-modo-link.active { background-color: #DC2626 !important; color: #FFFFFF !important; border-color: #DC2626 !important; box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3) !important; }
+            body.tema-claro #btn-modo-infra.active { background-color: #0284C7 !important; color: #FFFFFF !important; border-color: #0284C7 !important; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3) !important; }
+
+            body.tema-claro .btn-action { color: #0284C7 !important; font-weight: 800 !important; transition: all 0.2s ease !important; }
+            body.tema-claro .btn-action:hover { color: #0369A1 !important; }
+
+            body.tema-claro .action-footer-sleek { background-color: #FFFFFF !important; border: 1px solid #CBD5E1 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: 0 4px 10px rgba(0,0,0,0.03) !important; }
+            body.tema-claro .action-footer-sleek > button:first-child { background-color: #FEF2F2 !important; color: #DC2626 !important; border: 1px solid #FCA5A5 !important; transition: all 0.2s ease !important; }
+            body.tema-claro .action-footer-sleek > button:first-child:hover { background-color: #FEE2E2 !important; }
+            body.tema-claro .btn-footer-dark { background-color: #F8FAFC !important; border: 1px solid #CBD5E1 !important; border-radius: 6px !important; transition: all 0.2s ease !important; }
+            body.tema-claro .btn-footer-dark:hover { background-color: #E2E8F0 !important; border-color: #94A3B8 !important; }
+            body.tema-claro .btn-footer-dark span { color: #64748B !important; font-weight: 700 !important; } 
+            body.tema-claro .btn-footer-dark span:last-child { color: #0F172A !important; font-weight: 900 !important; } 
+
+            body.tema-claro #app-gestao { background-color: #F4F5F0 !important; }
+            body.tema-claro #conteudo-gestao, body.tema-claro #gestao-content-area { background-color: #FDFBF7 !important; border-color: #E2E8F0 !important; }
+
+            body.tema-claro .btn-pull { background-color: #F1F5F9 !important; color: #0284C7 !important; border: 1px solid #CBD5E1 !important; font-weight: bold !important; }
+            body.tema-claro .btn-pull:hover { background-color: #E2E8F0 !important; }
+            body.tema-claro .btn-close-modal { color: #64748B !important; text-shadow: none !important; opacity: 1 !important; }
+            body.tema-claro .btn-close-modal:hover { color: #EF4444 !important; }
+
+            body.tema-claro label, body.tema-claro h3, body.tema-claro h4 { color: #334155 !important; }
+            body.tema-claro .chip { background-color: #F8FAFC !important; color: #475569 !important; border-color: #CBD5E1 !important; transition: all 0.2s ease !important;}
+            body.tema-claro .chip.active { background-color: #E2E8F0 !important; color: #0F172A !important; font-weight: bold; border-color: #94A3B8 !important; }
+
+            body.tema-claro .my-card, body.tema-claro .log-item, body.tema-claro .item-notificacao, body.tema-claro .card-auditoria,
+            body.tema-claro .linha-pendencia, body.tema-claro .linha-parada, body.tema-claro .linha-aviso-cliente { 
+                background-color: #FFFFFF !important; 
+                border-top-color: #E2E8F0 !important; border-right-color: #E2E8F0 !important; border-bottom-color: #E2E8F0 !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; color: #1E293B !important; 
+            }
+            body.tema-claro .my-card-client, body.tema-claro .log-subject { color: #0F172A !important; font-weight: 900; }
+            body.tema-claro .sanfona-header { color: #1E293B !important; }
+
+            body.tema-claro .item-notificacao strong, body.tema-claro .card-auditoria strong, body.tema-claro .my-card-time strong,
+            body.tema-claro .log-time span[style*="color:#38bdf8"], body.tema-claro .log-time span[style*="color: #38bdf8"], body.tema-claro .log-time span[style*="color: rgb(56, 189, 248)"] {
+                color: #0284C7 !important; font-weight: 900 !important;
+            }
+
+            /* ESMAGAR INJEÇÕES JS GERAIS */
+            body.tema-claro div[style*="background: #1E293B"], body.tema-claro div[style*="background:#1E293B"], body.tema-claro div[style*="background-color: #1E293B"],
+            body.tema-claro div[style*="background: #0F172A"], body.tema-claro div[style*="background:#0F172A"], body.tema-claro div[style*="background-color: #0F172A"],
+            body.tema-claro details[style*="background: #1E293B"], body.tema-claro summary[style*="background: #0F172A"],
+            body.tema-claro span[style*="background: #1E293B"], body.tema-claro span[style*="background:#1E293B"], body.tema-claro span[style*="background-color: #1E293B"] {
+                background-color: #F8FAFC !important; border-color: #CBD5E1 !important;
+            }
+            
+            body.tema-claro *:not(button):not(.my-card-badge):not(.badge-aberto):not(.badge-follow):not(.badge-ok)[style*="color: #F8FAFC"],
+            body.tema-claro *:not(button):not(.my-card-badge)[style*="color: white"], body.tema-claro *:not(button):not(.my-card-badge)[style*="color: #FFFFFF"],
+            body.tema-claro *:not(button):not(.my-card-badge)[style*="color: #E0E7FF"], body.tema-claro *:not(button)[style*="color: #CBD5E1"] {
+                color: #1E293B !important;
+            }
+            body.tema-claro *:not(button)[style*="color: #94A3B8"] { color: #475569 !important; }
+
+            /* CORREÇÕES CIRÚRGICAS (Modais e Cores) */
+            body.tema-claro #header-modal-aceite { background-color: #F8FAFC !important; border-bottom-color: #E2E8F0 !important; }
+            body.tema-claro #header-modal-aceite[style*="#0284C7"], body.tema-claro #header-modal-aceite[style*="rgb(2, 132, 199)"] { background-color: #F0F9FF !important; border-bottom-color: #38BDF8 !important; }
+            body.tema-claro #header-modal-aceite[style*="#0284C7"] h2, body.tema-claro #header-modal-aceite[style*="rgb(2, 132, 199)"] h2 { color: #0284C7 !important; }
+            body.tema-claro #header-modal-aceite[style*="#0284C7"] p, body.tema-claro #header-modal-aceite[style*="rgb(2, 132, 199)"] p { color: #0C4A6E !important; }
+
+            body.tema-claro #header-modal-aceite[style*="#EF4444"], body.tema-claro #header-modal-aceite[style*="rgb(239, 68, 68)"] { background-color: #FEF2F2 !important; border-bottom-color: #FCA5A5 !important; }
+            body.tema-claro #header-modal-aceite[style*="#EF4444"] h2, body.tema-claro #header-modal-aceite[style*="rgb(239, 68, 68)"] h2 { color: #DC2626 !important; }
+            body.tema-claro #header-modal-aceite[style*="#EF4444"] p, body.tema-claro #header-modal-aceite[style*="rgb(239, 68, 68)"] p { color: #7F1D1D !important; }
+
+            body.tema-claro div[style*="border-left: 3px solid #38BDF8"], body.tema-claro div[style*="border-left: 3px solid rgb(56, 189, 248)"] { background-color: #F0F9FF !important; color: #1E293B !important; border-color: #BAE6FD !important; }
+            body.tema-claro div[style*="border-left: 3px solid #38BDF8"] strong, body.tema-claro div[style*="border-left: 3px solid rgb(56, 189, 248)"] strong { color: #0284C7 !important; }
+
+            body.tema-claro div[style*="background: #0C4A6E"], body.tema-claro div[style*="background: rgb(12, 74, 110)"] { background-color: #0C4A6E !important; color: #FFFFFF !important; }
+            body.tema-claro div[style*="background: #064E3B"], body.tema-claro div[style*="background: rgb(6, 78, 59)"] { background-color: #064E3B !important; color: #FFFFFF !important; }
+            body.tema-claro div[style*="background: #4C1D95"], body.tema-claro div[style*="background: rgb(76, 29, 149)"] { background-color: #4C1D95 !important; color: #FFFFFF !important; }
+            body.tema-claro div[style*="grid-template-columns: 1fr 1fr 1fr"] { background-color: #FFFFFF !important; border-color: #CBD5E1 !important; }
+            body.tema-claro div[style*="grid-template-columns: 1fr 1fr 1fr"] > div { border-color: #CBD5E1 !important; color: #334155 !important; font-weight: 500 !important; }
+
+            body.tema-claro div[style*="border-left: 3px solid #F59E0B"], body.tema-claro div[style*="border-left: 3px solid rgb(245, 158, 11)"] { background-color: #FFFFFF !important; color: #1E293B !important; border: 1px solid #E2E8F0 !important; border-left: 3px solid #F59E0B !important; }
+            body.tema-claro div[style*="border-left: 3px solid #EF4444"], body.tema-claro div[style*="border-left: 3px solid rgb(239, 68, 68)"] { background-color: #FFFFFF !important; color: #1E293B !important; border: 1px solid #E2E8F0 !important; border-left: 3px solid #EF4444 !important; }
+            body.tema-claro div[style*="border-left: 3px solid #FCA5A5"], body.tema-claro div[style*="border-left: 3px solid rgb(252, 165, 165)"] { background-color: #FFFFFF !important; color: #1E293B !important; border: 1px solid #E2E8F0 !important; border-left: 3px solid #FCA5A5 !important; }
+            body.tema-claro div[style*="color: #FCD34D"], body.tema-claro div[style*="color: rgb(252, 211, 77)"] { color: #92400E !important; background-color: #FFFBEB !important; border-color: #FDE68A !important; }
+            
+            body.tema-claro details, body.tema-claro .linha-parada, body.tema-claro .linha-aviso-cliente, body.tema-claro .linha-pendencia { background-color: #FFFFFF !important; border-color: #CBD5E1 !important; }
+            body.tema-claro summary { background-color: #F4F5F0 !important; color: #1E293B !important; }
+            body.tema-claro table thead, body.tema-claro table thead th { background-color: #F4F5F0 !important; color: #334155 !important; border-color: #CBD5E1 !important; }
+            body.tema-claro table tr { border-bottom-color: #E2E8F0 !important; }
+            body.tema-claro table tr:hover { background-color: #FDFBF7 !important; }
+            body.tema-claro .kpi-box, body.tema-claro .chart-box { background-color: #FFFFFF !important; border-color: #E2E8F0 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important; }
+            body.tema-claro .dashboard-select { background-color: #FFFFFF !important; color: #1E293B !important; border-color: #CBD5E1 !important; }
+            body.tema-claro .box-cirurgica { border-color: #CBD5E1 !important; }
+            body.tema-claro .btn-gestao-menu { color: #475569 !important; }
+            body.tema-claro .btn-gestao-menu.active { color: #1E293B !important; background-color: #E2E8F0 !important; }
+            body.tema-claro #modal-auditoria-historica > div > div:first-child { background-color: #F0F9FF !important; border-bottom-color: #7DD3FC !important; }
+            body.tema-claro #modal-auditoria-historica h2 { color: #0284C7 !important; }
+            body.tema-claro #modal-auditoria-historica p { color: #0C4A6E !important; }
+            body.tema-claro .user-dropdown { background-color: #FFFFFF !important; border-color: #CBD5E1 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
+            body.tema-claro .user-dropdown .dropdown-item { color: #1E293B !important; }
+            body.tema-claro .user-dropdown .dropdown-item:hover { background-color: #F1F5F9 !important; }
+
+            /* Textos das Instruções do Modal de Passagem */
+            body.tema-claro #modal-passagem p[style*="color"] { color: #64748B !important; font-weight: 600 !important; }
+            body.tema-claro #scroll-passagem > div { background-color: #F8FAFC !important; border-color: #CBD5E1 !important; box-shadow: 0 4px 6px rgba(0,0,0,0.02) !important; }
+            body.tema-claro #scroll-passagem > div[style*="border: 1px solid #047857"] { border-color: #10B981 !important; background-color: #F0FDF4 !important; }
+            body.tema-claro #scroll-passagem input:not([type="checkbox"]), body.tema-claro #scroll-passagem textarea, body.tema-claro #scroll-passagem select { background-color: #FFFFFF !important; border: 1px solid transparent !important; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05) !important; color: #0F172A !important; transition: all 0.2s ease !important; }
+            body.tema-claro #scroll-passagem input:focus, body.tema-claro #scroll-passagem textarea:focus, body.tema-claro #scroll-passagem select:focus { border: 1px solid #0284C7 !important; }
+            body.tema-claro #scroll-passagem button[onclick^="adicionar"], body.tema-claro #scroll-passagem button[onclick^="renderizar"] { background-color: #E2E8F0 !important; color: #334155 !important; border: 1px dashed #94A3B8 !important; transition: all 0.2s ease !important; }
+            body.tema-claro #scroll-passagem button[onclick^="adicionar"]:hover, body.tema-claro #scroll-passagem button[onclick^="renderizar"]:hover { background-color: #CBD5E1 !important; }
+        `;
+        document.head.appendChild(style);
+    }
+
+    let temaSalvo = localStorage.getItem('noc_theme') || 'tema-escuro';
+    document.body.classList.remove('tema-escuro', 'tema-claro', 'tema-pro', 'light-theme', 'light-mode');
+    document.body.classList.add(temaSalvo);
+    setTimeout(window.atualizarTextoBotaoTema, 200);
 });
