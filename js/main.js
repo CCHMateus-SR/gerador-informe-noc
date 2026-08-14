@@ -553,14 +553,29 @@ const dbConfigClientes = db.ref('configuracoes/clientes');
 const dbConfigAnalistas = db.ref('configuracoes/analistas');
 
 // ----------------------------------------------------
-// 1. GESTÃO DE CLIENTES & LOGOS
+// 1. GESTÃO DE CLIENTES & LOGOS (COM MODO EDIÇÃO)
 // ----------------------------------------------------
 
+window.editarCliente = function(id, nome, apelidos) {
+    document.getElementById('cfg-edit-cliente-id').value = id;
+    document.getElementById('cfg-nome-cliente').value = nome || '';
+    if(document.getElementById('cfg-apelidos-cliente')) document.getElementById('cfg-apelidos-cliente').value = apelidos || '';
+    
+    // Muda a cara do botão para o modo de Edição
+    const btnSalvar = document.querySelector('#cfg-aba-clientes .btn-cfg-salvar');
+    btnSalvar.innerText = "🔄 ATUALIZAR CLIENTE";
+    btnSalvar.style.background = "#F59E0B";
+    
+    document.getElementById('btn-cancelar-edit-cliente').style.display = 'block';
+};
+
 window.salvarNovoCliente = function() {
+    const editId = document.getElementById('cfg-edit-cliente-id').value;
     const nome = document.getElementById('cfg-nome-cliente').value.trim();
+    const apelidosStr = document.getElementById('cfg-apelidos-cliente') ? document.getElementById('cfg-apelidos-cliente').value.trim() : '';
     const fileInput = document.getElementById('cfg-logo-cliente');
 
-    if (!nome) return alert('⚠️ Por favor, digite o nome do cliente!');
+    if (!nome) return alert('⚠️ Por favor, digite o nome oficial do cliente!');
     
     const btnSalvar = document.querySelector('#cfg-aba-clientes .btn-cfg-salvar');
     btnSalvar.innerText = "⏳ Salvando...";
@@ -568,47 +583,66 @@ window.salvarNovoCliente = function() {
 
     const file = fileInput.files[0];
     
+    // Função interna super blindada (Não apaga a logo velha se não enviar uma nova!)
+    const enviarParaNuvem = (logoBase64) => {
+        let payload = { nome: nome, apelidos: apelidosStr };
+        if (logoBase64 !== null) payload.logo = logoBase64; 
+        
+        if (editId) {
+            // Modo Edição
+            dbConfigClientes.child(editId).update(payload)
+                .then(() => limparFormularioCliente())
+                .catch(err => { alert("Erro: " + err.message); limparFormularioCliente(); });
+        } else {
+            // Modo Criação
+            if (logoBase64 === null) payload.logo = '';
+            dbConfigClientes.push(payload)
+                .then(() => limparFormularioCliente())
+                .catch(err => { alert("Erro: " + err.message); limparFormularioCliente(); });
+        }
+    };
+
     if (file) {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = function(e) {
-            // 🔥 A MÁGICA: Comprime o Logo do Cliente!
             const img = new Image();
             img.src = e.target.result;
             img.onload = function() {
                 const canvas = document.createElement('canvas');
-                const MAX_SIZE = 200; // Logos podem ser bem pequenos
-                let width = img.width;
-                let height = img.height;
-
+                const MAX_SIZE = 200; 
+                let width = img.width; let height = img.height;
                 if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
                 else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-
                 canvas.width = width; canvas.height = height;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
-
-                // Força PNG para manter o fundo transparente do logo (80% qualidade)
-                const logoBase64 = canvas.toDataURL('image/png', 0.8); 
-                
-                dbConfigClientes.push({ nome: nome, logo: logoBase64 })
-                    .then(() => limparFormularioCliente(btnSalvar))
-                    .catch(err => { alert("Erro: " + err.message); limparFormularioCliente(btnSalvar); });
+                enviarParaNuvem(canvas.toDataURL('image/png', 0.8)); 
             };
         };
     } else {
-        dbConfigClientes.push({ nome: nome, logo: '' }).then(() => limparFormularioCliente(btnSalvar));
+        enviarParaNuvem(null); // null avisa o sistema que a logo velha deve ser mantida
     }
 };
 
-function limparFormularioCliente(btn) {
+window.limparFormularioCliente = function() {
+    document.getElementById('cfg-edit-cliente-id').value = '';
     document.getElementById('cfg-nome-cliente').value = '';
+    if(document.getElementById('cfg-apelidos-cliente')) document.getElementById('cfg-apelidos-cliente').value = '';
     document.getElementById('cfg-logo-cliente').value = '';
     document.getElementById('cfg-file-name').innerText = 'Nenhum arquivo selecionado';
-    btn.innerText = "➕ Salvar Cliente";
-    btn.style.background = "#10B981";
-    if (typeof window.mostrarToast === 'function') window.mostrarToast('✅ Operação concluída!', 'success');
-}
+    
+    const btnSalvar = document.querySelector('#cfg-aba-clientes .btn-cfg-salvar');
+    if (btnSalvar) {
+        btnSalvar.innerText = "➕ Salvar Cliente";
+        btnSalvar.style.background = "#10B981";
+    }
+    
+    const btnCancel = document.getElementById('btn-cancelar-edit-cliente');
+    if (btnCancel) btnCancel.style.display = 'none';
+
+    if (typeof window.mostrarToast === 'function') window.mostrarToast('✅ Operação concluída com sucesso!', 'success');
+};
 
 window.removerCliente = function(idBanco, nomeCliente) {
     if (confirm(`⚠️ ATENÇÃO: Tem certeza que deseja remover o cliente "${nomeCliente}"?`)) {
@@ -618,18 +652,20 @@ window.removerCliente = function(idBanco, nomeCliente) {
     }
 };
 
-// Monitora o Banco em Tempo Real (Com Auto-Completar)
+// Monitora o Banco em Tempo Real (Com Botão de Edição)
 window.bancoDeLogos = {}; 
+window.bancoDeApelidos = {}; 
 
 dbConfigClientes.on('value', (snapshot) => {
     const lista = document.getElementById('lista-cfg-clientes');
     const datalist = document.getElementById('lista-clientes'); 
     
-    lista.innerHTML = ''; 
+    if(lista) lista.innerHTML = ''; 
     let htmlDatalist = ''; 
+    window.bancoDeLogos = {}; window.bancoDeApelidos = {};
     
     if (!snapshot.exists()) {
-        lista.innerHTML = '<li style="color: #64748B; font-size: 12px; justify-content: center;">Nenhum cliente cadastrado ainda.</li>';
+        if(lista) lista.innerHTML = '<li style="color: #64748B; font-size: 12px; justify-content: center;">Nenhum cliente cadastrado ainda.</li>';
         if (datalist) datalist.innerHTML = '';
         return;
     }
@@ -638,27 +674,40 @@ dbConfigClientes.on('value', (snapshot) => {
         const key = childSnapshot.key;
         const data = childSnapshot.val();
         
-        if (data.nome && data.logo) {
-            window.bancoDeLogos[data.nome.trim().toUpperCase()] = data.logo;
-        }
-
         if (data.nome) {
+            const nomeUpper = data.nome.trim().toUpperCase();
+            if (data.logo) window.bancoDeLogos[nomeUpper] = data.logo;
+            
+            // Alimenta a inteligência de correlação!
+            if (data.apelidos) {
+                window.bancoDeApelidos[nomeUpper] = data.apelidos.split(',').map(a => a.trim().toUpperCase()).filter(a => a !== '');
+            }
+
             htmlDatalist += `<option value="${data.nome}"></option>`;
         }
 
-        const preview = data.logo 
-            ? `<img src="${data.logo}" style="height: 24px; max-width: 60px; object-fit: contain; background: white; padding: 2px; border-radius: 4px;">` 
-            : `<span style="font-size: 18px;">🏢</span>`;
+        const preview = data.logo ? `<img src="${data.logo}" style="height: 24px; max-width: 60px; object-fit: contain; background: white; padding: 2px; border-radius: 4px;">` : `<span style="font-size: 18px;">🏢</span>`;
+        const badgeApelidos = (data.apelidos) ? `<div style="font-size: 9px; color: #38BDF8; margin-top: 3px;">Siglas: ${data.apelidos}</div>` : '';
+        const safeNome = data.nome ? data.nome.replace(/'/g, "\\'") : '';
+        const safeApelidos = data.apelidos ? data.apelidos.replace(/'/g, "\\'") : '';
 
-        lista.innerHTML += `
-            <li>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    ${preview}
-                    <strong style="color: #F8FAFC; font-size: 13px;">${data.nome}</strong>
-                </div>
-                <button class="btn-remover-item" onclick="removerCliente('${key}', '${data.nome}')">✖ Remover</button>
-            </li>
-        `;
+        if(lista) {
+            lista.innerHTML += `
+                <li style="align-items: flex-start; display: flex; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        ${preview}
+                        <div>
+                            <strong style="color: #F8FAFC; font-size: 13px;">${data.nome}</strong>
+                            ${badgeApelidos}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 2px;">
+                        <button class="btn-remover-item" onclick="editarCliente('${key}', '${safeNome}', '${safeApelidos}')" style="background: #334155; color: #F8FAFC; border: 1px solid #475569;">✏️ Editar</button>
+                        <button class="btn-remover-item" onclick="removerCliente('${key}', '${safeNome}')">✖ Remover</button>
+                    </div>
+                </li>
+            `;
+        }
     });
     
     if (datalist) datalist.innerHTML = htmlDatalist;
@@ -983,9 +1032,21 @@ window.adicionarLinhaAvisoCliente = function(cli = '', txt = '') {
     div.innerHTML = `
         <div style="display: flex; justify-content: space-between;">
             <input type="text" placeholder="Nome do Cliente (Ex: Cogna, Libbs)..." value="${cli}" class="input-aviso-cli" style="width: 60%; padding: 6px; font-size: 12px; background: #1E293B; border: 1px solid #475569; color: #38BDF8; font-weight: bold; border-radius: 4px;">
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                
+                <!-- BOTÕES SVGs COMPACTOS (DESFAZER/REFAZER) -->
+                <div style="display: flex; gap: 6px; border-right: 1px solid #475569; padding-right: 10px; margin-right: 4px;">
+                    <button type="button" onclick="desfazerTexto(this)" style="background: transparent; color: #94A3B8; border: none; padding: 0; cursor: pointer; transition: 0.2s; display: flex; align-items: center;" title="Desfazer (Ctrl+Z)" onmouseover="this.style.color='#38BDF8'" onmouseout="this.style.color='#94A3B8'">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                    </button>
+                    <button type="button" onclick="refazerTexto(this)" style="background: transparent; color: #94A3B8; border: none; padding: 0; cursor: pointer; transition: 0.2s; display: flex; align-items: center;" title="Refazer (Ctrl+Y)" onmouseover="this.style.color='#38BDF8'" onmouseout="this.style.color='#94A3B8'">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path></svg>
+                    </button>
+                </div>
+
+                <button onclick="inserirLinhaDivisoria(this)" style="background: transparent; color: #94A3B8; border: 1px solid #475569; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; transition: 0.2s;" title="Inserir linha divisória" onmouseover="this.style.background='#1E293B'; this.style.color='#F8FAFC'" onmouseout="this.style.background='transparent'; this.style.color='#94A3B8'">➖ DIVIDIR</button>
                 <button onclick="aplicarRealce(this)" style="background: #422006; color: #FCD34D; border: 1px solid #78350F; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold;" title="Selecione um texto abaixo e clique para destacar">🖍️ DESTACAR</button>
-                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: transparent; color: #EF4444; border: none; cursor: pointer; font-size: 14px;">✖</button>
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: transparent; color: #EF4444; border: none; cursor: pointer; font-size: 14px; margin-left: 4px;">✖</button>
             </div>
         </div>
         <textarea placeholder="Descreva os procedimentos ou tratativas deste cliente..." class="input-aviso-texto" rows="1" style="width: 100%; padding: 8px; font-size: 12px; background: #1E293B; border: 1px solid #475569; color: white; border-radius: 4px; resize: vertical; box-sizing: border-box;">${txt}</textarea>
@@ -1004,17 +1065,20 @@ window.inserirLinhaDivisoria = function(elemento) {
     }
     if (!textarea) return;
 
-    const cursor = textarea.selectionStart;
-    const text = textarea.value;
-    
-    // A nossa "linha" em texto puro
+    // Foca na caixa (obrigatório para o comando do navegador funcionar)
+    textarea.focus({ preventScroll: true });
+
     const linhaPontilhada = "\n\n--------------------------------------------------\n\n";
 
-    textarea.value = text.substring(0, cursor) + linhaPontilhada + text.substring(textarea.selectionEnd);
+    // A MÁGICA: Em vez de forçar o texto, mandamos o navegador "digitar", salvando no Ctrl+Z!
+    if (!document.execCommand('insertText', false, linhaPontilhada)) {
+        // Fallback de segurança caso falhe em navegadores antigos
+        const cursor = textarea.selectionStart;
+        const text = textarea.value;
+        textarea.value = text.substring(0, cursor) + linhaPontilhada + text.substring(textarea.selectionEnd);
+        textarea.setSelectionRange(cursor + linhaPontilhada.length, cursor + linhaPontilhada.length);
+    }
 
-    // Devolve o cursor para o final da linha inserida e expande a caixa
-    textarea.focus({ preventScroll: true });
-    textarea.setSelectionRange(cursor + linhaPontilhada.length, cursor + linhaPontilhada.length);
     if (typeof window.autoExpandTextarea === 'function') window.autoExpandTextarea(textarea);
 };
 
@@ -1627,48 +1691,40 @@ window.aplicarRealce = function(elemento) {
     const trimmedText = selectedText.trimEnd();
     const trailingSpaces = selectedText.substring(trimmedText.length);
     
-    let newText = "";
-    let newStart = start;
-    let newEnd = end;
+    let textoFinal = "";
 
     // CENÁRIO 1: Tira os marcadores de dentro
     if (trimmedText.startsWith("==") && trimmedText.endsWith("==") && trimmedText.length >= 4) {
-        const textoLimpo = trimmedText.substring(2, trimmedText.length - 2);
-        newText = text.substring(0, start) + textoLimpo + trailingSpaces + text.substring(end);
-        newEnd = end - 4; // Ajusta a seleção do mouse
+        textoFinal = trimmedText.substring(2, trimmedText.length - 2) + trailingSpaces;
+        textarea.setSelectionRange(start, end);
     } 
     // CENÁRIO 2: Tira os marcadores de fora
     else if (start >= 2 && text.substring(start - 2, start) === "==" && text.substring(start + trimmedText.length, start + trimmedText.length + 2) === "==") {
-        const parteAntes = text.substring(0, start - 2);
-        const parteDepois = text.substring(start + trimmedText.length + 2);
-        newText = parteAntes + trimmedText + trailingSpaces + parteDepois;
-        newStart = start - 2;
-        newEnd = end - 2;
+        textoFinal = trimmedText + trailingSpaces;
+        textarea.setSelectionRange(start - 2, start + trimmedText.length + 2); // Expande a seleção para cobrir os iguais
     } 
     // CENÁRIO 3: Coloca os marcadores
     else {
-        newText = text.substring(0, start) + "==" + trimmedText + "==" + trailingSpaces + text.substring(end);
-        newEnd = end + 4;
+        textoFinal = "==" + trimmedText + "==" + trailingSpaces;
+        textarea.setSelectionRange(start, end);
     }
 
-    // Salva a posição exata da barra de rolagem do modal antes de mexer
     const scrollContainer = textarea.closest('.form-side') || textarea.closest('#modal-passagem') || document.documentElement;
     const containerScrollTop = scrollContainer.scrollTop;
 
-    textarea.value = newText;
-    
-    // Devolve a seleção exata do texto (Bônus de UX)
-    textarea.setSelectionRange(newStart, newEnd);
-    
-    // Devolve o foco SEM deixar o navegador "pular" a tela (A Mágica!)
+    // Devolve o foco SEM deixar o navegador "pular" a tela
     textarea.focus({ preventScroll: true });
     
-    // Ajusta APENAS esta caixa, instantaneamente (Sem o delay de 200ms)
+    // A MÁGICA: O execCommand vai substituir APENAS o pedaço selecionado e salvar no Ctrl+Z!
+    if (!document.execCommand('insertText', false, textoFinal)) {
+        // Fallback
+        textarea.value = text.substring(0, textarea.selectionStart) + textoFinal + text.substring(textarea.selectionEnd);
+    }
+    
     if (typeof window.autoExpandTextarea === 'function') {
         window.autoExpandTextarea(textarea);
     }
 
-    // Trava o scroll no lugar original
     scrollContainer.scrollTop = containerScrollTop;
 };
 
@@ -2508,3 +2564,61 @@ window.fecharLightbox = function() {
     document.getElementById('modal-lightbox').style.display = 'none';
     document.getElementById('lightbox-img').src = '';
 };
+
+// ==========================================
+// MOTOR DE DESFAZER / REFAZER (UNDO/REDO)
+// ==========================================
+window.desfazerTexto = function(elemento) {
+    let textarea = typeof elemento === 'string' ? document.getElementById(elemento) : elemento.closest('div[class^="linha-"]')?.querySelector('textarea');
+    if (textarea) {
+        textarea.focus();
+        document.execCommand('undo');
+    }
+};
+
+window.refazerTexto = function(elemento) {
+    let textarea = typeof elemento === 'string' ? document.getElementById(elemento) : elemento.closest('div[class^="linha-"]')?.querySelector('textarea');
+    if (textarea) {
+        textarea.focus();
+        document.execCommand('redo');
+    }
+};
+
+// ==========================================
+// MOTOR DE TEXTO DINÂMICO DO TEMA VISUAL
+// ==========================================
+
+// 1. Interceptamos a função original para rodar a nossa mágica junto com ela
+if (typeof window.cycleTheme === 'function' && !window.temaInterceptado) {
+    const temaOriginal = window.cycleTheme;
+    
+    window.cycleTheme = function() {
+        temaOriginal(); // O sistema troca a cor normalmente
+        window.atualizarTextoBotaoTema(); // Nós atualizamos a palavra!
+    };
+    window.temaInterceptado = true;
+}
+
+// 2. A inteligência que lê o sistema e escreve no botão
+window.atualizarTextoBotaoTema = function() {
+    const textoBtn = document.getElementById('texto-btn-tema');
+    if (!textoBtn) return;
+
+    // Varre o sistema (memória e classes) para descobrir onde parou
+    const bodyClass = document.body.className || '';
+    const temaSalvo = localStorage.getItem('theme') || localStorage.getItem('noc_theme') || '';
+    const rastreador = (bodyClass + ' ' + temaSalvo).toLowerCase();
+    
+    if (rastreador.includes('claro') || rastreador.includes('light')) {
+        textoBtn.innerHTML = '<span class="icon">☀️</span> Tema Visual: <strong style="color: #F59E0B;">Claro</strong>';
+    } else if (rastreador.includes('pro')) {
+        textoBtn.innerHTML = '<span class="icon">🚀</span> Tema Visual: <strong style="color: #10B981;">PRO</strong>';
+    } else {
+        textoBtn.innerHTML = '<span class="icon">🌙</span> Tema Visual: <strong style="color: #38BDF8;">Escuro</strong>';
+    }
+};
+
+// 3. Roda assim que o site abre para sincronizar o botão com o tema que o usuário já tinha salvo
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(window.atualizarTextoBotaoTema, 500);
+});
