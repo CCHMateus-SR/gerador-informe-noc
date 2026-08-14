@@ -1677,12 +1677,27 @@ window.processarExtratorMagico = function() {
                 }
             }
 
-            // O robô varre o dicionário fundido e faz o match com precisão absoluta
+            // 🧠 A MÁGICA DO "MAIOR VENCE": Evita que siglas genéricas como "FW" roubem hosts de outros clientes
+            let melhorCliente = "";
+            let tamanhoMaiorMatch = 0;
+
             for (const [nomeOficial, apelidos] of Object.entries(dicionarioMisto)) {
-                if (apelidos.some(apelido => hostPrincipal.includes(apelido))) {
-                    clienteDetectado = nomeOficial;
-                    break; 
+                for (const apelido of apelidos) {
+                    // Evita que siglas em branco causem bugs e verifica se o host contém a sigla
+                    if (apelido.length > 0 && hostPrincipal.includes(apelido)) {
+                        
+                        // A REGRA DE OURO: O apelido mais específico (maior tamanho) rouba a liderança!
+                        if (apelido.length > tamanhoMaiorMatch) {
+                            melhorCliente = nomeOficial;
+                            tamanhoMaiorMatch = apelido.length;
+                        }
+                    }
                 }
+            }
+
+            // Atribui o grande vencedor para preencher a tela
+            if (melhorCliente) {
+                clienteDetectado = melhorCliente;
             }
         }
 
